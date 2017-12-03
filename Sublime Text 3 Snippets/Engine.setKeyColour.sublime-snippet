@@ -1,0 +1,6 @@
+<snippet>
+	<content><![CDATA[Engine.setKeyColour(${1:keyNumber}, Colours.withAlpha(Colours.${2:colourConstant}, 0.3));]]></content>
+	<description>setKeyColour</description>
+	<tabTrigger>setKeyColour</tabTrigger>
+	<scope>source.js</scope>
+</snippet>

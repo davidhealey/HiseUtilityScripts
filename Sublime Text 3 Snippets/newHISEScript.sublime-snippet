@@ -1,0 +1,40 @@
+<snippet>
+<content><![CDATA[
+/**
+ * Title
+ * Author: David Healey
+ * Date: 
+ * Modified:
+ * License: GPLv3 - https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+//INCLUDES
+
+//INIT
+
+//FUNCTIONS
+
+//CALLBACKS
+function onNoteOn()
+{
+}
+
+function onNoteOff()
+{
+}
+
+function onController()
+{
+}
+
+function onTimer()
+{
+}
+
+function onControl(number, value)
+{
+}]]></content>
+	<description>newHISEScript</description>
+	<tabTrigger>newHISEScript</tabTrigger>
+	<scope>source.js</scope>
+</snippet>

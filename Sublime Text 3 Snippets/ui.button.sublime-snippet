@@ -1,0 +1,6 @@
+<snippet>
+	<content><![CDATA[const var btn${1:id} = ui.button(${2:x}, ${3:y}, {width:${4:num}, height:${5:num}, text:"${6:string}", bgColour:${7:hex}, itemColour:${8:hex}, itemColour2:${9:hex}, filmstripImage:"${10:string}", radioGroup:${11:num}});]]></content>
+	<description>ui.button</description>
+	<tabTrigger>ui.button</tabTrigger>
+	<scope>source.js</scope>
+</snippet>

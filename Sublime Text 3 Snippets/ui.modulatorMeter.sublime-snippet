@@ -1,0 +1,6 @@
+<snippet>
+	<content><![CDATA[const var mtr${1:id} = ui.modulatorMeter(${2:x}, ${3:y}, {width:${4:num}, height:${5:num}, text:"${6:string}", bgColour:${7:hex}, itemColour:${8:hex}, itemColour2:${9:hex}, modulatorID:"${10:string}"});]]></content>
+	<description>ui.modulatorMeter</description>
+	<tabTrigger>ui.modulatorMeter</tabTrigger>
+	<scope>source.js</scope>
+</snippet>

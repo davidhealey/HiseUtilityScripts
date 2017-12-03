@@ -1,0 +1,221 @@
+{
+      "Type": "HorizontalTile",
+      "StyleData": {
+      },
+      "LayoutData": {
+        "ID": "anonymous",
+        "Size": -0.5,
+        "Folded": -1,
+        "Visible": true,
+        "ForceFoldButton": 0,
+        "MinSize": -1
+      },
+      "ColourData": {
+      },
+      "Dynamic": false,
+      "Content": [
+        {
+          "Type": "VerticalTile",
+          "StyleData": {
+          },
+          "LayoutData": {
+            "ID": "anonymous",
+            "Size": -0.97559917,
+            "Folded": -1,
+            "Visible": true,
+            "ForceFoldButton": 0,
+            "MinSize": -1
+          },
+          "ColourData": {
+          },
+          "Dynamic": false,
+          "Content": [
+            {
+              "Type": "Tabs",
+              "StyleData": {
+              },
+              "LayoutData": {
+                "ID": "anonymous",
+                "Size": 357,
+                "Folded": 0,
+                "Visible": true,
+                "ForceFoldButton": 0,
+                "MinSize": -1
+              },
+              "ColourData": {
+              },
+              "Dynamic": false,
+              "Content": [
+                {
+                  "Type": "ApiCollection",
+                  "StyleData": {
+                  },
+                  "LayoutData": {
+                    "ID": "anonymous",
+                    "Size": -0.5,
+                    "Folded": 0,
+                    "Visible": true,
+                    "ForceFoldButton": 0,
+                    "MinSize": -1
+                  },
+                  "ColourData": {
+                  }
+                },
+                {
+                  "Type": "FileBrowser",
+                  "StyleData": {
+                  },
+                  "LayoutData": {
+                    "ID": "anonymous",
+                    "Size": -0.5,
+                    "Folded": 0,
+                    "Visible": true,
+                    "ForceFoldButton": 0,
+                    "MinSize": -1
+                  },
+                  "ColourData": {
+                  }
+                },
+              ],
+              "CurrentTab": 2
+            },
+            {
+              "Type": "HorizontalTile",
+              "StyleData": {
+              },
+              "LayoutData": {
+                "ID": "anonymous",
+                "Size": -0.58047337,
+                "Folded": -1,
+                "Visible": true,
+                "ForceFoldButton": 0,
+                "MinSize": -1
+              },
+              "ColourData": {
+              },
+              "Dynamic": false,
+              "Content": [
+                {
+                  "Type": "GlobalConnectorJavascriptProcessor",
+                  "StyleData": {
+                  },
+                  "LayoutData": {
+                    "ID": "anonymous",
+                    "Size": 18,
+                    "Folded": 0,
+                    "Visible": true,
+                    "ForceFoldButton": 0,
+                    "MinSize": -1
+                  },
+                  "ColourData": {
+                  },
+                  "ProcessorId": "",
+                  "Index": -1
+                },
+                {
+                  "Type": "Tabs",
+                  "StyleData": {
+                  },
+                  "LayoutData": {
+                    "ID": "anonymous",
+                    "Size": -0.5,
+                    "Folded": -1,
+                    "Visible": true,
+                    "ForceFoldButton": 0,
+                    "MinSize": -1
+                  },
+                  "ColourData": {
+                  },
+                  "Content": [
+                    {
+                      "Type": "ScriptEditor",
+                      "StyleData": {
+                      },
+                      "LayoutData": {
+                        "ID": "anonymous",
+                        "Size": -0.5,
+                        "Folded": 0,
+                        "Visible": true,
+                        "ForceFoldButton": 0,
+                        "MinSize": -1
+                      },
+                      "ColourData": {
+                      },
+                      "ProcessorId": "",
+                      "Index": -1
+                    },
+                    {
+                      "Type": "ScriptEditor",
+                      "StyleData": {
+                      },
+                      "LayoutData": {
+                        "ID": "anonymous",
+                        "Size": -0.5,
+                        "Folded": 0,
+                        "Visible": true,
+                        "ForceFoldButton": 0,
+                        "MinSize": -1
+                      },
+                      "ColourData": {
+                      },
+                      "ProcessorId": "",
+                      "Index": -1
+                    },
+                    {
+                      "Type": "ScriptEditor",
+                      "StyleData": {
+                      },
+                      "LayoutData": {
+                        "ID": "anonymous",
+                        "Size": -0.5,
+                        "Folded": 0,
+                        "Visible": true,
+                        "ForceFoldButton": 0,
+                        "MinSize": -1
+                      },
+                      "ColourData": {
+                      },
+                      "ProcessorId": "",
+                      "Index": -1
+                    },
+                    {
+                      "Type": "ScriptEditor",
+                      "StyleData": {
+                      },
+                      "LayoutData": {
+                        "ID": "anonymous",
+                        "Size": -0.5,
+                        "Folded": 0,
+                        "Visible": true,
+                        "ForceFoldButton": 0,
+                        "MinSize": -1
+                      },
+                      "ColourData": {
+                      },
+                      "ProcessorId": "",
+                      "Index": -1
+                    }
+                  ],
+                  "CurrentTab": 0
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "Type": "Console",
+          "StyleData": {
+          },
+          "LayoutData": {
+            "ID": "anonymous",
+            "Size": -0.31327334,
+            "Folded": 0,
+            "Visible": true,
+            "ForceFoldButton": 0,
+            "MinSize": -1
+          },
+          "ColourData": {
+          }
+        }
+      ]
+    }

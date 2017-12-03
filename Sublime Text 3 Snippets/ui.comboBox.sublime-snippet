@@ -1,0 +1,6 @@
+<snippet>
+	<content><![CDATA[const var cmb${1:id} = ui.comboBox(${2:x}, ${3:y}, {width:${4:num}, height:${5:num}, text:"${6:string}", bgColour:${7:hex}, itemColour:${8:hex}, itemColour2:${9:hex}, items:${10:[]}});]]></content>
+	<description>ui.comboBox</description>
+	<tabTrigger>ui.comboBox</tabTrigger>
+	<scope>source.js</scope>
+</snippet>

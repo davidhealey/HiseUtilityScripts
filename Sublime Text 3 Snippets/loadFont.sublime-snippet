@@ -1,0 +1,6 @@
+<snippet>
+	<content><![CDATA[Engine.loadFont("{PROJECT_FOLDER}" + "${1:font name}.ttf");]]></content>
+	<description>loadFont</description>
+	<tabTrigger>loadFont</tabTrigger>
+	<scope>source.js</scope>
+</snippet>
