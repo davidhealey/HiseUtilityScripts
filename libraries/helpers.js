@@ -4,7 +4,7 @@
  * Additional Functions by Christoph Hart
  * Date: 29/07/2017
  * Modified: 03/12/2017
- * License: LGPL
+ * License: LGPL - https://www.gnu.org/licenses/lgpl-3.0.en.html
 */
 
 namespace helpers

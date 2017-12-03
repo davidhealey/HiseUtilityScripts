@@ -3,7 +3,7 @@
  * Author: David Healey
  * Date: 29/07/2017
  * Modified: 29/07/2017
- * License: GPLv3 - https://www.gnu.org/licenses/gpl-3.0.en.html
+ * License: LGPL - https://www.gnu.org/licenses/lgpl-3.0.en.html
 */
 
 namespace tab
