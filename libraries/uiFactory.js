@@ -215,7 +215,6 @@ namespace ui
 	{
 		local control = Content.addLabel("uiControl" + _counter++, x, y);
 		if (!_keyExists(obj, "editable")) obj.editable = false; //Labels aren't editable by default
-		if (!_keyExists(obj, "alignment")) obj.alignment = "left"; //Default alignment
 
 		control.set("saveInPreset", false);
 
