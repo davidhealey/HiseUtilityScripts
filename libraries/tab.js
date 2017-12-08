@@ -56,12 +56,6 @@ namespace tab
 		}
 	}
 
-	inline function fill(obj, colour)
-	{
-		g.data.colour = colour;
-		obj._panel.setPaintRoutine(function(g){g.fillAll(g.data.colour);});
-	}
-
 	/**
 	 * Hides all tab panels except the one that is passed in obj
 	 * @param  {tab} obj  The tab to display
