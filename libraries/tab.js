@@ -122,7 +122,6 @@ namespace tab
 	inline function getHeight(obj) {return obj._height;}
 	inline function getPanel(obj) {return obj._panel;}
 	inline function getPanelId(obj) {return "pnlTab"+obj._id;}
-	inline function getImage(obj) {return obj._image;}
-		inline function getControl(obj, id) {return obj.controls[id];}
+	inline function getControl(obj, id) {return obj.controls[id];}
 	inline function getIsVisible(obj) {return obj._isVisible;}
 }
