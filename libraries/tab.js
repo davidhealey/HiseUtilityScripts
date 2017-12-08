@@ -105,9 +105,10 @@ namespace tab
 
 	/**
 	* Set the background colour of the tab's panel to a solid colour
+	* @param tab obj The tab object to show
 	* @param c hex Colour code
 	*/
-	inline function setColour(c)
+	inline function setColour(obj, c)
 	{
 		obj._panel.set("itemColour", c);
 		obj._panel.set("itemColour2", c);
