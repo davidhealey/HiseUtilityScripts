@@ -107,6 +107,7 @@ namespace tab
 	}
 
 	//GETTERS AND SETTERS
+
 	/**
 	* Set the background colour of the tab's panel to a solid colour
 	* @param tab obj The tab object to show
@@ -123,6 +124,13 @@ namespace tab
 	inline function getHeight(obj) {return obj._height;}
 	inline function getPanel(obj) {return obj._panel;}
 	inline function getPanelId(obj) {return "pnlTab"+obj._id;}
+<<<<<<< HEAD
 	inline function getControl(obj, id) {return obj.controls[id];}
 	inline function isVisible(obj) {return obj._isVisible;}
+=======
+	inline function getImage(obj) {return obj._image;}
+	inline function getImageName(obj) {return obj._imageName;}
+	inline function getControl(obj, id) {return obj.controls[id];}
+	inline function getIsVisible(obj) {return obj._isVisible;}
+>>>>>>> parent of 2a681d6... Removed getImageName() function
 }
