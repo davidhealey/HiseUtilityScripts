@@ -102,6 +102,17 @@ namespace tab
 	};
 
 	//GETTERS AND SETTERS
+
+	/**
+	* Set the background colour of the tab's panel to a solid colour
+	* @param c hex Colour code
+	*/
+	inline function setColour(c)
+	{
+		obj._panel.set("itemColour", c);
+		obj._panel.set("itemColour2", c);
+	};
+
 	inline function getId(obj) {return obj._id;}
 	inline function getWidth(obj) {return obj._width;}
 	inline function getHeight(obj) {return obj._height;}
