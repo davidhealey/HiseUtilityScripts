@@ -126,5 +126,5 @@ namespace tab
 	inline function getImage(obj) {return obj._image;}
 	inline function getImageName(obj) {return obj._imageName;}
 	inline function getControl(obj, id) {return obj.controls[id];}
-	inline function getIsVisible(obj) {return obj._isVisible;}
+	inline function isVisible(obj) {return obj._isVisible;}
 }
