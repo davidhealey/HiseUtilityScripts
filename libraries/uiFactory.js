@@ -2,7 +2,6 @@
  * Title: uiFactory.js
  * Author: David Healey
  * Date: 29/07/2017
- * Modified: 03/12/2017
  * License: LGPL - https://www.gnu.org/licenses/lgpl-3.0.en.html
 */
 
