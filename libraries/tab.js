@@ -31,7 +31,7 @@ namespace tab
 		obj._panel.set("itemColour", 0x00000000);
 		obj._panel.set("itemColour2", 0x00000000);
 		obj._panel.set("borderSize", 0);
-		obj.controls = {};
+		obj._controls = {};
 
 		return obj;
 	}
@@ -100,6 +100,8 @@ namespace tab
 		obj._panel.set("visible", false);
 		obj._isVisible = false;
 	};
+
+	
 
 	//GETTERS AND SETTERS
 
