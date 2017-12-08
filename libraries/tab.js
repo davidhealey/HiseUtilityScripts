@@ -53,6 +53,7 @@ namespace tab
 			obj._image.set("height", obj._height);
 			obj._image.set("fileName", "{PROJECT_FOLDER}" + imageName); //Use project folder
 			obj._image.set("parentComponent", "pnlTab"+obj._id);
+			obj._controls.push(obj._image);
 		}
 	}
 
