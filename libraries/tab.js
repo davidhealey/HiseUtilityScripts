@@ -123,5 +123,5 @@ namespace tab
 	inline function getPanel(obj) {return obj._panel;}
 	inline function getPanelId(obj) {return "pnlTab"+obj._id;}
 	inline function getControl(obj, id) {return obj.controls[id];}
-	inline function getIsVisible(obj) {return obj._isVisible;}
+	inline function isVisible(obj) {return obj._isVisible;}
 }
