@@ -101,7 +101,15 @@ namespace tab
 		obj._isVisible = false;
 	};
 
-	
+	/**
+	 * Makes the passed control a child of the tab object's panel and adds it to the tab object's controls object
+	 * @param {tab} obj The tab object to hide
+	*/
+	inline function addControl(obj, control)
+	{
+		control.set("parentComponent", "pnlTab"+obj._id); //Set control's parent to tab's panel
+		obj._controls.push(control); //Add control to tab's controls object
+	}
 
 	//GETTERS AND SETTERS
 
