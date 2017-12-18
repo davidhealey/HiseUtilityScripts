@@ -168,7 +168,7 @@ namespace ui
 				var w = this.get("width") * ui.getNormalizedValue(this);
 
 				g.setColour(0xFF333333);  //Dark Grey
-				g.fillRect([0, 0, width, this.get("height")]);
+				g.fillRect([0, 0, w, this.get("height")]);
 
 			});
 		}
