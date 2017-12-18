@@ -165,7 +165,7 @@ namespace ui
 				g.fillRoundedRectangle([0, 0, this.get("width"), this.get("height")], 2);
 
 				//Get width of slider based on its current normalized value
-				var width = this.get("width") * ui.getNormalizedValue(this);
+				var w = this.get("width") * ui.getNormalizedValue(this);
 
 				g.setColour(0xFF333333);  //Dark Grey
 				g.fillRect([0, 0, width, this.get("height")]);
