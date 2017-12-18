@@ -165,7 +165,7 @@ namespace ui
 				g.fillRoundedRectangle([0, 0, this.get("width"), this.get("height")], 2);
 
 				//Get width of slider based on its current normalized value
-				var w = this.get("width") * ui.getNormalizedValue(this);
+				reg w = this.get("width") * ui.getNormalizedValue(this);
 
 				g.setColour(0xFF333333);  //Dark Grey
 				g.fillRect([0, 0, w, this.get("height")]);
@@ -195,14 +195,14 @@ namespace ui
 				else if (event.drag)
 				{
 					// Calculate the sensitivity value
-					var distance  = (event.dragX - event.dragY) / this.data.sensitivity;
+					reg distance  = (event.dragX - event.dragY) / this.data.sensitivity;
 
 					if (event.ctrlDown) //If ctrl/cmd key is held down
 					{
 						distance = (event.dragX - event.dragY) / (this.data.sensitivity * 4);
 					}
 
-					var newValue = Math.range(this.data.mouseDownValue + distance, this.get("min"), this.get("max"));
+					reg newValue = Math.range(this.data.mouseDownValue + distance, this.get("min"), this.get("max"));
 
 					if (newValue != this.getValue())
 					{
