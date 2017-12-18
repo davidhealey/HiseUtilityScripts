@@ -13,24 +13,9 @@ namespace ui
 		return !(obj[key] == void); //Important: void, not undefined!
 	};
 
-	inline function button(id, x, y, obj)
-	{
-		local control = Content.addButton(id, x, y);
-
-		if (_keyExists(obj, "filmstripImage")) obj.filmstripImage = "{PROJECT_FOLDER}" + obj.filmstripImage; //Uses project folder
-
-		//Set control properties
-		for (k in obj) //Each key in object
-		{
-			control.set(k, obj[k]);
-		}
-
-		return control;
-	};
-
 	inline function buttonPanel(id, x, y, obj)
 	{
-		local control = Content.addPanel(id, x, y);
+		local control = Content.getComponent(id);
 
 		control.set("allowCallbacks", "Clicks Only");
 		control.set("saveInPreset", true);
@@ -40,7 +25,7 @@ namespace ui
 		//Set control properties
 		for (k in obj) //Each key in object
 		{
-			if (k == "paintRoutine" || k == void) continue
+			if (k == "paintRoutine" || obj[k] == void) continue
 			control.set(k, obj[k]);
 		}
 
@@ -82,24 +67,9 @@ namespace ui
 		return control;
 	}
 
-	inline function comboBox(id, x, y, obj)
-	{
-		local control = Content.addComboBox(id, x, y);
-
-		if (_keyExists(obj, "items")) obj.items = obj.items.join("\n"); //Make array of items into string
-
-		//Set control properties
-		for (k in obj) //Each key in object
-		{
-			control.set(k, obj[k]);
-		}
-
-		return control;
-	};
-
 	inline function comboBoxPanel(id, x, y, obj) //Custom combo box
 	{
-		local control = Content.addPanel(id, x, y);
+		local control = Content.getComponent(id);
 
 		control.set("allowCallbacks", "Context Menu");
 		control.set("popupOnRightClick", false);
@@ -113,7 +83,7 @@ namespace ui
 		//Set control properties
 		for (k in obj) //Each key in object
 		{
-			if (obj[k] == void || k == "paintRoutine") continue;
+			if (k == "paintRoutine" || obj[k] == void) continue
 			control.set(k, obj[k]);
 		}
 
@@ -149,22 +119,6 @@ namespace ui
 		return control;
 	};
 
-	inline function floatingTile(id, x, y, obj, data)
-	{
-		local control = Content.addFloatingTile(id, x, y);
-
-		//Set control properties
-		for (k in obj) //Each key in object
-		{
-			control.set(k, obj[k]);
-		}
-
-		control.setContentData(data);
-		control.set("updateAfterInit", false);
-
-		return control;
-	};
-
 	inline function getNormalizedValue(control)
 	{
 		if (typeof control.getValue() == "number" && typeof control.get("min") == "number" && typeof control.get("max") == "number")
@@ -174,132 +128,14 @@ namespace ui
 		return false;
 	}
 
-	inline function image(id, x, y, obj)
-	{
-		local control = Content.addImage(id, x, y);
-
-		if (_keyExists(obj, "fileName")) obj.fileName = "{PROJECT_FOLDER}" + obj.fileName; //Uses project folder
-
-		//Set control properties
-		for (k in obj) //Each key in object
-		{
-			control.set(k, obj[k]);
-		}
-
-		return control;
-	};
-
-	inline function knob(id, x, y, obj)
-	{
-		local control = Content.addKnob(id, x, y);
-
-		if (_keyExists(obj, "filmstripImage")) obj.filmstripImage = "{PROJECT_FOLDER}" + obj.filmstripImage; //Uses project folder
-		if (!_keyExists(obj, "mouseSensitivity")) obj.mouseSensitivity = 0.3;
-
-		//Set control properties
-		for (k in obj) //Each key in object
-		{
-			control.set(k, obj[k]);
-		}
-
-		return control;
-	};
-
-	inline function label(id, x, y, obj)
-	{
-		local control = Content.addLabel(id, x, y);
-		if (!_keyExists(obj, "editable")) obj.editable = false; //Labels aren't editable by default
-
-		control.set("saveInPreset", false);
-
-		//Set control properties
-		for (k in obj) //Each key in object
-		{
-			control.set(k, obj[k]);
-		}
-
-		return control;
-	};
-
-	inline function modulatorMeter(id, x, y, obj)
-	{
-		local control = Content.addModulatorMeter(id, x, y);
-
-		//Set control properties
-		for (k in obj) //Each key in object
-		{
-			control.set(k, obj[k]);
-		}
-
-		return control;
-	};
-
-	inline function panel(id, x, y, obj)
-	{
-		local control = Content.addPanel(id, x, y);
-
-		if (_keyExists(obj, "popupMenuItems"))
-		{
-			obj.popupMenuItems = obj.popupMenuItems.join("\n");
-			control.data.popupMenuItems = obj.popupMenuItems;
-		}
-
-		if (_keyExists(obj, "paintRoutine"))
-		{
-			control.setPaintRoutine(obj.paintRoutine);
-			obj.paintRoutine = void;
-		}
-
-		control.set("itemColour", 0x00000000);
-		control.set("itemColour2", 0x00000000);
-		control.set("borderSize", 0);
-		control.set("borderRadius", 0);
-
-		//Set control properties
-		for (k in obj) //Each key in object
-		{
-			if (obj[k] == void) continue;
-			control.set(k, obj[k]);
-		}
-
-		return control;
-	};
-
-	inline function plotter(id, x, y, obj)
-	{
-		local control = Content.addPlotter(id, x, y);
-
-		//Set control properties
-		for (k in obj) //Each key in object
-		{
-			control.set(k, obj[k]);
-		}
-
-		return control;
-	};
-
 	inline function resetKeyColour(n)
 	{
 		Engine.setKeyColour(n, Colours.withAlpha(Colours.white, 0.0));
 	}
 
-	inline function sliderPack(id, x, y, obj)
-	{
-		local control = Content.addSliderPack(id, x, y);
-
-		//Set control properties
-		for (k in obj) //Each key in object
-		{
-			control.set(k, obj[k]);
-		}
-
-		return control;
-	};
-
-
 	inline function sliderPanel(id, x, y, obj)
 	{
-		local control = Content.addPanel(id, x, y);
+		local control = Content.getComponent(id);
 
 		control.set("allowCallbacks", "Clicks, Hover & Dragging");
 		control.set("saveInPreset", true);
@@ -380,29 +216,4 @@ namespace ui
 
 		return control;
 	}
-
-	inline function table(id, x, y, obj)
-	{
-		local control = Content.addTable(id, x, y);
-
-		//Set control properties
-		for (k in obj) //Each key in object
-		{
-			control.set(k, obj[k]);
-		}
-
-		return control;
-	};
-
-	inline function setWallpaper(width, height, fileName)
-	{
-		local control = Content.addImage(id, 0, 0);
-
-		//Set control properties
-		control.set("width", width);
-		control.set("height", height);
-		control.set("fileName", "{PROJECT_FOLDER}" + fileName); //Uses project folder
-
-		return control;
-	};
 }
