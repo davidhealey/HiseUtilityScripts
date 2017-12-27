@@ -1,12 +1,11 @@
 /**
  * Title genericMicMixer
  * Author: David Healey
- * Date: 01/07/2017
- * Modified: 28/11/2017
  * License: GPLv3 - https://www.gnu.org/licenses/gpl-3.0.en.html
 */
 
 //INIT
+Content.setWidth(650);
 Content.setHeight(350);
 
 //Retrieve simple gain FX with "mic" in their ID and store in gainFX array
@@ -29,6 +28,7 @@ for (s in samplerIds)
 {
 	samplers.push(Synth.getSampler(s));
 }
+Console.print(simpleGainIds.length);
 
 //GUI
 const var vol = [];
@@ -39,9 +39,9 @@ const var mute = [];
 const var solo = [];
 const var purge = [];
 
-for (i = 0; i < Math.min(8, gainFx.length); i++)
+for (i = 0; i < Math.min(8, gainFx.length); i++) //Maximum of 8 channels
 {
-	vol[i] = knobFactory(100*i, 0, "vol"+i, {width:95, max:4, defaultValue:1, text:"Vol " + (i+1)});
+	vol[i] = knobFactory(100*i, 0, "vol"+i, {width:95, mode:"Decibel", max:3, text:"Vol " + (i+1)});
 	delay[i] = knobFactory(100*i, 50, "delay"+i, {width:95, max:500, text:"Delay " + (i+1)});
 	width[i] = knobFactory(100*i, 100, "width"+i, {width:95, max:200, text:"Width " + (i+1)});
 	pan[i] = knobFactory(100*i, 150, "pan"+i, {width:95, min:-100, max:100, text:"Pan " + (i+1)});
@@ -53,7 +53,7 @@ for (i = 0; i < Math.min(8, gainFx.length); i++)
 //FUNCTIONS
 inline function knobFactory(x, y, name, obj)
 {
-	var control = Content.addKnob(name, x, y);
+	local control = Content.addKnob(name, x, y);
 
 	//Set control properties
 	for (k in obj) //Each key in object
@@ -66,7 +66,7 @@ inline function knobFactory(x, y, name, obj)
 
 inline function buttonFactory(x, y, name, obj)
 {
-	var control = Content.addButton(name, x, y);
+	local control = Content.addButton(name, x, y);
 
 	//Set control properties
 	for (k in obj) //Each key in object
@@ -115,19 +115,19 @@ inline function muteSolo()
 }
 function onNoteOn()
 {
-
+	
 }
 function onNoteOff()
 {
-
+	
 }
 function onController()
 {
-
+	
 }
 function onTimer()
 {
-
+	
 }
 function onControl(number, value)
 {
@@ -140,7 +140,7 @@ function onControl(number, value)
 				//No channels are soloed or this channel is soloed
 				if (soloOn == false || (soloOn == true && solo[i].getValue()))
 				{
-					gainFx[i].setAttribute(gainFx[i].Gain, Engine.getDecibelsForGainFactor(value));
+					gainFx[i].setAttribute(gainFx[i].Gain, value);
 				}
 			}
 		}

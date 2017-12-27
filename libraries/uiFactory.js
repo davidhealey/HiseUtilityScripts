@@ -13,46 +13,15 @@ namespace ui
 		return !(obj[key] == void); //Important: void, not undefined!
 	};
 
-	inline function buttonPanel(id, x, y, obj)
+	inline function buttonPanel(id, paintRoutine)
 	{
 		local control = Content.getComponent(id);
 
 		control.set("allowCallbacks", "Clicks Only");
-		control.set("saveInPreset", true);
 		control.set("min", 0);
 		control.set("max", 1);
-
-		//Set control properties
-		for (k in obj) //Each key in object
-		{
-			if (k == "paintRoutine" || obj[k] == void) continue
-			control.set(k, obj[k]);
-		}
-
-		if (_keyExists(obj, "paintRoutine"))
-		{
-			control.setPaintRoutine(obj.paintRoutine);
-		}
-		else //Default paint routine - toggle switch
-		{
-			control.setPaintRoutine(function(g){
-
-				g.setColour(0xFFAAA591); //Beige
-				g.fillRoundedRectangle([0, 0, this.get("width"), this.get("height")], 2);
-
-				g.setColour(0xff333333); //Dark grey
-
-				if (this.getValue() == 0)
-				{
-					g.fillRoundedRectangle([0, 0, this.get("width")/2, this.get("height")], 2);
-				}
-				else
-				{
-					g.fillRoundedRectangle([this.get("width")/2, 0, this.get("width")/2, this.get("height")], 2);
-				}
-			});
-		}
-
+		control.setPaintRoutine(paintRoutine);		
+		
 		// Define a callback behaviour when you select a popup menu...
 		control.setMouseCallback(function(event)
 		{
@@ -67,7 +36,7 @@ namespace ui
 		return control;
 	}
 
-	inline function comboBoxPanel(id, x, y, obj) //Custom combo box
+	inline function comboBoxPanel(id, paintRoutine, items, text) //Custom combo box
 	{
 		local control = Content.getComponent(id);
 
@@ -75,35 +44,11 @@ namespace ui
 		control.set("popupOnRightClick", false);
 		control.set("popupMenuAlign", true);
 		control.set("saveInPreset", true);
-		control.set("popupMenuItems", obj.items.join("\n")); //Menu items
-		control.data.items = obj.items;
-		obj.items = void;
-		if (_keyExists(obj, "text")) {control.data.text = obj.text; obj.text = void;}
+		control.set("popupMenuItems", items.join("\n")); //Menu items
+		control.data.items = items;
+		control.data.text = text;
 
-		//Set control properties
-		for (k in obj) //Each key in object
-		{
-			if (k == "paintRoutine" || obj[k] == void) continue
-			control.set(k, obj[k]);
-		}
-
-		if (_keyExists(obj, "paintRoutine"))
-		{
-			control.setPaintRoutine(obj.paintRoutine);
-		}
-		else //Default paint routine
-		{
-			control.setPaintRoutine(function(g){
-
-				g.setColour(0xFFAAA591); //Beige
-				g.fillRoundedRectangle([0, 0, this.get("width"), this.get("height")], 2);
-
-				g.setColour(0xff333333); //Dark grey
-				g.fillTriangle([this.get("width")-this.get("width")/3, this.get("height")/2, this.get("width")/4, this.get("height")/4], Math.toRadians(900));
-
-				g.drawAlignedText(this.data.items[this.getValue()-1], [5, 0, this.get("width"), this.get("height")], "left");
-			});
-		}
+		control.setPaintRoutine(paintRoutine);
 
 		// Define a callback behaviour when you select a popup menu...
 		control.setMouseCallback(function(event)
@@ -119,8 +64,10 @@ namespace ui
 		return control;
 	};
 
-	inline function getNormalizedValue(control)
+	inline function getNormalizedValue(id)
 	{
+		local control = Content.getComponent(id);
+		
 		if (typeof control.getValue() == "number" && typeof control.get("min") == "number" && typeof control.get("max") == "number")
 		{
 			return (control.getValue() - control.get("min")) / (control.get("max") - control.get("min"));
@@ -133,45 +80,14 @@ namespace ui
 		Engine.setKeyColour(n, Colours.withAlpha(Colours.white, 0.0));
 	}
 
-	inline function sliderPanel(id, x, y, obj)
+	inline function sliderPanel(id, paintRoutine, defaultValue, sensitivity)
 	{
 		local control = Content.getComponent(id);
 
 		control.set("allowCallbacks", "Clicks, Hover & Dragging");
-		control.set("saveInPreset", true);
-		control.set("enableMidiLearn", true);
-		control.set("borderSize", 0);
-		if (_keyExists(obj, "defaultValue")) control.data.defaultValue = obj.defaultValue;
-		if (_keyExists(obj, "sensitivity")) control.data.sensitivity = obj.sensitivity;
-
-		//Set control properties
-		for (k in obj) //Each key in object
-		{
-			if (k == "defaultValue" || k == "paintRoutine" || k == "sensitivity") continue;
-			control.set(k, obj[k]);
-		}
-
-		//Paint routine
-		if (_keyExists(obj, "paintRoutine"))
-		{
-			control.setPaintRoutine(obj.paintRoutine);
-		}
-		else //Default paint routine
-		{
-			control.setPaintRoutine(function(g){
-
-				//Background
-				g.setColour(0xFFAAA591); //Beige
-				g.fillRoundedRectangle([0, 0, this.get("width"), this.get("height")], 2);
-
-				//Get width of slider based on its current normalized value
-				var width = this.get("width") * ui.getNormalizedValue(this);
-
-				g.setColour(0xFF333333);  //Dark Grey
-				g.fillRect([0, 0, width, this.get("height")]);
-
-			});
-		}
+		control.setPaintRoutine(paintRoutine);
+		control.data.defaultValue = defaultValue;
+		control.data.sensitivity = sensitivity;		
 
 		// Define callback behaviour
 		control.setMouseCallback(function(event)
@@ -195,14 +111,14 @@ namespace ui
 				else if (event.drag)
 				{
 					// Calculate the sensitivity value
-					var distance  = (event.dragX - event.dragY) / this.data.sensitivity;
+					reg distance  = (event.dragX - event.dragY) / this.data.sensitivity;
 
 					if (event.ctrlDown) //If ctrl/cmd key is held down
 					{
 						distance = (event.dragX - event.dragY) / (this.data.sensitivity * 4);
 					}
 
-					var newValue = Math.range(this.data.mouseDownValue + distance, this.get("min"), this.get("max"));
+					reg newValue = Math.range(this.data.mouseDownValue + distance, this.get("min"), this.get("max"));
 
 					if (newValue != this.getValue())
 					{
