@@ -97,7 +97,7 @@ inline function muteSolo()
 
 		if (solo[i].getValue() == 1) //Channel is soloed
 		{
-			gainFx[i].setAttribute(0, Engine.getDecibelsForGainFactor(vol[i].getValue()));
+			gainFx[i].setAttribute(0, vol[i].getValue());
 			mute[i].setValue(0); //Toggle mute state
 		}
 		else //Channel is not soloed
@@ -108,7 +108,7 @@ inline function muteSolo()
 			}
 			else //No channels soloed
 			{
-				gainFx[i].setAttribute(0, Engine.getDecibelsForGainFactor(vol[i].getValue()));	//Restore channel's volume
+				gainFx[i].setAttribute(0, vol[i].getValue());	//Restore channel's volume
 			}
 		}
 	}
