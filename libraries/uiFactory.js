@@ -132,4 +132,14 @@ namespace ui
 
 		return control;
 	}
+	
+	inline function showControlFromArray(a, idx)
+	{
+		for (i = 0; i < a.length; i++)
+		{
+			a[i].set("visible", false);
+		}
+		
+		a[idx].set("visible", true);
+	}
 }
