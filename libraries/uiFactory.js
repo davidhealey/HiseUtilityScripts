@@ -36,7 +36,7 @@ namespace ui
 		return control;
 	}
 
-	inline function comboBoxPanel(id, paintRoutine, items, text) //Custom combo box
+	inline function comboBoxPanel(id, paintRoutine, items) //Custom combo box
 	{
 		local control = Content.getComponent(id);
 
@@ -46,7 +46,6 @@ namespace ui
 		control.set("saveInPreset", true);
 		control.set("popupMenuItems", items.join("\n")); //Menu items
 		control.data.items = items;
-		control.data.text = text;
 
 		control.setPaintRoutine(paintRoutine);
 

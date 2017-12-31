@@ -27,7 +27,7 @@ namespace asyncUpdater
 	inline function triggerUpdate()
 	{
 		internalUpdater_.startTimer(25);
-		timerState_ = true;
+		timerState_ = true;		
 	}
 
 	inline function setFunctionAndUpdate(f, p)
@@ -37,7 +37,7 @@ namespace asyncUpdater
 		internalUpdater_.startTimer(25);
 		timerState_ = true;
 	}
-
+	
 	inline function isTimerRunning()
 	{
 		return timerState_;
