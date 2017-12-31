@@ -7,7 +7,7 @@ namespace idh
 	reg keyswitches = []; //User customisable values (unused ones will be set to -1 by script)
 
 	//Instrument loading functions
-	inline function loadInstrument(name)
+	inline function loadInstrument(name, sampleMaps)
 	{
 		local entry = instData.database[name]; //Get instrument entry from the database
 		
@@ -20,11 +20,12 @@ namespace idh
 		}
 		
 		articulationIndexes = indexArticulations(name);
-		loadSampleMaps(name, entry);
+		bypassUnusedSamplers();
+		if (sampleMaps == true) loadSampleMaps(name, entry);
 	}
-			
-	inline function loadSampleMaps(name, entry)
-	{	
+	
+	inline function bypassUnusedSamplers()
+	{
 		for (i = 0; i < samplerIds.length; i++) //Each sampler ID
 		{
 			local s = Synth.getChildSynth(samplerIds[i]); //Get the sampler
@@ -34,13 +35,31 @@ namespace idh
 				if (samplerIds[i].indexOf(a) != -1) //Sample ID contains articulation name
 				{
 					s.setBypassed(false);
-					//s.loadSampleMap(name + "_" + id); //Load sample map for this instrument
-					break; //Exit inner loop
 				}
 				else 
 				{
 					s.setBypassed(true); //Bypass unused sampler
-					//s.loadSampleMap("empty"); //Load empty sample map
+				}
+			}
+		}
+	}
+			
+	inline function loadSampleMaps(name, entry)
+	{	
+		for (i = 0; i < samplerIds.length; i++) //Each sampler ID
+		{
+			local s = Synth.getSampler(samplerIds[i]); //Get the sampler
+		
+			for (a in entry.articulations) //Each of the entry's articulations
+			{
+				if (samplerIds[i].indexOf(a) != -1) //Sample ID contains articulation name
+				{
+					s.loadSampleMap(name + "_" + id); //Load sample map for this instrument
+					break; //Exit inner loop
+				}
+				else 
+				{
+					s.loadSampleMap("empty"); //Load empty sample map
 				}
 			}
 		}
@@ -78,13 +97,13 @@ namespace idh
 	}
 	
 	//Returns the range of the specified articulation
-	inline function getArticulationRange(name, articulation)
+	inline function getArticulationRange(name, a)
 	{
 		local entry = instData.database[name]; //Get instrument entry from the instData.database
 		
 		Console.assertIsObjectOrArray(entry); //Error if entry not found
 		
-		return entry.articulations[articulation].range;
+		return entry.articulations[a].range;
 	}
 	
 	/**
@@ -213,15 +232,15 @@ namespace idh
 		return keyswitches.indexOf(noteNum);
 	}
 	
-	//For the given program number returns the index in the instData.programs array
-	inline function getProgramIndex(progNum)
-	{
-		return instData.programs.indexOf(progNum);
-	}
-	
 	//Set the index in the keyswitches array to the given note number
 	inline function setKeyswitch(idx, noteNum)
 	{
 		keyswitches[idx] = noteNum;
+	}
+	
+	//For the given program number returns the index in the instData.programs array
+	inline function getProgramIndex(progNum)
+	{
+		return instData.programs.indexOf(progNum);
 	}
 }
