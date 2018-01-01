@@ -27,9 +27,12 @@ namespace idh
 	{
 		local samplerIds = Synth.getIdList("Sampler");
 		local s;
+		reg bypassSet;
 		
 		for (i = 0; i < samplerIds.length; i++) //Each sampler ID
 		{
+			bypassSet = false;
+			
 			s = Synth.getChildSynth(samplerIds[i]); //Get the sampler
 		
 			for (a in entry.articulations) //Each of the entry's articulations
@@ -37,11 +40,14 @@ namespace idh
 				if (samplerIds[i].indexOf(a) != -1) //Sample ID contains articulation name
 				{
 					s.setBypassed(false);
+					bypassSet = true; //Set flag
+					break; //Exit inner loop
 				}
-				else 
-				{
-					s.setBypassed(true); //Bypass unused sampler
-				}
+			}
+			
+			if (bypassSet == false) //Bypass state has not yet been set for this sampler
+			{
+				s.setBypassed(true); //Bypass unused sampler
 			}
 		}
 	}
@@ -51,9 +57,7 @@ namespace idh
 		local samplerIds = Synth.getIdList("Sampler");
 		local s;
 		reg loaded; //Flag to keep check if sample map has been loaded into sampler
-		
-		Console.clear();
-		
+				
 		for (i = 0; i < samplerIds.length; i++)	//Each sampler ID
 		{		
 			loaded = false;
