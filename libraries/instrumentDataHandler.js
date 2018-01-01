@@ -2,7 +2,6 @@ include("instrumentData.js");
 
 namespace idh
 {	
-	const var samplerIds = Synth.getIdList("Sampler");
 	reg articulationIndexes = []; //Instrument's articulations indexed against allArticulations
 	reg keyswitches = []; //User customisable values (unused ones will be set to -1 by script)
 
@@ -26,9 +25,12 @@ namespace idh
 	
 	inline function bypassUnusedSamplers()
 	{
+		local samplerIds = Synth.getIdList("Sampler");
+		local s;
+		
 		for (i = 0; i < samplerIds.length; i++) //Each sampler ID
 		{
-			local s = Synth.getChildSynth(samplerIds[i]); //Get the sampler
+			s = Synth.getChildSynth(samplerIds[i]); //Get the sampler
 		
 			for (a in entry.articulations) //Each of the entry's articulations
 			{
@@ -46,21 +48,31 @@ namespace idh
 			
 	inline function loadSampleMaps(name, entry)
 	{	
-		for (i = 0; i < samplerIds.length; i++) //Each sampler ID
-		{
-			local s = Synth.getSampler(samplerIds[i]); //Get the sampler
+		local samplerIds = Synth.getIdList("Sampler");
+		local s;
+		reg loaded; //Flag to keep check if sample map has been loaded into sampler
 		
-			for (a in entry.articulations) //Each of the entry's articulations
+		Console.clear();
+		
+		for (i = 0; i < samplerIds.length; i++)	//Each sampler ID
+		{		
+			loaded = false;
+			
+			s = Synth.getSampler(samplerIds[i]);
+			
+			for (a in entry.articulations)
+			{									
+				if (samplerIds[i].indexOf(a) != -1)
+				{
+					s.loadSampleMap(name + "_" + samplerIds[i]); //Load sample map for this instrument
+					loaded = true; //Flag that a sample map has been loaded into this sampler
+					break; //Exit the inner loop
+				}
+			}
+			
+			if (loaded == false) //If no sample map was loaded
 			{
-				if (samplerIds[i].indexOf(a) != -1) //Sample ID contains articulation name
-				{
-					s.loadSampleMap(name + "_" + id); //Load sample map for this instrument
-					break; //Exit inner loop
-				}
-				else 
-				{
-					s.loadSampleMap("empty"); //Load empty sample map
-				}
+				s.loadSampleMap("empty"); //Load empty sample map
 			}
 		}
 	}
