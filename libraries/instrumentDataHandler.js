@@ -19,17 +19,17 @@ namespace idh
 		}
 		
 		articulationIndexes = indexArticulations(name);
-		bypassUnusedSamplers();
+		bypassUnusedSamplers(entry);
 		if (sampleMaps == true) loadSampleMaps(name, entry);
 	}
 	
-	inline function bypassUnusedSamplers()
+	inline function bypassUnusedSamplers(entry)
 	{
 		local samplerIds = Synth.getIdList("Sampler");
 		local s;
 		reg bypassSet;
 		
-		for (i = 0; i < samplerIds.length; i++) //Each sampler ID
+		for (i = 0; i < samplerIds.length; i++)	//Each sampler ID
 		{
 			bypassSet = false;
 			
@@ -65,7 +65,7 @@ namespace idh
 			s = Synth.getSampler(samplerIds[i]);
 			
 			for (a in entry.articulations)
-			{									
+			{	
 				if (samplerIds[i].indexOf(a) != -1)
 				{
 					s.loadSampleMap(name + "_" + samplerIds[i]); //Load sample map for this instrument
