@@ -9,6 +9,9 @@
 reg rrStep = -1;
 reg lastRR = -1; //RR step number used for the last onNote
 
+Content.setHeight(100);
+Content.setWidth(650);
+
 const var btnBypass = Content.addButton("Bypass", 0, 10); //Script bypass
 
 const var btnRandom = Content.addButton("Random", 150, 10); //Random mode button
