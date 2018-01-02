@@ -3,7 +3,6 @@ include("instrumentData.js");
 namespace idh
 {	
 	reg articulationIndexes = []; //Instrument's articulations indexed against allArticulations
-	reg keyswitches = []; //User customisable values (unused ones will be set to -1 by script)
 
 	//Instrument loading functions
 	inline function loadInstrument(name, sampleMaps)
@@ -87,7 +86,7 @@ namespace idh
 		{
 			if (articulationIndexes.indexOf(i) == -1) //This articulation is not used by the insturment
 			{
-				keyswitches[i] = -1; //Clear the KS
+				instData.keyswitches[i] = -1; //Clear the KS
 			}
 		}
 	}
@@ -236,22 +235,22 @@ namespace idh
 		return articulationIndexes.indexOf(idx);
 	}
 		
-	//Returns the note number for the given index in the keyswitches array
+	//Returns the note number for the given index in the instData.keyswitches array
 	inline function getKeyswitch(idx)
 	{
-		return keyswitches[idx];
+		return instData.keyswitches[idx];
 	}
 	
-	//Returns the index of the given note number from the keyswitches array
+	//Returns the index of the given note number from the instData.keyswitches array
 	inline function getKeyswitchIndex(noteNum)
 	{
-		return keyswitches.indexOf(noteNum);
+		return instData.keyswitches.indexOf(noteNum);
 	}
 	
-	//Set the index in the keyswitches array to the given note number
+	//Set the index in the instData.keyswitches array to the given note number
 	inline function setKeyswitch(idx, noteNum)
 	{
-		keyswitches[idx] = noteNum;
+		instData.keyswitches[idx] = noteNum;
 	}
 	
 	//For the given program number returns the index in the instData.programs array
