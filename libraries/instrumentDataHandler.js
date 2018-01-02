@@ -198,7 +198,7 @@ namespace idh
 		if (name != null)
 		{
 			local entry = instData.database[name]; //Get instrument entry from the instData.database
-		
+
 			Console.assertIsObjectOrArray(entry); //Error if entry not found
 		
 			local n = [];
