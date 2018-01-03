@@ -241,22 +241,34 @@ namespace idh
 		return articulationIndexes.indexOf(idx);
 	}
 		
-	//Returns the note number for the given index in the instData.keyswitches array
-	inline function getKeyswitch(idx)
+	//Returns the note number for the given index in the instrumentsKeyswitches array
+	inline function getKeyswitch(name, idx)
 	{
-		return instData.keyswitches[idx];
+	    local entry = instData.database[name]; //Get instrument entry from the instData.database
+
+		Console.assertIsObjectOrArray(entry); //Error if entry not found
+			
+		return entry.keyswitches[idx];
 	}
 	
 	//Returns the index of the given note number from the instData.keyswitches array
-	inline function getKeyswitchIndex(noteNum)
+	inline function getKeyswitchIndex(name, noteNum)
 	{
-		return instData.keyswitches.indexOf(noteNum);
+	    local entry = instData.database[name]; //Get instrument entry from the instData.database
+
+		Console.assertIsObjectOrArray(entry); //Error if entry not found
+		
+		return entry.keyswitches.indexOf(noteNum);
 	}
 	
 	//Set the index in the instData.keyswitches array to the given note number
-	inline function setKeyswitch(idx, noteNum)
+	inline function setKeyswitch(name, idx, noteNum)
 	{
-		instData.keyswitches[idx] = noteNum;
+	    local entry = instData.database[name]; //Get instrument entry from the instData.database
+
+		Console.assertIsObjectOrArray(entry); //Error if entry not found
+		
+		entry.keyswitches[idx] = noteNum;
 	}
 	
 	//For the given program number returns the index in the instData.programs array
