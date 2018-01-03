@@ -27,9 +27,10 @@ namespace idh
 		local entry = instData.database[name]; //Get instrument entry from the database
 		
 		Console.assertIsObjectOrArray(entry); //Error if entry not found
-			
+		
 		articulationIndexes = indexArticulations(name);
 		bypassUnusedSamplers(entry);
+		disableUnusedKeyswitches();
 		if (sampleMaps == true) loadSampleMaps(name, entry);
 	}
 	
