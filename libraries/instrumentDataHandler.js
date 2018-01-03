@@ -90,18 +90,7 @@ namespace idh
 			}
 		}
 	}
-		
-	inline function disableUnusedKeyswitches()
-	{
-		for (i = 0; i < instData.allArticulations.length; i++)
-		{
-			if (articulationIndexes.indexOf(i) == -1) //This articulation is not used by the insturment
-			{
-				instData.keyswitches[i] = -1; //Clear the KS
-			}
-		}
-	}
-	
+			
 	//Returns the data entry for the given instrument
 	inline function getData(name)
 	{
