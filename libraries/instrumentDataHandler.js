@@ -30,7 +30,6 @@ namespace idh
 		
 		articulationIndexes = indexArticulations(name);
 		bypassUnusedSamplers(entry);
-		disableUnusedKeyswitches();
 		if (sampleMaps == true) loadSampleMaps(name, entry);
 	}
 	
@@ -240,6 +239,12 @@ namespace idh
 	{
 		return articulationIndexes[idx];
 	}
+	
+    //Looks for a value in the articulationIndexes array and returns its index if found
+    inline function searchArticulationIndexes(value)
+    {
+        return articulationIndexes.indexOf(value);
+    }
 	
 	//Given an index in the instrument's articulations array, returns the corrosponding index in allArticulations
 	inline function instrumentArticulationIndexToAllArticulationIndex(idx)
