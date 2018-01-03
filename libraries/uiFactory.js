@@ -20,8 +20,8 @@ namespace ui
 		control.set("allowCallbacks", "Clicks Only");
 		control.set("min", 0);
 		control.set("max", 1);
-		control.setPaintRoutine(paintRoutine);		
-		
+		control.setPaintRoutine(paintRoutine);
+
 		// Define a callback behaviour when you select a popup menu...
 		control.setMouseCallback(function(event)
 		{
@@ -66,7 +66,7 @@ namespace ui
 	inline function getNormalizedValue(id)
 	{
 		local control = Content.getComponent(id);
-		
+
 		if (typeof control.getValue() == "number" && typeof control.get("min") == "number" && typeof control.get("max") == "number")
 		{
 			return (control.getValue() - control.get("min")) / (control.get("max") - control.get("min"));
@@ -86,7 +86,7 @@ namespace ui
 		control.set("allowCallbacks", "Clicks, Hover & Dragging");
 		control.setPaintRoutine(paintRoutine);
 		control.data.defaultValue = defaultValue;
-		control.data.sensitivity = sensitivity;		
+		control.data.sensitivity = sensitivity;
 
 		// Define callback behaviour
 		control.setMouseCallback(function(event)
@@ -131,14 +131,14 @@ namespace ui
 
 		return control;
 	}
-	
+
 	inline function showControlFromArray(a, idx)
 	{
 		for (i = 0; i < a.length; i++)
 		{
 			a[i].set("visible", false);
 		}
-		
+
 		a[idx].set("visible", true);
 	}
 }
