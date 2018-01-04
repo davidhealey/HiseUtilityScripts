@@ -28,7 +28,6 @@ for (s in samplerIds)
 {
 	samplers.push(Synth.getSampler(s));
 }
-Console.print(simpleGainIds.length);
 
 //GUI
 const var vol = [];
@@ -115,19 +114,19 @@ inline function muteSolo()
 }
 function onNoteOn()
 {
-	
+
 }
 function onNoteOff()
 {
-	
+
 }
 function onController()
 {
-	
+
 }
 function onTimer()
 {
-	
+
 }
 function onControl(number, value)
 {
