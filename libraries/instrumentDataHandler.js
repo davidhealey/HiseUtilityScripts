@@ -47,7 +47,7 @@ namespace idh
 		
 			for (a in entry.articulations) //Each of the entry's articulations
 			{
-				if (samplerIds[i].indexOf(a) != -1) //Sample ID contains articulation name
+				if (samplerIds[i].indexOf(a) != -1) //Sample ID contains articulation name (case sensitive)
 				{
 					s.setBypassed(false);
 					bypassSet = true; //Set flag
