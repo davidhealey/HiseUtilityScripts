@@ -6,6 +6,7 @@
  * License: Public Domain
 */
 
+Content.setWidht(650);
 Content.setHeight(175);
 
 reg colour = [];

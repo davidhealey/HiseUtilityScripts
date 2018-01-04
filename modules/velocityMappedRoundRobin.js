@@ -13,6 +13,9 @@ Always start with 0-1 for RR1 and work up from there.
 
 reg rrStep = -1;
 
+Content.setWidth(650);
+Content.setHeight(50);
+
 //Knob to lock to a specific RR - essentially disabling the round robin functionality - useful for finding duff samples
 const var knbRRLock = Content.addKnob("knbRRLock", 0, 0);
 knbRRLock.set("text", "Lock to RR");

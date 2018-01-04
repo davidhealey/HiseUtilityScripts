@@ -6,6 +6,9 @@
  * License: GPLv3 - https://www.gnu.org/licenses/gpl-3.0.en.html
 */
 
+Content.setWidth(650);
+Content.setHeight(50);
+
 const var UACC_NUM = 32;
 
 // Create a storage panel, hide it, and save it in the preset
@@ -66,7 +69,7 @@ for (i = 0; i < 17; i++)
 	i == 0 ? cmbChan.addItem("Omni") : cmbChan.addItem(i);
 }
 
-//Populate KS and UACC dropdowns
+//Populate KS and UACC dropdownsContent.setHeight(50);
 for (i = 0; i < 128; i++)
 {
 	cmbKs.addItem(Engine.getMidiNoteName(i)); //Populate KS dropdown

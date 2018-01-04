@@ -5,7 +5,7 @@
  * Modified: 30/06/2017
  * License: Public Domain
 */
-
+Content.setWidth(650);
 Content.setHeight(275);
 
 const var COUNT = 15; //The number of CCs you want to remap

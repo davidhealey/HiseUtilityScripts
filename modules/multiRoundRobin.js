@@ -46,6 +46,7 @@ for (samplerName in samplerNames)
 }
 
 //GUI
+Content.setWidth(650);
 Content.setHeight(100);
 
 //RR Type and Mode Combo Boxes

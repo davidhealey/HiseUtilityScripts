@@ -6,6 +6,7 @@
  * License: Public Domain
 */
 
+Content.setWidth(650);
 Content.setHeight(50);
 
 const var tableEnvelopes = Synth.getIdList("Midi Controller");

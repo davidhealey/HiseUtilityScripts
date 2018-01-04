@@ -9,7 +9,9 @@
 //Includes
 
 //Init
+Content.setWidth(650);
 Content.setHeight(175);
+
 Content.setName("Release Trigger");
 
 reg attenuationLevel = 1.0;

@@ -9,7 +9,9 @@
 //Includes
 
 //Init
+Content.setWidth(650);
 Content.setHeight(100);
+
 reg randNoteOnDelay;
 reg randNoteOffDelay;
 reg randVelocity;

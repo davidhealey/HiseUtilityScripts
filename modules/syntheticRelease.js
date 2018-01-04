@@ -7,6 +7,7 @@
 */
 
 //INIT
+Content.setWidth(650);
 Content.setHeight(50);
 
 const var envelopeNames = Synth.getIdList("Table Envelope"); //Get all child table envelopes

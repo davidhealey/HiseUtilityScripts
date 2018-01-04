@@ -39,7 +39,7 @@ for (modName in modulatorNames)
 }
 
 //GUI
-
+Content.setWidth(650);
 Content.setHeight(150);
 
 const var btnBypass = Content.addButton("Bypass", 0, 10);

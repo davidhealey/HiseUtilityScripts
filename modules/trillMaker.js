@@ -28,6 +28,7 @@ for (modName in modulatorNames)
 }
 
 //GUI
+Content.setWidth(650);
 Content.setHeight(100);
 
 const var btnMute = Content.addButton("btnMute", 0, 10);

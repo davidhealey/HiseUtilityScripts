@@ -7,6 +7,7 @@
 */
 
 //Init
+Content.setWidth(650);
 Content.setHeight(50);
 
 const var colours = [Colours.blue, Colours.cyan, Colours.yellow, Colours.green, Colours.red, Colours.purple, Colours.black, Colours.white, Colours.orange, Colours.pink];

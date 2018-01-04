@@ -2,9 +2,11 @@
  * Title: velocityFilter.js
  * Author: David Healey
  * Date: 07/09/2017
- * Modified: 07/09/2017
  * License: Public Domain
 */
+
+Content.setWidth(650);
+Content.setHeight(50);
 
 const var min = Content.addKnob("Min", 0, 0);
 min.setRange(1, 127, 1);
