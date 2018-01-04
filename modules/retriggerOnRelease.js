@@ -2,11 +2,11 @@
  * Title: retriggerOnRelease
  * Author: David Healey
  * Date: 28/03/2017
- * Modified:
  * License: Public Domain
 */
 
 //INIT
+Content.setWidth(650);
 Content.setHeight(50);
 
 const var velocities = Engine.createMidiList();
