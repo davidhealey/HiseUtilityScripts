@@ -276,4 +276,13 @@ namespace idh
 	{
 		return instData.programs.indexOf(progNum);
 	}
+	
+	inline function isMetaArticulation(idx)
+    {        Console.print(instData.allArticulations[idx]);
+        if (instData.allArticulations[idx].indexOf("meta_") == -1)
+        {
+            return false;
+        }
+        return true;
+    }
 }
