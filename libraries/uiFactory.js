@@ -43,7 +43,6 @@ namespace ui
 		control.set("allowCallbacks", "Context Menu");
 		control.set("popupOnRightClick", false);
 		control.set("popupMenuAlign", true);
-		control.set("saveInPreset", true);
 		control.set("popupMenuItems", items.join("\n")); //Menu items
 		control.data.items = items;
 
