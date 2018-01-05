@@ -217,12 +217,18 @@ namespace idh
 
 	}
 	
-	//Returns the name of the articulation specified by the given index
+	//Returns the name of the articulation specified by the given index of the indexes array
 	inline function getArticulationNameByIndex(idx)
 	{
 		return instData.allArticulations[articulationIndexes[idx]];
 	}
 	
+	//Returns the name of the articulation specified by the given index of the allArticulations array
+	inline function getArticulationName(idx)
+    {
+            return instData.allArticulations[idx];
+    }
+    
 	//Given an index in the allArticulations array, returns the corrosponding index for the instrument's articulations
 	inline function allArticulationIndexToInstrumentArticulationIndex(idx)
 	{
@@ -278,7 +284,7 @@ namespace idh
 	}
 	
 	inline function isMetaArticulation(idx)
-    {        Console.print(instData.allArticulations[idx]);
+    {
         if (instData.allArticulations[idx].indexOf("meta_") == -1)
         {
             return false;
