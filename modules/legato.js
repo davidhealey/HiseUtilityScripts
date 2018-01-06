@@ -86,7 +86,7 @@ knbOffset.set("tooltip", "Sets the startMod constant modulator (required) for le
 
 const var knbRate = Content.addKnob("Rate", 150, 100);
 knbRate.set("mode", "TempoSync");
-knbRate.set("max", 11);
+knbRate.set("max", 19);
 knbRate.set("tooltip", "Rate for glide timer relative to current tempo. If velocity is selected then the glide time will be based on the played velocity.");
 
 const var btnSameNote = Content.addButton("Same Note Legato", 300, 110);
@@ -381,3 +381,4 @@ function onControl(number, value)
 		break;
 	}
 }
+ 
