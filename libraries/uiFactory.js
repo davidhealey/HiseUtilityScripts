@@ -140,4 +140,11 @@ namespace ui
 
 		a[idx].set("visible", true);
 	}
+	
+	inline function setupControl(id, json)
+    {
+        local control = Content.getComponent(id);
+        Content.setPropertiesFromJSON(id, json);
+        return control;
+    }
 }
