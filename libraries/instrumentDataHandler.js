@@ -20,6 +20,7 @@ include("instrumentData.js");
 namespace idh
 {	
 	reg articulationIndexes = []; //Instrument's articulations indexed against allArticulations
+	reg instrumentsArticulations = []; //Just the instrument's articulations names
 
 	//Instrument loading functions
 	inline function loadInstrument(name, sampleMaps)
@@ -29,6 +30,7 @@ namespace idh
 		Console.assertIsObjectOrArray(entry); //Error if entry not found
 		
 		articulationIndexes = indexArticulations(name);
+		instrumentsArticulations = getArticulations(name); //Populate array of instrument's articulation names
 		bypassUnusedSamplers(entry);
 		if (sampleMaps == true) loadSampleMaps(name, entry);
 	}
@@ -100,6 +102,22 @@ namespace idh
 		
 		return entry;
 	}
+	
+	inline function getArticulations(name)
+    {
+        local entry = instData.database[name]; //Get instrument entry from the instData.database
+		
+		Console.assertIsObjectOrArray(entry); //Error if entry not found
+		
+		local articulations = [];
+
+		for (k in entry.articulations)
+		{
+			articulations.push(k);
+		}
+		
+		return articulations;
+    }
 	
 	//Returns the full range of the instrument (maximum range of all articulations)
 	inline function getRange(name)
@@ -227,6 +245,16 @@ namespace idh
 	inline function getArticulationName(idx)
     {
             return instData.allArticulations[idx];
+    }
+    
+    inline function getGlobalArticulationIndex(articulationName)
+    {
+       return instData.allArticulations.indexOf(articulationName); 
+    }
+
+    inline function getlArticulationIndex(articulationName)
+    {
+       return instrumentsArticulations.indexOf(articulationName);
     }
     
 	//Given an index in the allArticulations array, returns the corrosponding index for the instrument's articulations
