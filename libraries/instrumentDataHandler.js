@@ -230,8 +230,15 @@ namespace idh
         return true;
     }
     
-    /*inline function getAttack(name, idx)
+    //Returns the attack for the given insturment name and articulation (a)
+    inline function getAttack(name, a)
     {
-        
-    }*/
+        return instData.database[name].articulations[a].attack;
+    }
+    
+    //Returns the release for the given insturment name and articulation (a)
+    inline function getRelease(name, a)
+    {
+        return instData.database[name].articulations[a].release;
+    }
 }
