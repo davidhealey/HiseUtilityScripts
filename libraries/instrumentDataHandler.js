@@ -37,7 +37,7 @@ namespace idh
 	{
 		local samplerIds = Synth.getIdList("Sampler");
 		local s;
-		reg bypassSet;
+		local bypassSet;
 		
 		for (i = 0; i < samplerIds.length; i++)	//Each sampler ID
 		{
@@ -66,7 +66,7 @@ namespace idh
 	{	
 		local samplerIds = Synth.getIdList("Sampler");
 		local s;
-		reg loaded; //Flag to keep check if sample map has been loaded into sampler
+		local loaded; //Flag to keep check if sample map has been loaded into sampler
 				
 		for (i = 0; i < samplerIds.length; i++)	//Each sampler ID
 		{		
@@ -93,8 +93,8 @@ namespace idh
 			
 	//Returns the data entry for the given instrument
 	inline function getData(name)
-	{
-		local entry = instData.database[name]; //Get instrument entry from the instData.database
+	{		
+		local entry = instData.database[name]; //Get instrument entry from the database
 		
 		Console.assertIsObjectOrArray(entry); //Error if entry not found
 		
@@ -102,14 +102,11 @@ namespace idh
 	}
 	
 	inline function getArticulations(name)
-    {
-        local entry = instData.database[name]; //Get instrument entry from the instData.database
-		
-		Console.assertIsObjectOrArray(entry); //Error if entry not found
-		
+    {		
+		local data = instData.database[name].articulations; //Get instrument entry from the database
 		local articulations = [];
 
-		for (k in entry.articulations)
+		for (k in data)
 		{
 			articulations.push(k);
 		}
@@ -119,22 +116,14 @@ namespace idh
 	
 	//Returns the full range of the instrument (maximum range of all articulations)
 	inline function getRange(name)
-	{
-		local entry = instData.database[name]; //Get instrument entry from the instData.database
-		
-		Console.assertIsObjectOrArray(entry); //Error if entry not found
-		
-		return entry.range;
+	{				
+		return instData.database[name].range;
 	}
 	
 	//Returns the range of the specified articulation
 	inline function getArticulationRange(name, a)
-	{
-		local entry = instData.database[name]; //Get instrument entry from the instData.database
-		
-		Console.assertIsObjectOrArray(entry); //Error if entry not found
-		
-		return entry.articulations[a].range;
+	{		
+		return instData.database[name].articulations[a].range;
 	}
 		
 	//Returns the number of articulations either for the specified insturment or from allArticulations
@@ -167,14 +156,10 @@ namespace idh
 	inline function getArticulationDisplayNames(name)
 	{
 		if (name != null)
-		{
-			local entry = instData.database[name]; //Get instrument entry from the instData.database
-
-			Console.assertIsObjectOrArray(entry); //Error if entry not found
-		
+		{		
 			local n = [];
 		
-			for (k in entry.articulations) //Each of the insturment's articulations
+			for (k in instData.database[name].articulations) //Each of the insturment's articulations
 			{
 				n.push(instData.articulationDisplayNames[instData.allArticulations.indexOf(k)]);
 			}
@@ -185,7 +170,6 @@ namespace idh
 		{
 			return instData.articulationDisplayNames;
 		}
-
 	}
 		
 	//Returns the name of the articulation specified by the given index
@@ -215,32 +199,20 @@ namespace idh
     				
 	//Returns the note number for the given index in the instrumentsKeyswitches array
 	inline function getKeyswitch(name, idx)
-	{
-	    local entry = instData.database[name]; //Get instrument entry from the instData.database
-
-		Console.assertIsObjectOrArray(entry); //Error if entry not found
-			
-		return entry.keyswitches[idx];
+	{			
+		return instData.database[name].keyswitches[idx];
 	}
 	
 	//Returns the index of the given note number from the instData.keyswitches array
 	inline function getKeyswitchIndex(name, noteNum)
-	{
-	    local entry = instData.database[name]; //Get instrument entry from the instData.database
-
-		Console.assertIsObjectOrArray(entry); //Error if entry not found
-		
-		return entry.keyswitches.indexOf(noteNum);
+	{		
+		return instData.database[name].keyswitches.indexOf(noteNum);
 	}
 	
 	//Set the index in the instData.keyswitches array to the given note number
 	inline function setKeyswitch(name, idx, noteNum)
-	{
-	    local entry = instData.database[name]; //Get instrument entry from the instData.database
-
-		Console.assertIsObjectOrArray(entry); //Error if entry not found
-		
-		entry.keyswitches[idx] = noteNum;
+	{		
+		instData.database[name].keyswitches[idx] = noteNum;
 	}
 	
 	//For the given program number returns the index in the instData.programs array
@@ -257,4 +229,9 @@ namespace idh
         }
         return true;
     }
+    
+    /*inline function getAttack(name, idx)
+    {
+        
+    }*/
 }
