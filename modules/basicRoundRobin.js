@@ -12,6 +12,7 @@ const var samplerIds = Synth.getIdList("Sampler");
 const var childSamplers = [];
 reg rr = -1;
 reg lastRR = -1; //RR step number used for the last onNote
+reg lastTime = 0; //Track how long between notes
 
 const var btnBypass = Content.addButton("Bypass", 0, 10); //Script bypass
 const var btnRandom = Content.addButton("Random", 150, 10); //Random mode button
@@ -26,20 +27,28 @@ for (id in samplerIds)
 {
 	if (!btnBypass.getValue()) //Not bypassed and note in range
 	{
-		//Random RR
-		if (btnRandom.getValue())
-		{
-			rr = Math.randInt(0, parseInt(knbGroups.getValue()));
-		}
+    if (Engine.getUptime() - lastTime > 2) //More than 2 seconds between notes
+    {
+      rr = -1; //Reset RR counter
+    }
+    else
+    {
+  		//Random RR
+  		if (btnRandom.getValue())
+  		{
+  			rr = Math.randInt(0, parseInt(knbGroups.getValue()));
+  		}
 
-		//Random is disabled, or the randomly generated RR is the same as the last RR
-		if (!btnRandom.getValue() || lastRR == rr)
-		{
-			rr = (rr + 1) % parseInt(knbGroups.getValue());
-		}
+  		//Random is disabled, or the randomly generated RR is the same as the last RR
+  		if (!btnRandom.getValue() || lastRR == rr)
+  		{
+  			rr = (rr + 1) % parseInt(knbGroups.getValue());
+  		}
+    }
 
 		lastRR = rr; //Make a note of the RR number for next time
-		
+    lastTime = Engine.getUptime();
+
 		for (s in childSamplers)
 	    {
 	        s.setActiveGroup(rr+1);
