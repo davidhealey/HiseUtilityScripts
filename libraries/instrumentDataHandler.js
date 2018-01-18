@@ -215,7 +215,7 @@ namespace idh
 		return instData.database[name].keyswitches[idx];
 	}
 	
-	//Returns the index of the given note number from the instData.keyswitches array
+	//Returns the indexOf the given note number from the instrument's keyswitches array
 	inline function getKeyswitchIndex(name, noteNum)
 	{		
 		return instData.database[name].keyswitches.indexOf(noteNum);
