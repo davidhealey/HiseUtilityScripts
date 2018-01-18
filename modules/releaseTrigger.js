@@ -34,6 +34,7 @@ knbTime.setRange(0, 20, 0.1);
 
 const var tblTime = Content.addTable("tblTime", 140, 0);
 tblTime.setPosition(0, 60, 575, 100);
+tblTime.set("saveInPreset", true);
 
 for(i = 0; i < 127; i++)
 {
