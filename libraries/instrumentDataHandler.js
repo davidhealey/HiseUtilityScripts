@@ -20,6 +20,7 @@ include("instrumentData.js");
 namespace idh
 {	
 	reg instrumentsArticulations = []; //Just the instrument's articulations names
+	reg displayNames = [];
 
 	//Instrument loading functions
 	inline function loadInstrument(name, sampleMaps)
@@ -29,6 +30,13 @@ namespace idh
 		Console.assertIsObjectOrArray(entry); //Error if entry not found
 		
 		instrumentsArticulations = getArticulations(name); //Populate array of instrument's articulation names
+		
+		//Populate displayNames array
+		for (k in entry.articulations)
+        {
+            displayNames.push(entry.articulations[k].displayName);
+        }
+		
 		bypassUnusedSamplers(entry);
 		if (sampleMaps == true) loadSampleMaps(name, entry);
 	}
@@ -152,25 +160,23 @@ namespace idh
 		}
 	}
 	
-	//Returns an array containing the names of all of the insturment's articulations display names
-	inline function getArticulationDisplayNames(name)
+	//Returns the display names array
+	inline function getArticulationDisplayNames()
 	{
-		if (name != null)
-		{		
-			local n = [];
-		
-			for (k in instData.database[name].articulations) //Each of the insturment's articulations
-			{
-				n.push(instData.articulationDisplayNames[instData.allArticulations.indexOf(k)]);
-			}
-		
-			return n;
-		}
-		else 
-		{
-			return instData.articulationDisplayNames;
-		}
+        return displayNames;
 	}
+	
+	//Get the display name from the instruments articulation index
+	inline function getDisplayName(idx)
+    {
+        return displayNames[idx];
+    }
+    
+    //Get the display name from the articulation's name
+    inline function getDisplayNameFromArticulationName(a)
+    {
+        return displayNames[instrumentsArticulations.indexOf(a)];
+    }
 		
 	//Returns the name of the articulation specified by the given index
 	inline function getArticulationName(idx, all)
