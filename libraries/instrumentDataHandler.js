@@ -202,7 +202,13 @@ namespace idh
             return instrumentsArticulations.indexOf(articulationName);   
         }
     }
-    				
+    
+    //Returns the keyswitch array for the specified instrument
+    inline function getKeyswitches(name)
+    {
+        return instData.database[name].keyswitches;
+    }
+    
 	//Returns the note number for the given index in the instrumentsKeyswitches array
 	inline function getKeyswitch(name, idx)
 	{			
