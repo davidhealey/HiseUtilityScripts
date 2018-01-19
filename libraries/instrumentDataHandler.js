@@ -37,66 +37,32 @@ namespace idh
             displayNames.push(entry.articulations[k].displayName);
         }
 		
-		bypassUnusedSamplers(entry);
 		if (sampleMaps == true) loadSampleMaps(name, entry);
 	}
-	
-	inline function bypassUnusedSamplers(entry)
-	{
-		local samplerIds = Synth.getIdList("Sampler");
-		local s;
-		local bypassSet;
 		
-		for (i = 0; i < samplerIds.length; i++)	//Each sampler ID
-		{
-			bypassSet = false;
-			
-			s = Synth.getChildSynth(samplerIds[i]); //Get the sampler
-		
-			for (a in entry.articulations) //Each of the entry's articulations
-			{
-				if (samplerIds[i].indexOf(a) != -1) //Sample ID contains articulation name (case sensitive)
-				{
-					s.setBypassed(false);
-					bypassSet = true; //Set flag
-					break; //Exit inner loop
-				}
-			}
-			
-			if (bypassSet == false) //Bypass state has not yet been set for this sampler
-			{
-				s.setBypassed(true); //Bypass unused sampler
-			}
-		}
-	}
-			
 	inline function loadSampleMaps(name, entry)
 	{	
 		local samplerIds = Synth.getIdList("Sampler");
+		local sampleMaps = Sampler.getSampleMapList();
+		local childSynth;
 		local s;
-		local loaded; //Flag to keep check if sample map has been loaded into sampler
-				
-		for (i = 0; i < samplerIds.length; i++)	//Each sampler ID
-		{		
-			loaded = false;
-			
-			s = Synth.getSampler(samplerIds[i]);
-			
-			for (a in entry.articulations)
-			{	
-				if (samplerIds[i].indexOf(a) != -1)
-				{
-					s.loadSampleMap(name + "_" + samplerIds[i]); //Load sample map for this instrument
-					loaded = true; //Flag that a sample map has been loaded into this sampler
-					break; //Exit the inner loop
-				}
-			}
-			
-			if (loaded == false) //If no sample map was loaded
-			{
-				s.loadSampleMap("empty"); //Load empty sample map
-			}
-		}
+
+		for (id in samplerIds)
+	    {
+	        childSynth = Synth.getChildSynth(id);
+	        s = Synth.getSampler(id);
+
+	        if (sampleMaps.contains(name + "_" + id)) //A sample map for this instrument was found
+	        {
+	            childSynth.setBypassed(false); //Enable sampler
+	            s.loadSampleMap(name + "_" + id); //Load the sample map for this sampler
+	        }
+	        else
+	        {
+	            childSynth.setBypassed(true); //Bypass sampler
+	            s.loadSampleMap("empty"); //Load the sample map for this sampler
+	        }
+	    }
 	}
 			
 	//Returns the data entry for the given instrument
