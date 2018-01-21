@@ -29,6 +29,8 @@ namespace idh
 		
 		Console.assertIsObjectOrArray(entry); //Error if entry not found
 		
+		instData.keyswitches = []; //Reset ks array - should be populated by instrument on load
+		
 		instrumentsArticulations = getArticulations(name); //Populate array of instrument's articulation names
 		
 		//Populate displayNames array
@@ -172,25 +174,25 @@ namespace idh
     //Returns the keyswitch array for the specified instrument
     inline function getKeyswitches(name)
     {
-        return instData.database[name].keyswitches;
+        return instData.keyswitches;
     }
     
 	//Returns the note number for the given index in the instrumentsKeyswitches array
 	inline function getKeyswitch(name, idx)
 	{			
-		return instData.database[name].keyswitches[idx];
+		return instData.keyswitches[idx];
 	}
 	
 	//Returns the indexOf the given note number from the instrument's keyswitches array
 	inline function getKeyswitchIndex(name, noteNum)
 	{		
-		return instData.database[name].keyswitches.indexOf(noteNum);
+		return instData.keyswitches.indexOf(noteNum);
 	}
 	
 	//Set the index in the instData.keyswitches array to the given note number
 	inline function setKeyswitch(name, idx, noteNum)
 	{		
-		instData.database[name].keyswitches[idx] = noteNum;
+		instData.keyswitches[idx] = noteNum;
 	}
 	
 	//For the given program number returns the index in the instData.programs array
