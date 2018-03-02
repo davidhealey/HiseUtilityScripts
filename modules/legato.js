@@ -1,8 +1,6 @@
 /**
  * Title: legato
  * Author: David Healey
- * Date: 27/01/2017
- * Modified: 17/11/2017
  * License: GPLv3 - https://www.gnu.org/licenses/gpl-3.0.en.html
 */
 
@@ -151,16 +149,18 @@ inline function getFadeTime(interval, velocity)
 inline function getRate(interval, velocity)
 {
 	reg rate = knbRate.getValue(); //Get rate knob value
+	reg invl = interval;
 
 	//If rate knob is set to the maximum then the actual rate will be determined by velocity
 	if (rate == knbRate.get("max"))
 	{
 		rate = Math.min(knbRate.get("max")-1, Math.floor((velocity / (knbRate.get("max") - 1)))); //Capped rate at max rate
+		invl = interval + 3; //Increase interval to improve velocity controlled resolution
 	}
 
 	rate = Engine.getMilliSecondsForTempo(rate) / 1000; //Rate to milliseconds for timer
 
-	rate = rate / interval; //Rate is per glide step
+	rate = rate / invl; //Rate is per glide step
 
 	if (rate < 0.04) rate = 0.04; //Cap lowest rate at timer's minimum
 
@@ -293,7 +293,7 @@ function onNoteOff()
 
 function onController()
 {
-
+	
 }
 function onTimer()
 {
@@ -381,4 +381,4 @@ function onControl(number, value)
 		break;
 	}
 }
- 
+
