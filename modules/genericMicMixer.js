@@ -114,19 +114,19 @@ inline function muteSolo()
 }
 function onNoteOn()
 {
-
+	
 }
 function onNoteOff()
 {
-
+	
 }
 function onController()
 {
-
+	
 }
 function onTimer()
 {
-
+	
 }
 function onControl(number, value)
 {
@@ -172,7 +172,7 @@ function onControl(number, value)
 		{
 			for (s in samplers) //Each sampler
 			{
-				if (s.getNumMicPositions > 1 && s.isMicPositionPurged(i) != value) //Only purge or load if it's not already purged or loaded
+				if (s.getNumMicPositions() > 1 && s.isMicPositionPurged(i) != value) //Only purge or load if it's not already purged or loaded
 				{
 					s.purgeMicPosition(s.getMicPositionName(i), value);
 				}
@@ -180,3 +180,4 @@ function onControl(number, value)
 		}
 	}
 }
+
