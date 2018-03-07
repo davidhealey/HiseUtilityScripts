@@ -1,8 +1,9 @@
 /**
  * Title: uiFactory.js
  * Author: David Healey
- * Date: 29/07/2017
  * License: LGPL - https://www.gnu.org/licenses/lgpl-3.0.en.html
+ *          Some of the functions in this file are in the public domain and may be used independently of this library and its license.
+ *          Such functions are preceded by a comment indicating their public domain status.
 */
 
 namespace ui
@@ -109,14 +110,14 @@ namespace ui
 				else if (event.drag)
 				{
 					// Calculate the sensitivity value
-					reg distance  = (event.dragX - event.dragY) / this.data.sensitivity;
+					var distance  = (event.dragX - event.dragY) / this.data.sensitivity;
 
 					if (event.ctrlDown) //If ctrl/cmd key is held down
 					{
 						distance = (event.dragX - event.dragY) / (this.data.sensitivity * 4);
 					}
 
-					reg newValue = Math.range(this.data.mouseDownValue + distance, this.get("min"), this.get("max"));
+					var newValue = Math.range(this.data.mouseDownValue + distance, this.get("min"), this.get("max"));
 
 					if (newValue != this.getValue())
 					{
@@ -130,6 +131,87 @@ namespace ui
 
 		return control;
 	}
+
+    //License - Public Domain
+    inline function modWheelDisplay(id, paintRoutine, sensitivity)
+    {
+        local control = Content.getComponent(id);
+
+        control.set("allowCallbacks", "Clicks, Hover & Dragging");        
+		control.setPaintRoutine(paintRoutine);
+		control.data.sensitivity = sensitivity;
+
+        control.setMouseCallback(function(event)
+        {
+            if (event.clicked)
+            {
+                this.data.mouseDownValue = this.getValue(); // save the value from the mouse click
+            }
+            else
+            {
+                var newValue = this.getValue();
+                
+                if (event.drag)
+                {
+                    var distance  = (event.dragX - event.dragY) / this.data.sensitivity; // Calculate the sensitivity value
+                    newValue = Math.range(this.data.mouseDownValue + distance, this.get("min"), this.get("max"));
+                }
+                        
+                if (newValue != this.getValue()) //The value has changed
+                {
+                    this.setValue(newValue);
+                    this.repaint();
+                    this.changed();
+                    Synth.sendController(1, newValue);
+                }                
+            }
+        });
+
+        return control;
+    }
+
+    //License - Public Domain
+    inline function pitchWheelDisplay(id, paintRoutine, sensitivity)
+    {
+        local control = Content.getComponent(id);
+
+        control.set("allowCallbacks", "Clicks, Hover & Dragging");        
+		control.setPaintRoutine(paintRoutine);
+		control.data.sensitivity = sensitivity;
+
+        control.setMouseCallback(function(event)
+        {
+            if (event.clicked)
+            {
+                this.data.mouseDownValue = this.getValue(); // save the value from the mouse click
+            }
+            else
+            {
+                var newValue = this.getValue();
+                
+                if (event.drag)
+                {
+                    var distance  = (event.dragX - event.dragY) * (this.data.sensitivity*10); // Calculate the sensitivity value
+                    newValue = Math.range(this.data.mouseDownValue + distance, this.get("min"), this.get("max"));
+                }
+                
+                if (event.mouseUp)
+                {
+                    newValue = 8192;
+                }
+                
+                if (newValue != this.getValue()) //The value has changed
+                {
+                    this.setValue(newValue);
+                    this.repaint();
+                    this.changed();
+                    Synth.sendController(129, newValue);
+                }   
+            }
+        });
+
+        return control;
+    }
 
 	inline function showControlFromArray(a, idx)
 	{
