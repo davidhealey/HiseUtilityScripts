@@ -132,6 +132,27 @@ namespace ui
 		return control;
 	}
 
+    inline function sliderPanelNew(panelId, knobId, paintRoutine)
+    {
+        local panel = Content.getComponent(panelId);
+        local knob = Content.getComponent(knobId);
+
+        panel.setPaintRoutine(paintRoutine);
+        panel.set("min", knob.get("min"));
+        panel.set("max", knob.get("max"));
+        knob.set("width", panel.get("width"));
+        knob.set("height", panel.get("height"));
+
+        knob.setControlCallback(function(){
+            panel.setValue(this.getValue());
+            panel.repaint();
+            panel.changed();
+        });
+        
+        return panel;
+    }
+
+
     //License - Public Domain
     inline function modWheel(id, sensitivity)
     {
@@ -140,6 +161,7 @@ namespace ui
         control.set("allowCallbacks", "Clicks, Hover & Dragging");        
 		control.setPaintRoutine(paintRoutine);
 		control.data.sensitivity = sensitivity;
+		control.setValue(0);
 
 		control.setPaintRoutine(function(g){
             g.fillAll(this.get("bgColour"));
@@ -193,6 +215,7 @@ namespace ui
         control.set("allowCallbacks", "Clicks, Hover & Dragging");        
 		control.setPaintRoutine(paintRoutine);
 		control.data.sensitivity = sensitivity;
+		control.setValue(8192);
 
 		control.setPaintRoutine(function(g){
             var lineSize = this.get("borderSize");
