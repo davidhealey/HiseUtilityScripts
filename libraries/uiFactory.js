@@ -133,7 +133,7 @@ namespace ui
 	}
 
     //License - Public Domain
-    inline function modWheelDisplay(id, paintRoutine, sensitivity)
+    inline function modWheel(id, sensitivity)
     {
         local control = Content.getComponent(id);
 
@@ -141,6 +141,21 @@ namespace ui
 		control.setPaintRoutine(paintRoutine);
 		control.data.sensitivity = sensitivity;
 
+		control.setPaintRoutine(function(g){
+            g.fillAll(this.get("bgColour"));
+    
+            var lineSize = this.get("borderSize");
+            var linePos = Math.range(this.get("height")-((this.get("height")/this.get("max")) * this.getValue()), lineSize/2, this.get("height")-lineSize/2);
+
+            //Draw value
+            g.setColour(this.get("itemColour"));
+            g.fillRect([0, linePos, this.get("width"), this.get("height")]);
+        
+            //Draw line
+            g.setColour(this.get("itemColour2"));
+            g.drawLine(0, this.get("width"), linePos, linePos, lineSize);
+		});
+		
         control.setMouseCallback(function(event)
         {
             if (event.clicked)
@@ -171,7 +186,7 @@ namespace ui
     }
 
     //License - Public Domain
-    inline function pitchWheelDisplay(id, paintRoutine, sensitivity)
+    inline function pitchWheel(id, sensitivity)
     {
         local control = Content.getComponent(id);
 
@@ -179,6 +194,32 @@ namespace ui
 		control.setPaintRoutine(paintRoutine);
 		control.data.sensitivity = sensitivity;
 
+		control.setPaintRoutine(function(g){
+            var lineSize = this.get("borderSize");
+    
+            //Calcluate the position to draw the line based on the panel's value (pitch wheel value)
+            //use Math.range to account for the height of the line (lineSize)
+            var linePos = Math.range(this.get("height")-((this.get("height")/this.get("max")) * this.getValue()), lineSize/2, this.get("height")-lineSize/2);
+    
+            g.fillAll(this.get("bgColour"));
+            
+            //Draw value display
+            g.setColour(this.get("itemColour"));
+    
+            if (this.getValue() > 8192) //Bend up
+            {   
+                g.fillRect([0, linePos, this.get("width"), this.get("height")/2 - linePos]);
+            }
+            else if (this.getValue() < 8192) //Bend down
+            {
+                g.fillRect([0, this.get("height")/2, this.get("width"), linePos-this.get("height")/2]);
+            }
+        
+            //Draw line
+            g.setColour(this.get("itemColour2"));
+            g.drawLine(0, this.get("width"), linePos, linePos, lineSize);
+		});
+		
         control.setMouseCallback(function(event)
         {
             if (event.clicked)
@@ -191,7 +232,7 @@ namespace ui
                 
                 if (event.drag)
                 {
-                    var distance  = (event.dragX - event.dragY) * (this.data.sensitivity*10); // Calculate the sensitivity value
+                    var distance  = ((event.dragX - event.dragY) * 150) / this.data.sensitivity; // Calculate the sensitivity value
                     newValue = Math.range(this.data.mouseDownValue + distance, this.get("min"), this.get("max"));
                 }
                 
