@@ -8,7 +8,7 @@
 
 namespace ui
 {
-	// Helper function
+	//Public Domain
 	inline function _keyExists(obj, key)
 	{
 		return !(obj[key] == void); //Important: void, not undefined!
@@ -63,6 +63,7 @@ namespace ui
 		return control;
 	};
 
+	//Public Domain
 	inline function getNormalizedValue(id)
 	{
 		local control = Content.getComponent(id);
@@ -72,12 +73,28 @@ namespace ui
 			return (control.getValue() - control.get("min")) / (control.get("max") - control.get("min"));
 		}
 		return false;
-	}
+	};
+
+	//Public Domain
+	inline function getPresetNames()
+    {
+        local presetList = Engine.getUserPresetList(); //Get list of all user presets
+        local presetNames = [];
+        local l;
+    
+        for (p in presetList)
+        {
+            l = p.split("/");        
+            if (l.length == 3) presetNames.push(l[2]);
+        }
+    
+        return presetNames;
+    };
 
 	inline function resetKeyColour(n)
 	{
 		Engine.setKeyColour(n, Colours.withAlpha(Colours.white, 0.0));
-	}
+	};
 
 	inline function sliderPanel(id, paintRoutine, defaultValue, sensitivity)
 	{
@@ -130,28 +147,7 @@ namespace ui
 		});
 
 		return control;
-	}
-
-    inline function sliderPanelNew(panelId, knobId, paintRoutine)
-    {
-        local panel = Content.getComponent(panelId);
-        local knob = Content.getComponent(knobId);
-
-        panel.setPaintRoutine(paintRoutine);
-        panel.set("min", knob.get("min"));
-        panel.set("max", knob.get("max"));
-        knob.set("width", panel.get("width"));
-        knob.set("height", panel.get("height"));
-
-        knob.setControlCallback(function(){
-            panel.setValue(this.getValue());
-            panel.repaint();
-            panel.changed();
-        });
-        
-        return panel;
-    }
-
+	};
 
     //License - Public Domain
     inline function modWheel(id, sensitivity)
@@ -205,7 +201,7 @@ namespace ui
         });
 
         return control;
-    }
+    };
 
     //License - Public Domain
     inline function pitchWheel(id, sensitivity)
@@ -275,7 +271,7 @@ namespace ui
         });
 
         return control;
-    }
+    };
 
 	inline function showControlFromArray(a, idx)
 	{
@@ -285,12 +281,12 @@ namespace ui
 		}
 
 		a[idx].set("visible", true);
-	}
+	};
 	
 	inline function setupControl(id, json)
     {
         local control = Content.getComponent(id);
         Content.setPropertiesFromJSON(id, json);
         return control;
-    }
+    };
 }
