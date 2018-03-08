@@ -8,12 +8,6 @@
 
 namespace ui
 {
-	//Public Domain
-	inline function _keyExists(obj, key)
-	{
-		return !(obj[key] == void); //Important: void, not undefined!
-	};
-
 	inline function buttonPanel(id, paintRoutine)
 	{
 		local control = Content.getComponent(id);
