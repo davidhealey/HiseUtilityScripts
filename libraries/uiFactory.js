@@ -29,7 +29,7 @@ namespace ui
 		});
 
 		return control;
-	}
+	};
 
 	inline function comboBoxPanel(id, paintRoutine, items) //Custom combo box
 	{
