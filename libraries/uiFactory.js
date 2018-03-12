@@ -14,7 +14,6 @@ namespace ui
 
 		control.set("allowCallbacks", "Clicks Only");
 		control.set("min", 0);
-		control.set("max", 1);
 		control.setPaintRoutine(paintRoutine);
 
 		// Define a callback behaviour when you select a popup menu...
@@ -22,7 +21,8 @@ namespace ui
 		{
 			if (event.clicked)
 			{
-				this.setValue(Math.round(1-this.getValue())); //Set the value
+			    this.setValue((this.getValue() + 1) % parseInt(this.get("max") + 1));
+				//this.setValue(Math.round(1-this.getValue())); //Set the value
 				this.changed(); // tells the script to execute the onControl callback with the new value
 				this.repaint();
 			}
@@ -273,8 +273,7 @@ namespace ui
 		{
 			a[i].set("visible", false);
 		}
-
-		a[idx].set("visible", true);
+		idx < a.length ? a[idx].set("visible", true) : Console.print("showControlFromArray: index out of range");	    
 	};
 	
 	inline function setupControl(id, json)
