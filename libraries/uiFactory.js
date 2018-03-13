@@ -21,8 +21,7 @@ namespace ui
 		{
 			if (event.clicked)
 			{
-			    this.setValue((this.getValue() + 1) % parseInt(this.get("max") + 1));
-				//this.setValue(Math.round(1-this.getValue())); //Set the value
+			    this.setValue(parseInt((this.getValue() + 1)) % parseInt(this.get("max") + 1));
 				this.changed(); // tells the script to execute the onControl callback with the new value
 				this.repaint();
 			}
