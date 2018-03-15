@@ -103,7 +103,7 @@ namespace ui
 		{
 			if (event.clicked)
 			{
-				// save the value from the mouse click
+				//Save the value from the mouse click
 				this.data.mouseDownValue = this.getValue();
 			}
 			else

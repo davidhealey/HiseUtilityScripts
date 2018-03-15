@@ -42,9 +42,8 @@ namespace asyncUpdater
 	{
 		return timerState_;
 	}
-
+	
 	/** Internal stuff. */
-
 	const var internalUpdater_ = Engine.createTimerObject();
 	reg handleAsyncUpdate_;
 	reg param_; //Parameter to be passed to function

@@ -172,7 +172,7 @@ namespace idh
     }
     
     //Returns the keyswitch array for the specified instrument
-    inline function getKeyswitches(name)
+    inline function getKeyswitches()
     {
         return instData.keyswitches;
     }
@@ -190,7 +190,7 @@ namespace idh
 	}
 	
 	//Set the index in the instData.keyswitches array to the given note number
-	inline function setKeyswitch(name, idx, noteNum)
+	inline function setKeyswitch(idx, noteNum)
 	{		
 		instData.keyswitches[idx] = noteNum;
 	}
