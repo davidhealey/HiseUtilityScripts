@@ -64,6 +64,25 @@ namespace idh
 	        }
 	    }
 	}
+	
+	inline function getInstrumentName()
+    {
+        local presetName = Engine.getCurrentUserPresetName();
+        local instrumentName = "";
+        
+        if (presetName != "")
+        {
+            for (n in instData.database)
+            {                
+                if (presetName.indexOf(n) != -1) //Preset name contains database entry name
+                {
+                    instrumentName = n;
+                    break;
+                }
+            }
+        }
+        return instrumentName;
+    }
 			
 	//Returns the data entry for the given instrument
 	inline function getData(name)
