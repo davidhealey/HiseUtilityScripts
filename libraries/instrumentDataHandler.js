@@ -20,7 +20,7 @@ include("instrumentData.js");
 namespace idh
 {	
 	reg instrumentsArticulations = []; //Just the instrument's articulations names
-	reg displayNames = [];
+	const var displayNames = [];
 
 	//Instrument loading functions
 	inline function loadInstrument(name, sampleMaps)
@@ -28,9 +28,7 @@ namespace idh
 		local entry = instData.database[name]; //Get instrument entry from the database
 		
 		Console.assertIsObjectOrArray(entry); //Error if entry not found
-		
-		instData.keyswitches = []; //Reset ks array - should be populated by instrument on load
-		
+				
 		instrumentsArticulations = getArticulations(name); //Populate array of instrument's articulation names
 		
 		//Populate displayNames array
@@ -105,7 +103,7 @@ namespace idh
 	//Returns the number of articulations either for the specified insturment or from allArticulations
 	inline function getNumArticulations(all)
 	{
-		if (all != false) //All articulations
+		if (all == true) //All articulations
 		{	
 		    return instData.allArticulations.length;
 		}
@@ -118,7 +116,7 @@ namespace idh
 	//Returns an array containing the names of either the instrument's or all articulations
 	inline function getArticulationNames(all)
 	{
-		if (all != false) //All articulations
+		if (all == true) //All articulations
 		{
             return instData.allArticulations;
 		}
@@ -170,31 +168,7 @@ namespace idh
             return instrumentsArticulations.indexOf(articulationName);   
         }
     }
-    
-    //Returns the keyswitch array for the specified instrument
-    inline function getKeyswitches()
-    {
-        return instData.keyswitches;
-    }
-    
-	//Returns the note number for the given index in the instrumentsKeyswitches array
-	inline function getKeyswitch(name, idx)
-	{			
-		return instData.keyswitches[idx];
-	}
-	
-	//Returns the indexOf the given note number from the instrument's keyswitches array
-	inline function getKeyswitchIndex(name, noteNum)
-	{		
-		return instData.keyswitches.indexOf(noteNum);
-	}
-	
-	//Set the index in the instData.keyswitches array to the given note number
-	inline function setKeyswitch(idx, noteNum)
-	{		
-		instData.keyswitches[idx] = noteNum;
-	}
-	
+    	
 	//For the given program number returns the index in the instData.programs array
 	inline function getProgramIndex(progNum)
 	{
@@ -208,6 +182,21 @@ namespace idh
             return false;
         }
         return true;
+    }
+    
+    //Returns the index of the articulation's (a) parent, if it has one
+    inline function getParentIdx(name, a)
+    {
+        local parent = instData.database[name].articulations[a].parent;
+        
+        if (typeof parent == "string")
+        {
+            return instData.allArticulations.indexOf(parent);
+        }
+        else 
+        {
+            return -1;
+        }
     }
     
     //Returns the attack for the given insturment name and articulation (a)
