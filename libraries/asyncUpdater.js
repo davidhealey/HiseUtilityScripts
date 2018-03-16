@@ -11,56 +11,41 @@
 */
 namespace asyncUpdater
 {
-	/** set a function that will be executed asynchronously. */
-	inline function setUpdateFunction(f, p)
+	inline function deferFunction(f, p)
 	{
-		handleAsyncUpdate_ = f;
-		param_ = p;
-	}
-
-	inline function setParameter(p)
-	{
-		param_ = p;
-	}
-
-	/** Call this to update your UI asynchronously. */
-	inline function triggerUpdate()
-	{
-		internalUpdater_.startTimer(25);
-		timerState_ = true;		
-	}
-
-	inline function setFunctionAndUpdate(f, p)
-	{
-		handleAsyncUpdate_ = f;
-		param_ = p;
-		internalUpdater_.startTimer(25);
-		timerState_ = true;
+		functions[0] = f;
+		parameters[0] = p;
+		timer0.startTimer(25);
 	}
 	
-	inline function isTimerRunning()
+	inline function deferFunction2(f, p)
 	{
-		return timerState_;
+		functions[1] = f;
+		parameters[1] = p;
+		timer1.startTimer(25);
 	}
 	
 	/** Internal stuff. */
-	const var internalUpdater_ = Engine.createTimerObject();
-	reg handleAsyncUpdate_;
-	reg param_; //Parameter to be passed to function
-	reg timerState_;
-
-	internalUpdater_.callback = function()
-	{
-		if (handleAsyncUpdate_)
-		{
-			param_ == null ? handleAsyncUpdate_() : handleAsyncUpdate_(param_);
-		}
-		else
-		{
-			Console.print("No UI update function defined");
-		}
-
-		this.stopTimer();
-		timerState_ = false;
-	};
+	const var timer0 = Engine.createTimerObject();
+	const var timer1 = Engine.createTimerObject();
+	const var functions = [];
+	const var parameters = [];
+	
+	timer0.callback = function()
+    {
+        if (functions[0])
+        {
+            parameters[0] = null ? functions[0]() : functions[0](parameters[0]);
+        }
+        this.stopTimer();
+    };
+    
+    timer1.callback = function()
+    {
+        if (functions[0])
+        {
+            parameters[0] = null ? functions[0]() : functions[0](parameters[0]);
+        }
+        this.stopTimer();
+    };
 };
