@@ -27,17 +27,18 @@ namespace idh
 	{
 		local entry = instData.database[name]; //Get instrument entry from the database
 		
-		Console.assertIsObjectOrArray(entry); //Error if entry not found
-				
-		instrumentsArticulations = getArticulations(name); //Populate array of instrument's articulation names
+		if (entry)
+	    {	
+            instrumentsArticulations = getArticulations(name); //Populate array of instrument's articulation names
 		
-		//Populate displayNames array
-		for (k in entry.articulations)
-        {
-            displayNames.push(entry.articulations[k].displayName);
-        }
+            //Populate displayNames array
+            for (k in entry.articulations)
+            {
+                displayNames.push(entry.articulations[k].displayName);
+            }
 		
-		if (sampleMaps == true) loadSampleMaps(name, entry);
+            if (sampleMaps == true) loadSampleMaps(name, entry);
+	    }
 	}
 		
 	inline function loadSampleMaps(name, entry)
@@ -47,7 +48,7 @@ namespace idh
 		local childSynth;
 		local s;
 		local sampleMapId = instData.database[name].sampleMapId;
-Console.print(sampleMapId);
+
 		for (id in samplerIds)
 	    {
 	        childSynth = Synth.getChildSynth(id);
