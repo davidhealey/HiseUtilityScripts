@@ -46,16 +46,17 @@ namespace idh
 		local sampleMaps = Sampler.getSampleMapList();
 		local childSynth;
 		local s;
-
+		local sampleMapId = instData.database[name].sampleMapId;
+Console.print(sampleMapId);
 		for (id in samplerIds)
 	    {
 	        childSynth = Synth.getChildSynth(id);
 	        s = Synth.getSampler(id);
 
-	        if (sampleMaps.contains(name + "_" + id)) //A sample map for this instrument was found
+	        if (sampleMaps.contains(sampleMapId + "_" + id)) //A sample map for this instrument was found
 	        {
 	            childSynth.setBypassed(false); //Enable sampler
-	            s.loadSampleMap(name + "_" + id); //Load the sample map for this sampler
+	            s.loadSampleMap(sampleMapId + "_" + id); //Load the sample map for this sampler
 	        }
 	        else
 	        {
@@ -65,7 +66,7 @@ namespace idh
 	    }
 	}
 	
-	inline function getInstrumentName()
+	inline function getInstrumentNameFromPresetName()
     {
         local presetName = Engine.getCurrentUserPresetName();
         local instrumentName = "";
