@@ -4,6 +4,7 @@
  * License: GPLv3 - https://www.gnu.org/licenses/gpl-3.0.en.html
 */
 
+reg inPhrase = 0;
 reg lastNote = -1;
 reg lastEventId = -1;
 reg retriggerNote = -1;
@@ -25,19 +26,33 @@ reg count; //Counter for switching between origin and target notes for trill
 reg CHORD_THRESHOLD = 25; //If two notes are played within this many milliseconds then it's a chord
 
 //Get all child sample start constant modulators
-const var modulatorNames = Synth.getIdList("Constant"); //Get child constant modulator names
-const var startModulators = []; //For offsetting sample start position
+const var constantModIds = Synth.getIdList("Constant"); //Get child constant modulator names
+const var velocityModIds = Synth.getIdList("Velocity Modulator"); //Get child velocity modulator names
 
-for (modName in modulatorNames)
+var constantMod; //Offseting start position during transition
+var velocityMod; //Optional, for offsetting start position for first note based on velocity
+
+//Get constant start time modulator
+for (m in constantModIds)
 {
-	if (Engine.matchesRegex(modName, "(?=.*tart)(?=.*od)")) //Sample start offset
+	if (Engine.matchesRegex(m, "(?=.*tart)(?=.*od)")) //Sample start offset
+    {
+	    constantMod = Synth.getModulator(m);
+    }
+	
+}
+
+//Get velocity start time modulator
+for (m in velocityModIds)
+{
+	if (Engine.matchesRegex(m, "(?=.*tart)(?=.*od)")) //Sample start offset
 	{
-		startModulators.push(Synth.getModulator(modName));
+		velocityMod = Synth.getModulator(m);
 	}
 }
 
 //GUI
-Content.setWidth(650);
+Content.setWidth(700);
 Content.setHeight(150);
 
 const var btnBypass = Content.addButton("Bypass", 0, 10);
@@ -95,15 +110,17 @@ btnSameNote.set("tooltip", "When active releasing a note in normal legato mode w
  * Sets the sample start offset constant modulators to the given value.
  * @param {number} value Constant modulator value between 0 and 1
  */
-inline function setSSOffset(value)
+inline function setModulators(value)
 {
-	if (startModulators.length > 0)
-	{
-		for (mod in startModulators)
-		{
-			mod.setIntensity(value);
-		}
-	}
+    if (velocityMod) //Instrument has velocity based start modulation
+    {
+        velocityMod.setIntensity(1-(value > 0)); //Set to min/max depending on value
+    }
+    
+    if (constantMod) //Instrument has constant based start modulation
+    {
+        constantMod.setIntensity(value);
+    }
 }
 
 /**
@@ -182,7 +199,7 @@ function onNoteOn()
 				interval = Math.abs(Message.getNoteNumber() - lastNote); //Get played interval
 				fadeTime = getFadeTime(interval, Message.getVelocity()); //Get fade time
 				bendTime = fadeTime + knbBendTm.getValue(); //Get bend time
-				if (bendTime < 10) bendTime = 10; //Bend time can't be less than 10ms
+				if (bendTime < 10) bendTime = 10; //Bend time can't be less than 10ms*/
 
 				//Get bend amount
 				bendAmount = 0;
@@ -192,7 +209,8 @@ function onNoteOn()
 					if (lastNote > Message.getNoteNumber()) bendAmount = -bendAmount; //Invert bend amount for down interval
 				}
 
-				setSSOffset(knbOffset.getValue()); //Set sample start offset modulators
+				//If this is the second note of the phrase set start offset modulators
+				if (inPhrase == 0) setModulators(knbOffset.getValue());
 
 				if (btnGlide.getValue()) //Glide mode
 				{
@@ -221,9 +239,11 @@ function onNoteOn()
 					Synth.addPitchFade(lastEventId, 0, Message.getCoarseDetune(), Message.getFineDetune() - bendAmount); //Set new note's initial detuning
 					Synth.addPitchFade(lastEventId, bendTime, Message.getCoarseDetune(), Message.getFineDetune()); //Pitch fade new note to 0 (or fineDetune)
 				}
+				inPhrase = 1;
 			}
 			else //First note of phrase
 			{
+			    inPhrase = 0;
 				lastEventId = Synth.playNote(Message.getNoteNumber() + Message.getTransposeAmount(), Message.getVelocity()); //Play new note
 				Synth.addPitchFade(lastEventId, 0, Message.getCoarseDetune(), Message.getFineDetune()); //Pass on any message detuning to new note
 			}
@@ -274,7 +294,7 @@ function onNoteOff()
 				Synth.noteOffByEventId(lastEventId);
 				lastEventId = -1;
 				lastNote = -1;
-				setSSOffset(1); //Reset sample start offset modulators
+				setModulators(0); //Reset sample start offset modulators
 			}
 		}
 	}
@@ -286,7 +306,7 @@ function onNoteOff()
 			Synth.noteOffByEventId(lastEventId);
 			lastEventId = -1;
 			lastNote = -1;
-			setSSOffset(1); //Reset sample start offset modulators
+			setModulators(0); //Reset sample start offset modulators
 		}
 	}
 }
