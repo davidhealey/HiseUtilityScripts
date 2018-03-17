@@ -11,41 +11,23 @@
 */
 namespace asyncUpdater
 {
-	inline function deferFunction(f, p)
-	{
-		functions[0] = f;
-		parameters[0] = p;
-		timer0.startTimer(25);
-	}
+	const var updater = Engine.createTimerObject();
+	reg func;
+	reg param;
 	
-	inline function deferFunction2(f, p)
-	{
-		functions[1] = f;
-		parameters[1] = p;
-		timer1.startTimer(25);
-	}
-	
-	/** Internal stuff. */
-	const var timer0 = Engine.createTimerObject();
-	const var timer1 = Engine.createTimerObject();
-	const var functions = [];
-	const var parameters = [];
-	
-	timer0.callback = function()
+	updater.callback = function()
     {
-        if (functions[0])
+        if (func)
         {
-            parameters[0] = null ? functions[0]() : functions[0](parameters[0]);
+            param == null ? func() : func(param);
         }
         this.stopTimer();
     };
     
-    timer1.callback = function()
-    {
-        if (functions[0])
-        {
-            parameters[0] = null ? functions[0]() : functions[0](parameters[0]);
-        }
-        this.stopTimer();
-    };
+	inline function deferFunction(f, p)
+	{
+		func = f;
+		param = p;
+		updater.startTimer(25);
+	}
 };
