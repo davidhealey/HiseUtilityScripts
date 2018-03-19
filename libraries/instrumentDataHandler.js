@@ -19,27 +19,24 @@ include("instrumentData.js");
 
 namespace idh
 {	
-	reg instrumentsArticulations = []; //Just the instrument's articulations names
-	const var displayNames = [];
+	const var articulations = []; //The articulations for the currently loaded instrument
+	const var displayNames = []; //Articulation display names for the currently loaded instrument
 
-	//Instrument loading functions
+	//Instrument loading
 	inline function loadInstrument(name, sampleMaps)
 	{
 		local entry = instData.database[name]; //Get instrument entry from the database
 		
-		if (entry)
-	    {	
-            instrumentsArticulations = getArticulations(name); //Populate array of instrument's articulation names
+        //Populate articulation and displayNames arrays
+        for (k in entry.articulations)
+        {
+            displayNames.push(entry.articulations[k].displayName);
+            articulations.push(k);
+        }
 		
-            //Populate displayNames array
-            for (k in entry.articulations)
-            {
-                displayNames.push(entry.articulations[k].displayName);
-            }
-		
-            if (sampleMaps == true) loadSampleMaps(name, entry);
-	    }
+        if (sampleMaps == true) loadSampleMaps(name, entry);
 	}
+	
 		
 	inline function loadSampleMaps(name, entry)
 	{	
@@ -89,25 +86,9 @@ namespace idh
 	//Returns the data entry for the given instrument
 	inline function getData(name)
 	{		
-		local entry = instData.database[name]; //Get instrument entry from the database
-		
-		Console.assertIsObjectOrArray(entry); //Error if entry not found
-		
+		local entry = instData.database[name]; //Get instrument entry from the database		
 		return entry;
 	}
-	
-	inline function getArticulations(name)
-    {		
-		local data = instData.database[name].articulations; //Get instrument entry from the database
-		local articulations = [];
-
-		for (k in data)
-		{
-			articulations.push(k);
-		}
-		
-		return articulations;
-    }
 	
 	//Returns the full range of the instrument (maximum range of all articulations)
 	inline function getRange(name)
@@ -121,7 +102,7 @@ namespace idh
 		return instData.database[name].articulations[a].range;
 	}
 		
-	//Returns the number of articulations either for the specified insturment or from allArticulations
+	//Returns the number of articulations either for the specified instrument or from allArticulations
 	inline function getNumArticulations(all)
 	{
 		if (all == true) //All articulations
@@ -134,75 +115,55 @@ namespace idh
 		}
 	}
 	
-	//Returns an array containing the names of either the instrument's or all articulations
-	inline function getArticulationNames(all)
+	//Returns an array containing the names of the instrument's articulations
+	inline function getInstrumentsArticulationNames()
 	{
-		if (all == true) //All articulations
-		{
-            return instData.allArticulations;
-		}
-		else //Current instrument only
-		{
-			return instrumentsArticulations;
-		}
+		return articulations;
 	}
 	
-	//Returns the display names array
-	inline function getArticulationDisplayNames()
-	{
-        return displayNames;
-	}
-	
-	//Get the display name from the instruments articulation index
-	inline function getDisplayName(idx)
+	//Get all display names 
+	inline function getDisplayNames()
     {
-        return displayNames[idx];
+        return displayNames;
     }
     
+	//Get the display name by index
+	inline function getDisplayName(idx)
+	{
+	    return displayNames[idx];
+	}
+    
     //Get the display name from the articulation's name
-    inline function getDisplayNameFromArticulationName(a)
+    inline function getDisplayNameByArticulationName(a)
     {
         return displayNames[instrumentsArticulations.indexOf(a)];
     }
 		
 	//Returns the name of the articulation specified by the given index
-	inline function getArticulationName(idx, all)
+	inline function getArticulationName(idx)
     {
-        if (all == true)
-        {
-            return instData.allArticulations[idx];
-        }
-        else 
-        {
-            return instrumentsArticulations[idx];
-        }            
+        return articulations[idx];
     }
     
-    inline function getArticulationIndex(articulationName, all)
+    inline function getArticulationIndex(a)
     {
-        if (all == true)
-        {
-            return instData.allArticulations.indexOf(articulationName);
-        }
-        else
-        {
-            return instrumentsArticulations.indexOf(articulationName);   
-        }
+        return articulations.indexOf(a);
     }
     	
 	//For the given program number returns the index in the instData.programs array
-	inline function getProgramIndex(progNum)
+	inline function getProgramIndex(n)
 	{
-		return instData.programs.indexOf(progNum);
+		return instData.programs.indexOf(n);
 	}
 	
 	inline function isMetaArticulation(idx)
     {
-        if (instData.allArticulations[idx].indexOf("meta_") == -1)
+        //If the articulation has a parent then it's a meta articulation
+        if (instData.allArticulations[idx].parent)
         {
-            return false;
+            return true;
         }
-        return true;
+        return false;
     }
     
     //Returns the index of the articulation's (a) parent, if it has one
@@ -212,12 +173,10 @@ namespace idh
         
         if (typeof parent == "string")
         {
-            return instData.allArticulations.indexOf(parent);
+            return instData.articulations.indexOf(parent);
         }
-        else 
-        {
-            return -1;
-        }
+
+        return -1;
     }
     
     //Returns the attack for the given insturment name and articulation (a)
