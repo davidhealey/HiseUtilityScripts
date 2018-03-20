@@ -59,7 +59,7 @@ knbHighNote.set("defaultValue", 127);function onNoteOn()
 		lastRR = rrStep; //Make a note of the RR number for next time
 		lastTime = Engine.getUptime();
 
-		Message.setNoteNumber(Message.getNoteNumber() + (1-rrStep)); //Note number can be picked up by later scripts if needed
+		Message.setTransposeAmount(1-rrStep);
 		Message.setCoarseDetune(-(1-rrStep)); //This can also be picked up by later scripts if needed using .getCoarseDetune
 	}
 }function onNoteOff()
