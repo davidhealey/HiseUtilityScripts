@@ -2,7 +2,7 @@
  * Title: borrowedSampleRoundRobin.js
  * Author: David Healey
  * Date: 17/11/2017
- * Modified: 17/11/2017
+ * Modified: 20/03/2018
  * License: Public Domain
 */
 
@@ -59,22 +59,22 @@ knbHighNote.set("defaultValue", 127);function onNoteOn()
 		lastRR = rrStep; //Make a note of the RR number for next time
 		lastTime = Engine.getUptime();
 
-		Message.setTransposeAmount(1-rrStep); //Use transpose rather than change note, this can be picked up by later scripts if needed
+		Message.setNoteNumber(Message.getNoteNumber() + (1-rrStep)); //Note number can be picked up by later scripts if needed
 		Message.setCoarseDetune(-(1-rrStep)); //This can also be picked up by later scripts if needed using .getCoarseDetune
 	}
 }function onNoteOff()
 {
-
+	
 }
 function onController()
 {
-
+	
 }
 function onTimer()
 {
-
+	
 }
 function onControl(number, value)
 {
-
+	
 }

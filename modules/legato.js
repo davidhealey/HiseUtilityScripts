@@ -13,7 +13,6 @@ reg lastTime;
 reg interval;
 reg fadeTime;
 reg bendTime;
-
 reg bendAmount = 0;
 reg bendLookup = []; //Bend amount lookup table - generated on init and updated when bend amount changed
 
@@ -187,8 +186,12 @@ inline function getRate(interval, velocity)
 function onNoteOn()
 {
 	if (!btnBypass.getValue())
-	{
+	{	    
 		Synth.stopTimer();
+
+		//Pick up any detuning that has been applied to the notes before this point
+		local coarseDetune = Message.getCoarseDetune();
+		local fineDetune = Message.getFineDetune();
 
 		if ((Engine.getUptime() - lastTime) * 1000 > CHORD_THRESHOLD) //Not a chord
 		{
@@ -209,14 +212,14 @@ function onNoteOn()
 					if (lastNote > Message.getNoteNumber()) bendAmount = -bendAmount; //Invert bend amount for down interval
 				}
 
-				//If this is the second note of the phrase set start offset modulators
+				//If this is the second note of the phrase set start offset modulators it will be reset in noteOff
 				if (inPhrase == 0) setModulators(knbOffset.getValue());
 
 				if (btnGlide.getValue()) //Glide mode
 				{
 					count = 0; //Reset count, for trills
 					notes[0] = lastNote; //Origin
-					notes[1] = Message.getNoteNumber(); //Target
+					notes[1] = Message.getNoteNumber()+coarseDetune+coarseFuneTune; //Target
 					glideNote = lastNote; //First glide note is the same as the origin
 					lastVelo = Message.getVelocity();
 
@@ -227,28 +230,28 @@ function onNoteOn()
 				else //Legato mode
 				{
 					Synth.addVolumeFade(lastEventId, fadeTime / 100 * knbFadeOutRatio.getValue(), -100); //Fade out old note
-					Synth.addPitchFade(lastEventId, bendTime / 100 * knbFadeOutRatio.getValue(), 0, Message.getFineDetune() + bendAmount); //Pitch fade old note
+					Synth.addPitchFade(lastEventId, bendTime / 100 * knbFadeOutRatio.getValue(), 0, fineDetune + bendAmount); //Pitch fade old note
 
 					retriggerNote = lastNote;
 
-					lastEventId = Synth.playNote(Message.getNoteNumber() + Message.getTransposeAmount(), Message.getVelocity()); //Play new note
-					Synth.addPitchFade(lastEventId, 0, Message.getCoarseDetune(), Message.getFineDetune()); //Pass on any message detuning to new note
+					lastEventId = Synth.playNote(Message.getNoteNumber(), Message.getVelocity()); //Play new note
+					Synth.addPitchFade(lastEventId, 0, coarseDetune, fineDetune); //Pass on any message detuning to new note
 
 					Synth.addVolumeFade(lastEventId, 0, -99); //Set new note's initial volume
 					Synth.addVolumeFade(lastEventId, fadeTime, 0); //Fade in new note
-					Synth.addPitchFade(lastEventId, 0, Message.getCoarseDetune(), Message.getFineDetune() - bendAmount); //Set new note's initial detuning
-					Synth.addPitchFade(lastEventId, bendTime, Message.getCoarseDetune(), Message.getFineDetune()); //Pitch fade new note to 0 (or fineDetune)
+					Synth.addPitchFade(lastEventId, 0, coarseDetune, fineDetune - bendAmount); //Set new note's initial detuning
+					Synth.addPitchFade(lastEventId, bendTime, coarseDetune, fineDetune); //Pitch fade new note to 0 (or fineDetune)
 				}
 				inPhrase = 1;
 			}
 			else //First note of phrase
 			{
 			    inPhrase = 0;
-				lastEventId = Synth.playNote(Message.getNoteNumber() + Message.getTransposeAmount(), Message.getVelocity()); //Play new note
-				Synth.addPitchFade(lastEventId, 0, Message.getCoarseDetune(), Message.getFineDetune()); //Pass on any message detuning to new note
+				lastEventId = Synth.playNote(Message.getNoteNumber(), Message.getVelocity()); //Play new note
+				Synth.addPitchFade(lastEventId, 0, coarseDetune, fineDetune); //Pass on any message detuning to new note
 			}
 
-			lastNote = Message.getNoteNumber();
+			lastNote = Message.getNoteNumber()+coarseDetune+fineDetune;
 			lastVelo = Message.getVelocity();
 			lastTime = Engine.getUptime();
 		}
