@@ -195,8 +195,6 @@ function onNoteOn()
 
 		if ((Engine.getUptime() - lastTime) * 1000 > CHORD_THRESHOLD) //Not a chord
 		{
-			Message.ignoreEvent(true);
-
 			if (lastNote != -1) //First note of phrase has already been played
 			{
 				interval = Math.abs(Message.getNoteNumber() - lastNote); //Get played interval
@@ -217,9 +215,11 @@ function onNoteOn()
 
 				if (btnGlide.getValue()) //Glide mode
 				{
+				    Message.ignoreEvent(true);
+				    
 					count = 0; //Reset count, for trills
 					notes[0] = lastNote; //Origin
-					notes[1] = Message.getNoteNumber()+coarseDetune+coarseFuneTune; //Target
+					notes[1] = Message.getNoteNumber();//+coarseDetune+coarseFuneTune; //Target
 					glideNote = lastNote; //First glide note is the same as the origin
 					lastVelo = Message.getVelocity();
 
@@ -234,7 +234,7 @@ function onNoteOn()
 
 					retriggerNote = lastNote;
 
-					lastEventId = Synth.playNote(Message.getNoteNumber(), Message.getVelocity()); //Play new note
+					lastEventId = Message.makeArtificial();
 					Synth.addPitchFade(lastEventId, 0, coarseDetune, fineDetune); //Pass on any message detuning to new note
 
 					Synth.addVolumeFade(lastEventId, 0, -99); //Set new note's initial volume
@@ -247,11 +247,11 @@ function onNoteOn()
 			else //First note of phrase
 			{
 			    inPhrase = 0;
-				lastEventId = Synth.playNote(Message.getNoteNumber(), Message.getVelocity()); //Play new note
+				lastEventId = Message.makeArtificial();
 				Synth.addPitchFade(lastEventId, 0, coarseDetune, fineDetune); //Pass on any message detuning to new note
 			}
 
-			lastNote = Message.getNoteNumber()+coarseDetune+fineDetune;
+			lastNote = Message.getNoteNumber();//+coarseDetune+fineDetune;
 			lastVelo = Message.getVelocity();
 			lastTime = Engine.getUptime();
 		}
