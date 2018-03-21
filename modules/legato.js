@@ -14,7 +14,7 @@ reg interval;
 reg fadeTime;
 reg bendTime;
 reg bendAmount = 0;
-reg bendLookup = []; //Bend amount lookup table - generated on init and updated when bend amount changed
+reg bendLookup = []; //Bend amount lookup table - generated on init (onControl) and updated when bend amount changed
 
 reg glideBend; //The bend amount for glides, either 100 or -100 depending on if an up or down glide
 reg glideNote; //Currently sounding note during a glide
@@ -22,14 +22,14 @@ reg rate; //Timer rate for glide/trill
 reg notes = []; //Origin and target notes for glide/trill
 reg count; //Counter for switching between origin and target notes for trill
 
-reg CHORD_THRESHOLD = 25; //If two notes are played within this many milliseconds then it's a chord
+const var CHORD_THRESHOLD = 25; //If two notes are played within this many milliseconds then it's a chord
 
 //Get all child sample start constant modulators
 const var constantModIds = Synth.getIdList("Constant"); //Get child constant modulator names
 const var velocityModIds = Synth.getIdList("Velocity Modulator"); //Get child velocity modulator names
 
-var constantMod; //Offseting start position during transition
-var velocityMod; //Optional, for offsetting start position for first note based on velocity
+reg constantMod; //Offseting start position during transition
+reg velocityMod; //Optional, for offsetting start position for first note based on velocity
 
 //Get constant start time modulator
 for (m in constantModIds)
@@ -37,8 +37,7 @@ for (m in constantModIds)
 	if (Engine.matchesRegex(m, "(?=.*tart)(?=.*od)")) //Sample start offset
     {
 	    constantMod = Synth.getModulator(m);
-    }
-	
+    }	
 }
 
 //Get velocity start time modulator
@@ -122,6 +121,27 @@ inline function setModulators(value)
     }
 }
 
+//Resets the sample start offset modulators - if any
+inline function resetModulators()
+{
+    if (velocityMod) //Instrument has velocity based start modulation
+    {
+        velocityMod.setIntensity(1); //Set to min/max depending on value
+    }
+    
+    if (constantMod) //Instrument has constant based start modulation
+    {
+        if (velocityMod)
+        {
+            constantMod.setIntensity(0);
+        }
+        else 
+        {
+            constantMod.setIntensity(1);
+        }        
+    }
+}
+
 /**
  * A lookup table is used for pitch bending to save CPU. This function fills that lookup table based on the min bend and max bend values.
  * @param  {number} minBend The amount of bend for an interval of 1 semitone
@@ -164,8 +184,8 @@ inline function getFadeTime(interval, velocity)
  */
 inline function getRate(interval, velocity)
 {
-	reg rate = knbRate.getValue(); //Get rate knob value
-	reg invl = interval;
+	local rate = knbRate.getValue(); //Get rate knob value
+	local invl = interval;
 
 	//If rate knob is set to the maximum then the actual rate will be determined by velocity
 	if (rate == knbRate.get("max"))
@@ -200,11 +220,10 @@ function onNoteOn()
 				interval = Math.abs(Message.getNoteNumber() - lastNote); //Get played interval
 				fadeTime = getFadeTime(interval, Message.getVelocity()); //Get fade time
 				bendTime = fadeTime + knbBendTm.getValue(); //Get bend time
-				if (bendTime < 10) bendTime = 10; //Bend time can't be less than 10ms*/
 
 				//Get bend amount
 				bendAmount = 0;
-				if (interval != 0) //Same note legato
+				if (interval != 0) //Not same note legato
 				{
 					interval > 12 ? bendAmount = bendLookup[11] : bendAmount = bendLookup[interval - 1]; //Get bend amount from lookup table
 					if (lastNote > Message.getNoteNumber()) bendAmount = -bendAmount; //Invert bend amount for down interval
@@ -229,7 +248,7 @@ function onNoteOn()
 				}
 				else //Legato mode
 				{
-					Synth.addVolumeFade(lastEventId, fadeTime / 100 * knbFadeOutRatio.getValue(), -100); //Fade out old note
+					Synth.addVolumeFade(lastEventId, fadeTime / 100 * knbFadeOutRatio.getValue(), -100); //Fade out old note					
 					Synth.addPitchFade(lastEventId, bendTime / 100 * knbFadeOutRatio.getValue(), 0, fineDetune + bendAmount); //Pitch fade old note
 
 					retriggerNote = lastNote;
@@ -297,7 +316,7 @@ function onNoteOff()
 				Synth.noteOffByEventId(lastEventId);
 				lastEventId = -1;
 				lastNote = -1;
-				setModulators(0); //Reset sample start offset modulators
+				resetModulators(); //Reset sample start offset modulators
 			}
 		}
 	}
@@ -309,7 +328,7 @@ function onNoteOff()
 			Synth.noteOffByEventId(lastEventId);
 			lastEventId = -1;
 			lastNote = -1;
-			setModulators(0); //Reset sample start offset modulators
+			resetModulators(); //Reset sample start offset modulators
 		}
 	}
 }
