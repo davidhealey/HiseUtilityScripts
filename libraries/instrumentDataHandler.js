@@ -190,4 +190,10 @@ namespace idh
     {
         return instData.database[name].articulations[a].release;
     }
+    
+    //Return keyswitches array for the passed instrument (name)
+    inline function getKeyswitches(name)
+    {
+        return instData.database[name].keyswitches;
+    }
 }
