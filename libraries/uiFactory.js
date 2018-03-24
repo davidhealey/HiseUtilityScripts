@@ -30,6 +30,34 @@ namespace ui
 		return control;
 	};
 
+	inline function momentaryButtonPanel(id, paintRoutine)
+	{
+		local control = Content.getComponent(id);
+
+		control.set("allowCallbacks", "Clicks Only");
+		control.setPaintRoutine(paintRoutine);
+
+		// Define a callback behaviour when you select a popup menu...
+		control.setMouseCallback(function(event)
+		{
+           if (event.clicked)
+            {
+                this.setValue(1);
+            }
+            else if (event.mouseUp)
+            {
+                this.setValue(0);
+            }
+    
+            this.changed();
+            this.repaint();
+		});
+
+		return control;
+	};
+
+	
+	
 	inline function comboBoxPanel(id, paintRoutine, items) //Custom combo box
 	{
 		local control = Content.getComponent(id);
