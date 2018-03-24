@@ -18,35 +18,17 @@
 include("instrumentData.js");
 
 namespace idh
-{	
-	const var articulations = []; //The articulations for the currently loaded instrument
-	const var displayNames = []; //Articulation display names for the currently loaded instrument
-
-	//Instrument loading
-	inline function loadInstrument(name, sampleMaps)
-	{
-		local entry = instData.database[name]; //Get instrument entry from the database
-
-        //Populate articulation and displayNames arrays
-        for (k in entry.articulations)
-        {
-            displayNames.push(entry.articulations[k].displayName);
-            articulations.push(k);
-        }
-		
-        if (sampleMaps == true) loadSampleMaps(name, entry);
-	}
-	
-		
-	inline function loadSampleMaps(name, entry)
+{			
+	inline function loadSampleMaps(name)
 	{	
+	    local entry = instData.database[name]; //Get instrument entry from the database
 		local samplerIds = Synth.getIdList("Sampler");
 		local sampleMaps = Sampler.getSampleMapList();
 		local childSynth;
 		local s;
 		local sampleMapId = instData.database[name].sampleMapId;
 
-		for (id in samplerIds)
+		for (id in samplerIds) //Each sampler
 	    {
 	        childSynth = Synth.getChildSynth(id);
 	        s = Synth.getSampler(id);
@@ -64,11 +46,36 @@ namespace idh
 	    }
 	}
 				
+	inline function getArticulationNames(name)
+    {
+        local entry = instData.database[name]; //Get instrument entry from the database
+        local a = [];
+        
+        for (k in entry.articulations)
+        {
+            a.push(k);
+        }
+        
+        return a;
+    }
+	
+	inline function getArticulationDisplayNames(name)
+    {
+        local entry = instData.database[name]; //Get instrument entry from the database
+        local a = [];
+        
+        for (k in entry.articulations)
+        {
+            a.push(entry.articulations[k].displayName);
+        }
+        
+        return a;
+    }
+    
 	//Returns the data entry for the given instrument
 	inline function getData(name)
 	{		
-		local entry = instData.database[name]; //Get instrument entry from the database		
-		return entry;
+		return instData.database[name]; //Get instrument entry from the database
 	}
 	
 	//Returns the full range of the instrument (maximum range of all articulations)
@@ -95,42 +102,7 @@ namespace idh
 			return instrumentsArticulations.length;
 		}
 	}
-	
-	//Returns an array containing the names of the instrument's articulations
-	inline function getInstrumentsArticulationNames()
-	{
-		return articulations;
-	}
-	
-	//Get all display names 
-	inline function getDisplayNames()
-    {
-        return displayNames;
-    }
-    
-	//Get the display name by index
-	inline function getDisplayName(idx)
-	{
-	    return displayNames[idx];
-	}
-    
-    //Get the display name from the articulation's name
-    inline function getDisplayNameByArticulationName(a)
-    {
-        return displayNames[instrumentsArticulations.indexOf(a)];
-    }
-		
-	//Returns the name of the articulation specified by the given index
-	inline function getArticulationName(idx)
-    {
-        return articulations[idx];
-    }
-    
-    inline function getArticulationIndex(a)
-    {
-        return articulations.indexOf(a);
-    }
-    	
+	     	
 	//For the given program number returns the index in the instData.programs array
 	inline function getProgramIndex(n)
 	{
@@ -158,18 +130,6 @@ namespace idh
         }
 
         return -1;
-    }
-    
-    //Returns the attack for the given insturment name and articulation (a)
-    inline function getAttack(name, a)
-    {
-        return instData.database[name].articulations[a].attack;
-    }
-    
-    //Returns the release for the given insturment name and articulation (a)
-    inline function getRelease(name, a)
-    {
-        return instData.database[name].articulations[a].release;
     }
     
     //Return keyswitches array for the passed instrument (name)
