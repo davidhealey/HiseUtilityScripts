@@ -18,20 +18,29 @@
 include("instrumentData.js");
 
 namespace idh
-{			
+{	
+    const var samplerIds = Synth.getIdList("Sampler");
+    const var samplers = {};
+    const var childSynths = {};
+    
+    //Index samplers by their ID
+    for (id in samplerIds)
+    {
+        childSynths[id] = Synth.getChildSynth(id);
+        samplers[id] = Synth.getSampler(id);
+    }
+
 	inline function loadSampleMaps(name)
 	{	
-	    local entry = instData.database[name]; //Get instrument entry from the database
-		local samplerIds = Synth.getIdList("Sampler");
+	    local sampleMapId = instData.database[name].sampleMapId;
 		local sampleMaps = Sampler.getSampleMapList();
-		local childSynth;
+        local childSynth;
 		local s;
-		local sampleMapId = instData.database[name].sampleMapId;
 
 		for (id in samplerIds) //Each sampler
 	    {
-	        childSynth = Synth.getChildSynth(id);
-	        s = Synth.getSampler(id);
+	        childSynth = childSynths[id];
+	        s = samplers[id];
 
 	        if (sampleMaps.contains(sampleMapId + "_" + id)) //A sample map for this instrument was found
 	        {
