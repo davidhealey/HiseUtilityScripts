@@ -103,6 +103,9 @@ knbRate.set("tooltip", "Rate for glide timer relative to current tempo. If veloc
 const var btnSameNote = Content.addButton("Same Note Legato", 300, 110);
 btnSameNote.set("tooltip", "When active releasing a note in normal legato mode will retrigger the note that was released with a transition.");
 
+const var btnKillOld = Content.addButton("Kill Old Notes", 450, 110);
+btnKillOld.set("tooltip", "If enabled old notes will be turned off, triggering releases, rather than faded out. Use an evelope to control the fade out time when enabled.");
+
 //FUNCTIONS
 /**
  * Sets the sample start offset constant modulators to the given value.
@@ -238,7 +241,7 @@ function onNoteOn()
 				    
 					count = 0; //Reset count, for trills
 					notes[0] = lastNote; //Origin
-					notes[1] = Message.getNoteNumber();//+coarseDetune+coarseFuneTune; //Target
+					notes[1] = Message.getNoteNumber();; //Target
 					glideNote = lastNote; //First glide note is the same as the origin
 					lastVelo = Message.getVelocity();
 
@@ -247,18 +250,25 @@ function onNoteOn()
 					Synth.startTimer(rate);
 				}
 				else //Legato mode
-				{
-					Synth.addVolumeFade(lastEventId, fadeTime / 100 * knbFadeOutRatio.getValue(), -100); //Fade out old note					
-					Synth.addPitchFade(lastEventId, bendTime / 100 * knbFadeOutRatio.getValue(), 0, fineDetune + bendAmount); //Pitch fade old note
-
+				{				    
+				    if (btnKillOld.getValue() == 0)
+				    {
+					    Synth.addVolumeFade(lastEventId, fadeTime / 100 * knbFadeOutRatio.getValue(), -100); //Fade out old note					
+					    Synth.addPitchFade(lastEventId, bendTime / 100 * knbFadeOutRatio.getValue(), 0, fineDetune + bendAmount); //Pitch fade old note
+				    }
+				    else 
+				    {
+				        Synth.noteOffByEventId(lastEventId);
+				    }
+				    
 					retriggerNote = lastNote;
 
 					lastEventId = Message.makeArtificial();
-					Synth.addPitchFade(lastEventId, 0, coarseDetune, fineDetune); //Pass on any message detuning to new note
 
 					Synth.addVolumeFade(lastEventId, 0, -99); //Set new note's initial volume
 					Synth.addVolumeFade(lastEventId, fadeTime, 0); //Fade in new note
-					Synth.addPitchFade(lastEventId, 0, coarseDetune, fineDetune - bendAmount); //Set new note's initial detuning
+					
+                    Synth.addPitchFade(lastEventId, 0, coarseDetune, fineDetune - bendAmount); //Set new note's initial detuning
 					Synth.addPitchFade(lastEventId, bendTime, coarseDetune, fineDetune); //Pitch fade new note to 0 (or fineDetune)
 				}
 				inPhrase = 1;
@@ -275,9 +285,7 @@ function onNoteOn()
 			lastTime = Engine.getUptime();
 		}
 	}
-}
-
-function onNoteOff()
+}function onNoteOff()
 {
 	if (!btnBypass.getValue())
 	{
@@ -300,9 +308,16 @@ function onNoteOff()
 
 			if (retriggerNote != -1)
 			{
-				Synth.addVolumeFade(lastEventId, fadeTime / 100 * knbFadeOutRatio.getValue(), -100); //Fade out old note
-				Synth.addPitchFade(lastEventId, bendTime / 100 * knbFadeOutRatio.getValue(), 0, bendAmount); //Pitch fade old note
-
+                if (btnKillOld.getValue() == 0)
+				{
+				    Synth.addVolumeFade(lastEventId, fadeTime / 100 * knbFadeOutRatio.getValue(), -100); //Fade out old note
+				    Synth.addPitchFade(lastEventId, bendTime / 100 * knbFadeOutRatio.getValue(), 0, bendAmount); //Pitch fade old note
+				}
+				else
+			    {
+			        Synth.noteOffByEventId(lastEventId);
+			    }
+			    
 				lastEventId = Synth.playNote(retriggerNote, lastVelo);
 
 				Synth.addVolumeFade(lastEventId, 0, -99); //Set new note's initial volume
@@ -420,6 +435,10 @@ function onControl(number, value)
 
 			retriggerNote = -1;
 
+		break;
+		
+		case btnKillOld:
+		    knbFadeOutRatio.showControl(1-value);
 		break;
 	}
 }
