@@ -118,12 +118,12 @@ namespace idh
 		return instData.programs.indexOf(n);
 	}
 	
-	inline function isMetaArticulation(idx)
+	inline function isMetaArticulation(name, a)
     {
         //If the articulation has a parent then it's a meta articulation
-        if (instData.allArticulations[idx].parent)
+        if (instData.database[name].articulations[a].parent != undefined)
         {
-            return true;
+            return true;   
         }
         return false;
     }
