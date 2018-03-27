@@ -19,6 +19,8 @@ include("instrumentData.js");
 
 namespace idh
 {	
+    const var containerIds = Synth.getIdList("Container"); //One container per articulation
+    const var containers = [];
     const var samplerIds = Synth.getIdList("Sampler");
     const var samplers = {};
     const var childSynths = {};
@@ -26,8 +28,14 @@ namespace idh
     //Index samplers by their ID
     for (id in samplerIds)
     {
-        childSynths[id] = Synth.getChildSynth(id);
-        samplers[id] = Synth.getSampler(id);
+        childSynths[id] = Synth.getChildSynth(id); //Need child synth to set bypassed state
+        samplers[id] = Synth.getSampler(id); //Need sampler to load sample map
+    }
+    
+    //Build array of containers - one per keyswitchable articulation
+    for (c in containerIds)
+    {
+        containers.push(Synth.getChildSynth(c));
     }
 
 	inline function loadSampleMaps(name)
@@ -54,7 +62,24 @@ namespace idh
 	        }
 	    }
 	}
-				
+
+	inline function loadContainerGain(name)
+    {
+        local entry = instData.database[name]; //Get instrument entry from the database
+        
+        for (i = 0; i < containers.length; i++)
+        {
+            for (a in entry.articulations)
+            {
+                //Container has articulation id and articulation has gain property
+                if (containerIds[i] == a && entry.articulations[a].gain != undefined)
+                {
+                    containers[i].setAttribute(0, Engine.getGainFactorForDecibels(entry.articulations[a].gain));
+                }
+            }
+        }
+    }
+	
 	inline function getArticulationNames(name)
     {
         local entry = instData.database[name]; //Get instrument entry from the database
