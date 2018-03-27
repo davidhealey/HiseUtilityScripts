@@ -117,30 +117,7 @@ namespace idh
 	{
 		return instData.programs.indexOf(n);
 	}
-	
-	inline function isMetaArticulation(name, a)
-    {
-        //If the articulation has a parent then it's a meta articulation
-        if (instData.database[name].articulations[a].parent != undefined)
-        {
-            return true;   
-        }
-        return false;
-    }
-    
-    //Returns the index of the articulation's (a) parent, if it has one
-    inline function getParentIdx(name, a)
-    {
-        local parent = instData.database[name].articulations[a].parent;
-        
-        if (typeof parent == "string")
-        {
-            return instData.articulations.indexOf(parent);
-        }
-
-        return -1;
-    }
-    
+	    
     //Return keyswitches array for the passed instrument (name)
     inline function getKeyswitches(name)
     {
