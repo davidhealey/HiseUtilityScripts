@@ -15,7 +15,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-include("instrumentData.js");
+include("manifest.js");
 
 namespace idh
 {	
@@ -40,7 +40,7 @@ namespace idh
 
 	inline function loadSampleMaps(name)
 	{	
-	    local sampleMapId = instData.database[name].sampleMapId;
+	    local sampleMapId = manifest.patches[name].sampleMapId; //Get patch's sample map id
 		local sampleMaps = Sampler.getSampleMapList();
         local childSynth;
 		local s;
@@ -50,7 +50,7 @@ namespace idh
 	        childSynth = childSynths[id];
 	        s = samplers[id];
 
-	        if (sampleMaps.contains(sampleMapId + "_" + id)) //A sample map for this instrument was found
+	        if (sampleMaps.contains(sampleMapId + "_" + id)) //A sample map for this patch was found
 	        {
 	            childSynth.setBypassed(false); //Enable sampler
 	            s.loadSampleMap(sampleMapId + "_" + id); //Load the sample map for this sampler
@@ -58,14 +58,15 @@ namespace idh
 	        else
 	        {
 	            childSynth.setBypassed(true); //Bypass sampler
-	            s.loadSampleMap("empty"); //Load the sample map for this sampler
+	            s.loadSampleMap("empty"); //Load empty sample map for this sampler
 	        }
 	    }
 	}
 
+	//If the patch's articulation has a gain property set the articulation's container's gain
 	inline function loadContainerGain(name)
     {
-        local entry = instData.database[name]; //Get instrument entry from the database
+        local entry = manifest.patches[name]; //Get patch entry from the database
         
         for (i = 0; i < containers.length; i++)
         {
@@ -82,7 +83,7 @@ namespace idh
 	
 	inline function getArticulationNames(name)
     {
-        local entry = instData.database[name]; //Get instrument entry from the database
+        local entry = manifest.patches[name]; //Get patch entry from the database
         local a = [];
         
         for (k in entry.articulations)
@@ -95,7 +96,7 @@ namespace idh
 	
 	inline function getArticulationDisplayNames(name)
     {
-        local entry = instData.database[name]; //Get instrument entry from the database
+        local entry = manifest.patches[name]; //Get patch entry from the database
         local a = [];
         
         for (k in entry.articulations)
@@ -106,30 +107,30 @@ namespace idh
         return a;
     }
     
-	//Returns the data entry for the given instrument
+	//Returns the data entry for the given patch name
 	inline function getData(name)
 	{		
-		return instData.database[name]; //Get instrument entry from the database
+		return manifest.patches[name];
 	}
 	
-	//Returns the full range of the instrument (maximum range of all articulations)
+	//Returns the full range of the patch
 	inline function getRange(name)
 	{				
-		return instData.database[name].range;
+		return manifest.patches[name].range;
 	}
 	
 	//Returns the range of the specified articulation
 	inline function getArticulationRange(name, a)
 	{		
-		return instData.database[name].articulations[a].range;
+		return manifest.patches[name].articulations[a].range;
 	}
 		
-	//Returns the number of articulations either for the specified instrument or from allArticulations
+	//Returns the number of articulations either for the specified patch or from allArticulations
 	inline function getNumArticulations(all)
 	{
 		if (all == true) //All articulations
 		{	
-		    return instData.allArticulations.length;
+		    return manifest.allArticulations.length;
 		}
 		else //Current instrument only
 		{
@@ -137,15 +138,15 @@ namespace idh
 		}
 	}
 	     	
-	//For the given program number returns the index in the instData.programs array
+	//For the given program number returns the index in the manifest.programs array
 	inline function getProgramIndex(n)
 	{
-		return instData.programs.indexOf(n);
+		return manifest.programs.indexOf(n);
 	}
 	    
-    //Return keyswitches array for the passed instrument (name)
+    //Return keyswitches array for the specified patch (name)
     inline function getKeyswitches(name)
     {
-        return instData.database[name].keyswitches;
+        return manifest.patches[name].keyswitches;
     }
 }
