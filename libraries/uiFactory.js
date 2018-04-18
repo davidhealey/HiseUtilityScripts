@@ -88,7 +88,7 @@ namespace ui
 	inline function getNormalizedValue(id)
 	{
 		local control = Content.getComponent(id);
-		return (control.getValue() - control.get("min")) / (control.get("max") - control.get("min"));
+		return (control.getValue() - parseInt(control.get("min"))) / (parseInt(control.get("max")) - parseInt(control.get("min")));
 	};
 
 	//Public Domain
