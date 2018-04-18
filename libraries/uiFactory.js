@@ -89,11 +89,11 @@ namespace ui
 	{
 		local control = Content.getComponent(id);
 
-		if (typeof control.getValue() == "number" && typeof control.get("min") == "number" && typeof control.get("max") == "number")
+		if (typeof control.getValue() == "number")
 		{
 			return (control.getValue() - control.get("min")) / (control.get("max") - control.get("min"));
 		}
-		return false;
+		return null;
 	};
 
 	//Public Domain
