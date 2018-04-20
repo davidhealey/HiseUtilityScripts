@@ -54,9 +54,7 @@ namespace ui
 		});
 
 		return control;
-	};
-
-	
+	};	
 	
 	inline function comboBoxPanel(id, paintRoutine, items) //Custom combo box
 	{
@@ -77,7 +75,7 @@ namespace ui
 			{
 				this.setValue(event.result); // stores the value
 				this.changed(); // tells the script to execute the onControl callback with the new value
-				this.repaintImmediately();
+				this.repaint();
 			}
 		});
 
@@ -136,7 +134,7 @@ namespace ui
 					if (this.data.defaultValue !== void)
 					{
 						this.setValue(this.data.defaultValue);
-						this.repaintImmediately();
+						this.repaint();
 						this.changed();
 					}
 				}
@@ -155,7 +153,7 @@ namespace ui
 					if (newValue != this.getValue())
 					{
 						this.get("stepSize") == 1 ? this.setValue(Math.round(newValue)) : this.setValue(newValue);
-						this.repaintImmediately();
+						this.repaint();
 						this.changed();
 					}
 				}
@@ -164,7 +162,7 @@ namespace ui
 
 		return control;
 	};
-
+	
     //License - Public Domain
     inline function modWheel(id, sensitivity)
     {
@@ -176,6 +174,7 @@ namespace ui
 		control.setValue(0);
 
 		control.setPaintRoutine(function(g){
+		    
             g.fillAll(this.get("bgColour"));
     
             var lineSize = this.get("borderSize");
