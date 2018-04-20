@@ -303,4 +303,11 @@ namespace ui
         Content.setPropertiesFromJSON(id, json);
         return control;
     };
+    
+    inline function setComboPanelItems(id, items)
+    {
+        local control = Content.getComponent(id);
+        control.data.items = items;
+        control.set("popupMenuItems", items.join("\n"));
+    };
 }
