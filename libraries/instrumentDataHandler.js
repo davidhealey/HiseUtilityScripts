@@ -80,6 +80,17 @@ namespace idh
             }
         }
     }
+    
+    inline function getPatchNames()
+    {
+        local a = [];
+        
+        for (k in manifest.patches)
+        {
+            a.push(k);
+        }
+        return a;
+    }
 	
 	inline function getArticulationNames(name)
     {
