@@ -19,8 +19,6 @@ include("manifest.js");
 
 namespace idh
 {	
-    const var containerIds = Synth.getIdList("Container"); //One container per articulation
-    const var containers = [];
     const var samplerIds = Synth.getIdList("Sampler");
     const var samplers = {};
     const var childSynths = {};
@@ -32,12 +30,6 @@ namespace idh
         samplers[id] = Synth.getSampler(id); //Need sampler to load sample map
     }
     
-    //Build array of containers - one per keyswitchable articulation
-    for (c in containerIds)
-    {
-        containers.push(Synth.getChildSynth(c));
-    }
-
 	inline function loadSampleMaps(name)
 	{	
 	    local sampleMapId = manifest.patches[name].sampleMapId; //Get patch's sample map id
@@ -62,24 +54,6 @@ namespace idh
 	        }
 	    }
 	}
-
-	//If the patch's articulation has a gain property set the articulation's container's gain
-	inline function loadContainerGain(name)
-    {
-        local entry = manifest.patches[name]; //Get patch entry from the database
-        
-        for (i = 0; i < containers.length; i++)
-        {
-            for (a in entry.articulations)
-            {
-                //Container has articulation id and articulation has gain property
-                if (containerIds[i] == a && entry.articulations[a].gain != undefined)
-                {
-                    containers[i].setAttribute(0, Engine.getGainFactorForDecibels(entry.articulations[a].gain));
-                }
-            }
-        }
-    }
     
     inline function getPatchNames()
     {
