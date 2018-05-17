@@ -4,7 +4,7 @@
  * License: GPLv3 - https://www.gnu.org/licenses/gpl-3.0.en.html
 */
 
-reg inPhrase = 0;
+reg lastChan = 0;
 reg lastNote = -1;
 reg lastEventId = -1;
 reg retriggerNote = -1;
@@ -22,32 +22,11 @@ reg rate; //Timer rate for glide/trill
 reg notes = []; //Origin and target notes for glide/trill
 reg count; //Counter for switching between origin and target notes for trill
 
+//Loop iterators
+reg i;
+reg j;
+
 const var CHORD_THRESHOLD = 25; //If two notes are played within this many milliseconds then it's a chord
-
-//Get all child sample start constant modulators
-const var constantModIds = Synth.getIdList("Constant"); //Get child constant modulator names
-const var velocityModIds = Synth.getIdList("Velocity Modulator"); //Get child velocity modulator names
-
-reg constantMod; //Offseting start position during transition
-reg velocityMod; //Optional, for offsetting start position for first note based on velocity
-
-//Get constant start time modulator
-for (m in constantModIds)
-{
-	if (Engine.matchesRegex(m, "(?=.*tart)(?=.*od)")) //Sample start offset
-    {
-	    constantMod = Synth.getModulator(m);
-    }	
-}
-
-//Get velocity start time modulator
-for (m in velocityModIds)
-{
-	if (Engine.matchesRegex(m, "(?=.*tart)(?=.*od)")) //Sample start offset
-	{
-		velocityMod = Synth.getModulator(m);
-	}
-}
 
 //GUI
 Content.setWidth(700);
@@ -93,6 +72,7 @@ knbFadeOutRatio.set("suffix", "%");
 knbFadeOutRatio.set("tooltip", "Shortens the fade out time to a percentage of the fade time. 100% = the same as fade in time.");
 
 const var knbOffset = Content.addKnob("Offset", 0, 100);
+knbOffset.setRange(0, 1000, 0.1);
 knbOffset.set("tooltip", "Sets the startMod constant modulator (required) for legato phrase and glide notes.");
 
 const var knbRate = Content.addKnob("Rate", 150, 100);
@@ -107,43 +87,6 @@ const var btnKillOld = Content.addButton("Kill Old Notes", 450, 110);
 btnKillOld.set("tooltip", "If enabled old notes will be turned off, triggering releases, rather than faded out. Use an evelope to control the fade out time when enabled.");
 
 //FUNCTIONS
-/**
- * Sets the sample start offset constant modulators to the given value.
- * @param {number} value Constant modulator value between 0 and 1
- */
-inline function setModulators(value)
-{
-    if (velocityMod) //Instrument has velocity based start modulation
-    {
-        velocityMod.setIntensity(1-(value > 0)); //Set to min/max depending on value
-    }
-    
-    if (constantMod) //Instrument has constant based start modulation
-    {
-        constantMod.setIntensity(value);
-    }
-}
-
-//Resets the sample start offset modulators - if any
-inline function resetModulators()
-{
-    if (velocityMod) //Instrument has velocity based start modulation
-    {
-        velocityMod.setIntensity(1); //Set to min/max depending on value
-    }
-    
-    if (constantMod) //Instrument has constant based start modulation
-    {
-        if (velocityMod)
-        {
-            constantMod.setIntensity(0);
-        }
-        else 
-        {
-            constantMod.setIntensity(1);
-        }        
-    }
-}
 
 /**
  * A lookup table is used for pitch bending to save CPU. This function fills that lookup table based on the min bend and max bend values.
@@ -174,7 +117,7 @@ inline function getFadeTime(interval, velocity)
 
 	fadeTime = fadeTime + (interval * 2); //Adjust the fade time based on the interval size
 
-    if (velocity > 64) fadeTime = fadeTime - (fadeTime * 0.2); //If a harder velocity is played reduce the fade time by 20%
+	if (velocity > 64) fadeTime = fadeTime - (fadeTime * 0.2); //If a harder velocity is played reduce the fade time by 20%
 
 	return fadeTime;
 }
@@ -199,9 +142,7 @@ inline function getRate(interval, velocity)
 
 	rate = Engine.getMilliSecondsForTempo(rate) / 1000; //Rate to milliseconds for timer
 
-	rate = rate / invl; //Rate is per glide step
-
-	if (rate < 0.04) rate = 0.04; //Cap lowest rate at timer's minimum
+	rate = Math.max(0.04, rate / invl); //Rate is per glide step - capped at timer's min
 
 	return rate;
 }
@@ -209,7 +150,7 @@ inline function getRate(interval, velocity)
 function onNoteOn()
 {
 	if (!btnBypass.getValue())
-	{	    
+	{
 		Synth.stopTimer();
 
 		//Pick up any detuning that has been applied to the notes before this point
@@ -232,13 +173,10 @@ function onNoteOn()
 					if (lastNote > Message.getNoteNumber()) bendAmount = -bendAmount; //Invert bend amount for down interval
 				}
 
-				//If this is the second note of the phrase set start offset modulators it will be reset in noteOff
-				if (inPhrase == 0) setModulators(knbOffset.getValue());
-
 				if (btnGlide.getValue()) //Glide mode
 				{
-				    Message.ignoreEvent(true);
-				    
+			    Message.ignoreEvent(true);
+
 					count = 0; //Reset count, for trills
 					notes[0] = lastNote; //Origin
 					notes[1] = Message.getNoteNumber();; //Target
@@ -250,42 +188,44 @@ function onNoteOn()
 					Synth.startTimer(rate);
 				}
 				else //Legato mode
-				{				    
-				    if (btnKillOld.getValue() == 0)
+				{
+				    if (btnKillOld.getValue() == 0) //Old notes are faded out
 				    {
-					    Synth.addVolumeFade(lastEventId, fadeTime / 100 * knbFadeOutRatio.getValue(), -100); //Fade out old note					
+					    Synth.addVolumeFade(lastEventId, fadeTime / 100 * knbFadeOutRatio.getValue(), -100); //Fade out old note
 					    Synth.addPitchFade(lastEventId, bendTime / 100 * knbFadeOutRatio.getValue(), 0, fineDetune + bendAmount); //Pitch fade old note
 				    }
-				    else 
+				    else //Old notes are turned off, use envelope release to control fade out
 				    {
 				        Synth.noteOffByEventId(lastEventId);
 				    }
-				    
+
 					retriggerNote = lastNote;
 
+					Message.setStartOffset(Engine.getSamplesForMilliSeconds(knbOffset.getValue())); //Apply offset time to phrase note
 					lastEventId = Message.makeArtificial();
 
 					Synth.addVolumeFade(lastEventId, 0, -99); //Set new note's initial volume
 					Synth.addVolumeFade(lastEventId, fadeTime, 0); //Fade in new note
-					
-                    Synth.addPitchFade(lastEventId, 0, coarseDetune, fineDetune - bendAmount); //Set new note's initial detuning
+
+					Synth.addPitchFade(lastEventId, 0, coarseDetune, fineDetune - bendAmount); //Set new note's initial detuning
 					Synth.addPitchFade(lastEventId, bendTime, coarseDetune, fineDetune); //Pitch fade new note to 0 (or fineDetune)
 				}
-				inPhrase = 1;
 			}
 			else //First note of phrase
 			{
-			    inPhrase = 0;
 				lastEventId = Message.makeArtificial();
 				Synth.addPitchFade(lastEventId, 0, coarseDetune, fineDetune); //Pass on any message detuning to new note
 			}
 
-			lastNote = Message.getNoteNumber();//+coarseDetune+fineDetune;
+			lastChan = Message.getChannel();
+			lastNote = Message.getNoteNumber();
 			lastVelo = Message.getVelocity();
 			lastTime = Engine.getUptime();
 		}
 	}
-}function onNoteOff()
+}
+
+function onNoteOff()
 {
 	if (!btnBypass.getValue())
 	{
@@ -308,17 +248,17 @@ function onNoteOn()
 
 			if (retriggerNote != -1)
 			{
-                if (btnKillOld.getValue() == 0)
+				if (btnKillOld.getValue() == 0)
 				{
 				    Synth.addVolumeFade(lastEventId, fadeTime / 100 * knbFadeOutRatio.getValue(), -100); //Fade out old note
 				    Synth.addPitchFade(lastEventId, bendTime / 100 * knbFadeOutRatio.getValue(), 0, bendAmount); //Pitch fade old note
 				}
 				else
-			    {
-			        Synth.noteOffByEventId(lastEventId);
-			    }
-			    
-				lastEventId = Synth.playNote(retriggerNote, lastVelo);
+		    {
+		        Synth.noteOffByEventId(lastEventId);
+		    }
+
+				lastEventId = Synth.playNoteWithStartOffset(lastChan, retriggerNote, lastVelo, Engine.getSamplesForMilliSeconds(knbOffset.getValue()));
 
 				Synth.addVolumeFade(lastEventId, 0, -99); //Set new note's initial volume
 				Synth.addVolumeFade(lastEventId, fadeTime, 0); //Fade in new note
@@ -331,7 +271,6 @@ function onNoteOn()
 				Synth.noteOffByEventId(lastEventId);
 				lastEventId = -1;
 				lastNote = -1;
-				resetModulators(); //Reset sample start offset modulators
 			}
 		}
 	}
@@ -343,14 +282,13 @@ function onNoteOn()
 			Synth.noteOffByEventId(lastEventId);
 			lastEventId = -1;
 			lastNote = -1;
-			resetModulators(); //Reset sample start offset modulators
 		}
 	}
 }
 
 function onController()
 {
-	
+
 }
 function onTimer()
 {
@@ -385,7 +323,7 @@ function onTimer()
 			Synth.addPitchFade(lastEventId, rate*1000, 0, glideBend); //Pitch fade old note to bend amount
 			Synth.addVolumeFade(lastEventId, rate*1000, -100); //Fade out last note
 
-			lastEventId = Synth.playNote(glideNote, lastVelo); //Play new note
+			lastEventId = Synth.playNoteWithStartOffset(lastChan, glideNote, lastVelo, Engine.getSamplesForMilliSeconds(knbOffset.getValue()));
 
 			Synth.addVolumeFade(lastEventId, 0, -99); //Set new note's initial volume
 			Synth.addVolumeFade(lastEventId, rate*1000, 0); //Fade in new note
@@ -434,12 +372,10 @@ function onControl(number, value)
 			}
 
 			retriggerNote = -1;
-
 		break;
-		
+
 		case btnKillOld:
 		    knbFadeOutRatio.showControl(1-value);
 		break;
 	}
 }
-
