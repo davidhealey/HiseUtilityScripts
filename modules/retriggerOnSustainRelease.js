@@ -7,17 +7,8 @@
 
 //INIT
 Content.setWidth(650);
-Content.setHeight(50);
 
 const var velocities = Engine.createMidiList();
-
-const var btnEnable = Content.addButton("Enable", 0, 10);
-const var cmbCC = Content.addComboBox("CC Trigger", 150, 10);
-
-for (i = 0; i < 128; i++)
-{
-	cmbCC.addItem(i);
-}
 
 //FUNCTIONS
 
@@ -29,7 +20,7 @@ function onNoteOn()
 
 function onNoteOff()
 {
-	if (btnEnable.getValue())
+	if (Synth.isSustainPedalDown())
 	{
 		Synth.playNote(Message.getNoteNumber(), velocities.getValue(Message.getNoteNumber()));
 	}
@@ -37,10 +28,6 @@ function onNoteOff()
 
 function onController()
 {
-	if (Message.getControllerNumber() == cmbCC.getValue()-1)
-	{
-		Message.getControllerValue() > 64 ? btnEnable.setValue(1) : btnEnable.setValue(0);
-	}
 }
 
 function onTimer()
