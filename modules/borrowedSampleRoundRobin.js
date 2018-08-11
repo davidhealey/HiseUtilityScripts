@@ -13,7 +13,7 @@ reg lastTime = 0; //Track how long between notes
 Content.setWidth(650);
 Content.setHeight(50);
 
-const var btnBypass = Content.addButton("Bypass", 0, 10); //Script bypass
+const var btnEnable = Content.addButton("Enable", 0, 10); //Script bypass
 
 const var btnRandom = Content.addButton("Random", 150, 10); //Random mode button
 
@@ -25,7 +25,7 @@ const var knbHighNote = Content.addKnob("High Note", 450, 0); //Highest playable
 knbHighNote.setRange(0, 127, 1);
 knbHighNote.set("defaultValue", 127);function onNoteOn()
 {
-	if (!btnBypass.getValue() && (Message.getNoteNumber() >= knbLowNote.getValue() && Message.getNoteNumber() <= knbHighNote.getValue())) //Not bypassed and note in range
+	if (btnEnable.getValue() && (Message.getNoteNumber() >= knbLowNote.getValue() && Message.getNoteNumber() <= knbHighNote.getValue())) //Not bypassed and note in range
 	{
 		if (Engine.getUptime() - lastTime > 2) //More than 2 seconds between notes
 		{
@@ -64,17 +64,17 @@ knbHighNote.set("defaultValue", 127);function onNoteOn()
 	}
 }function onNoteOff()
 {
-	
+
 }
 function onController()
 {
-	
+
 }
 function onTimer()
 {
-	
+
 }
 function onControl(number, value)
 {
-	
+
 }
