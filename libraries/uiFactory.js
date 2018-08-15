@@ -23,7 +23,7 @@ namespace ui
 			{
 				this.setValue(parseInt((this.getValue() + 1)) % parseInt(this.get("max") + 1));
 				this.changed(); // tells the script to execute the onControl callback with the new value
-				this.repaint();
+				this.repaint(); //Call the paint routine
 			}
 		});
 
@@ -111,13 +111,13 @@ namespace ui
 		Engine.setKeyColour(n, Colours.withAlpha(Colours.white, 0.0));
 	};
 
-	inline function sliderPanel(id, paintRoutine, defaultValue, sensitivity)
+	inline function sliderPanel(id, paintRoutine, middleValue, sensitivity)
 	{
 		local control = Content.getComponent(id);
 
 		control.set("allowCallbacks", "Clicks, Hover & Dragging");
 		control.setPaintRoutine(paintRoutine);
-		control.data.defaultValue = defaultValue;
+		control.data.middleValue = middleValue;
 		control.data.sensitivity = sensitivity;
 
 		// Define callback behaviour
@@ -132,12 +132,9 @@ namespace ui
 			{
 				if (event.doubleClick)
 				{
-					if (this.data.defaultValue !== void)
-					{
-						this.setValue(this.data.defaultValue);
-						this.repaint();
-						this.changed();
-					}
+                    this.setValue(parseInt(this.get("defaultValue")));
+                    this.repaint();
+                    this.changed();
 				}
 				else if (event.drag)
 				{
