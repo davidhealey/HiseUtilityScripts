@@ -84,7 +84,8 @@ knbFadeOutRatio.set("suffix", "%");
 knbFadeOutRatio.set("tooltip", "Shortens the fade out time to a percentage of the fade time. 100% = the same as fade in time.");
 
 const var knbOffset = Content.addKnob("Offset", 0, 100);
-knbOffset.setRange(0, 1000, 0.1);
+knbOffset.setRange(0, 1, 0.01);
+knbOffset.set("mode", "NormalizedPercentage");
 knbOffset.set("tooltip", "Sets the startMod constant modulator (required) for legato phrase and glide notes.");
 
 const var knbRate = Content.addKnob("Glide Rate", 150, 100);
@@ -111,27 +112,6 @@ inline function updateBendLookupTable(minBend, maxBend)
 	{
 		bendLookup[i] = ((i + 1) * (maxBend - minBend)) / 12 + minBend;
 	}
-}
-
-/**
- * The fade time to be used when crossfading legato notes
- * @param  {number} interval Distance between the two notes that will be crossfaded
- * @param  {number} velocity Velocity of the note that will be faded in, a higher velocity = shorter fade time
- * @return {number}          Crossfade time in ms
- */
-inline function getFadeTime(interval, velocity)
-{
-	local timeDif = (Engine.getUptime() - lastTime) * 1000; //Get time difference between now and last note
-	local fadeTime = timeDif; //Default fade time is time difference
-
-	if (timeDif <= knbFadeTm.getValue() * 0.5) fadeTime = knbFadeTm.getValue() * 0.5; //Fade time minimum is 50% of knbFadeTm.getValue() - when playing fast
-	if (timeDif >= knbFadeTm.getValue()) fadeTime = knbFadeTm.getValue();
-
-	fadeTime = fadeTime + (interval * 2); //Adjust the fade time based on the interval size
-
-	if (velocity > 64) fadeTime = fadeTime - (fadeTime * 0.2); //If a harder velocity is played reduce the fade time by 20%
-
-	return fadeTime;
 }
 
 /**
@@ -206,7 +186,7 @@ inline function changeMode(mode)
 			if (lastNote != -1) //First note of phrase has already been played
 			{
 				interval = Math.abs(Message.getNoteNumber() - lastNote); //Get played interval
-				fadeTime = getFadeTime(interval, Message.getVelocity()); //Get fade time
+				fadeTime = knbFadeTm.getValue();
 				bendTime = fadeTime + knbBendTm.getValue(); //Get bend time
 
 				//Get bend amount
@@ -245,7 +225,7 @@ inline function changeMode(mode)
 
 					retriggerNote = lastNote;
 
-					Message.setStartOffset(Engine.getSamplesForMilliSeconds(knbOffset.getValue())); //Apply offset time to phrase note
+					Message.setStartOffset(Engine.getSamplesForMilliSeconds(knbOffset.getValue()*500)); //Apply offset time to phrase note
 					lastEventId = Message.makeArtificial();
 
 					Synth.addVolumeFade(lastEventId, 0, -99); //Set new note's initial volume
@@ -302,7 +282,7 @@ function onNoteOff()
 		        Synth.noteOffByEventId(lastEventId);
 		    }
 
-				lastEventId = Synth.playNoteWithStartOffset(lastChan, retriggerNote, lastVelo, Engine.getSamplesForMilliSeconds(knbOffset.getValue()));
+				lastEventId = Synth.playNoteWithStartOffset(lastChan, retriggerNote, lastVelo, Engine.getSamplesForMilliSeconds(knbOffset.getValue()*500));
 
 				Synth.addVolumeFade(lastEventId, 0, -99); //Set new note's initial volume
 				Synth.addVolumeFade(lastEventId, fadeTime, 0); //Fade in new note
@@ -380,7 +360,7 @@ function onTimer()
 			Synth.addPitchFade(lastEventId, rate*1000, 0, glideBend); //Pitch fade old note to bend amount
 			Synth.addVolumeFade(lastEventId, rate*1000, -100); //Fade out last note
 
-			lastEventId = Synth.playNoteWithStartOffset(lastChan, glideNote, lastVelo, Engine.getSamplesForMilliSeconds(knbOffset.getValue()));
+			lastEventId = Synth.playNoteWithStartOffset(lastChan, glideNote, lastVelo, Engine.getSamplesForMilliSeconds(knbOffset.getValue()*500));
 
 			Synth.addVolumeFade(lastEventId, 0, -99); //Set new note's initial volume
 			Synth.addVolumeFade(lastEventId, rate*1000, 0); //Fade in new note
