@@ -19,7 +19,7 @@ reg lastChan = 0;
 reg lastNote = -1;
 reg lastEventId = -1;
 reg retriggerNote = -1;
-reg lastVelo = 0;
+reg lastVelo = 1;
 reg lastTime;
 reg interval;
 reg fadeTime;
@@ -243,7 +243,7 @@ inline function changeMode(mode)
 
 			lastChan = Message.getChannel();
 			lastNote = Message.getNoteNumber();
-			lastVelo = Message.getVelocity();
+			lastVelo = Math.max(1, Message.getVelocity());
 			lastTime = Engine.getUptime();
 		}
 	}
@@ -278,9 +278,9 @@ function onNoteOff()
 				    Synth.addPitchFade(lastEventId, bendTime / 100 * knbFadeOutRatio.getValue(), 0, bendAmount); //Pitch fade old note
 				}
 				else
-		    {
-		        Synth.noteOffByEventId(lastEventId);
-		    }
+		        {
+		            Synth.noteOffByEventId(lastEventId);
+		        }
 
 				lastEventId = Synth.playNoteWithStartOffset(lastChan, retriggerNote, lastVelo, Engine.getSamplesForMilliSeconds(knbOffset.getValue()*500));
 
