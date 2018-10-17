@@ -86,7 +86,7 @@ knbFadeOutRatio.set("tooltip", "Shortens the fade out time to a percentage of th
 const var knbOffset = Content.addKnob("Offset", 0, 100);
 knbOffset.setRange(0, 1, 0.01);
 knbOffset.set("mode", "NormalizedPercentage");
-knbOffset.set("tooltip", "Sets the startMod constant modulator (required) for legato phrase and glide notes.");
+knbOffset.set("tooltip", "Sets the sample start offset for legato phrase and glide notes.");
 
 const var knbRate = Content.addKnob("Glide Rate", 150, 100);
 knbRate.set("mode", "TempoSync");
