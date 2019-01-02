@@ -186,7 +186,6 @@ inline function setRate(interval)
             //Pick up any detuning that has been applied to the notes before this point
             coarseDetune = Message.getCoarseDetune();
             fineDetune = Message.getFineDetune();
-		Console.print(Message.getCoarseDetune());
 
             if (btnBc.getValue() && ccValue < 2) //If breath controller enabled and the bcc is below 2
             {
