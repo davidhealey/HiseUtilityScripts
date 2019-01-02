@@ -30,37 +30,29 @@ reg eventId = -1;
 reg lastTime;
 reg offset;
 reg rate;
-reg retriggerCCValue = 64;
-reg lastCCValue = 127;
 const var bendLookup = []; //Generated on init (onControl) and updated when bend amount changed
 reg glideNote;
 const var notes = [];
 notes.reserve(2);
+reg coarseDetune = 0;
+reg fineDetune = 0;
+
+//Breath control
+reg ccTime;
+reg ccValue;
+reg lastCcValue;
+reg threshold;
 
 //GUI
 const var btnMute = Content.addButton("btnMute", 0, 10);
 btnMute.set("text", "Mute");
 btnMute.set("tooltip", "Enable this to bypass the script. Still responds to hanging notes.");
 
-const var btnRetrigger = Content.addButton("btnRetrigger", 0, 160);
-btnRetrigger.set("text", "CC64 Retrigger");
-btnRetrigger.set("tooltip", "When enabled sustain pedal is used to retrigger notes, when disabled sustain pedal will hold legato notes.");
-
 const var knbOffset = Content.addKnob("knbOffset", 150, 0);
 knbOffset.set("text", "Offset");
 knbOffset.setRange(0, 1000, 1);
 knbOffset.set("suffix", "ms");
 knbOffset.set("tooltip", "Sample start offset time for legato and glide notes.");
-
-const var knbCC = Content.addKnob("knbCC", 150, 150);
-knbCC.set("text", "Retrigger CC");
-knbCC.setRange(1, 127, 1);
-knbCC.set("tooltip", "Select the CC used to control the CC based retrigger (separate from CC64 retrigger - so don't select CC64 for this).");
-
-const var knbThreshold = Content.addKnob("knbThreshold", 300, 150);
-knbThreshold.set("text", "Retrigger Level");
-knbThreshold.setRange(0, 127, 1);
-knbThreshold.set("tooltip", "Select the Retrigger CC threshold point at which notes will be retriggered - this is for breath controller users.");
 
 const var knbFadeMin = Content.addKnob("knbFadeMin", 0, 50);
 knbFadeMin.set("text", "Fade Tm Min");
@@ -111,6 +103,30 @@ const var btnWholeStep = Content.addButton("btnWholeStep", 450, 60);
 btnWholeStep.set("text", "Whole Step Glide");
 btnWholeStep.set("tooltip", "When enabled glides will be per whole step rather than each semi-tone.");
 
+//Breath controller GUI
+const var btnBc = Content.addButton("btnBc", 600, 10);
+btnBc.set("text", "Breath Control");
+btnBc.set("tooltip", "Toggles breath controller mode.");
+
+const var knbBcSkew = Content.addKnob("knbBcSkew", 600, 150);
+knbBcSkew.set("text", "Skew");
+knbBcSkew.setRange(0, 1, 0.1);
+knbBcSkew.set("tooltip", "Breath controller velocity skew factor.");
+
+const var btnRetrigger = Content.addButton("btnRetrigger", 0, 160);
+btnRetrigger.set("text", "CC64 Retrigger");
+btnRetrigger.set("tooltip", "When enabled sustain pedal is used to retrigger notes, when disabled sustain pedal will hold legato notes.");
+
+const var knbCC = Content.addKnob("knbCC", 600, 50);
+knbCC.set("text", "Breath CC");
+knbCC.setRange(1, 127, 1);
+knbCC.set("tooltip", "Select the CC used in breath controller mode.");
+
+const var knbThreshold = Content.addKnob("knbThreshold", 600, 100);
+knbThreshold.set("text", "Trigger Level");
+knbThreshold.setRange(0, 127, 1);
+knbThreshold.set("tooltip", "Breath controller trigger threshold.");
+
 /**
  * A lookup table is used for pitch bending to save CPU. This function fills that lookup table based on the min bend and max bend values.
  * @param  {number} minBend The amount of bend for an interval of 1 semitone
@@ -139,6 +155,14 @@ inline function setLegatoFadeTime(interval, velocity)
     if (velocity > 64) fadeTm = fadeTm - (fadeTm * 0.3);
 }
 
+inline function setBreathVelocity()
+{
+    local timeDiff = Math.min(1, Engine.getUptime()-ccTime) / 1; //Limit timeDiff to 0-1
+    local v = Math.pow(timeDiff, knbBcSkew.getValue()); //Skew values
+    velocity = parseInt(127-(v*117));
+    ccTime = 0;
+}
+
 /**
  * Returns the timer rate for glides
  * @param  {number} interval [The distance between the two notes that will be glided]
@@ -160,10 +184,15 @@ inline function setRate(interval)
         if ((Engine.getUptime() - lastTime) > 0.025) //Not a chord
         {
             //Pick up any detuning that has been applied to the notes before this point
-            local coarseDetune = Message.getCoarseDetune();
-            local fineDetune = Message.getFineDetune();
+            coarseDetune = Message.getCoarseDetune();
+            fineDetune = Message.getFineDetune();
+		Console.print(Message.getCoarseDetune());
 
-            if (Synth.isLegatoInterval() && Synth.isSustainPedalDown()) //Glide
+            if (btnBc.getValue() && ccValue < 2) //If breath controller enabled and the bcc is below 2
+            {
+                Message.ignoreEvent(true); //Ignore the event
+            }
+            else if (Synth.isLegatoInterval() && Synth.isSustainPedalDown()) //Glide
             {
                 Message.ignoreEvent(true);
 
@@ -234,8 +263,8 @@ function onNoteOff()
     if (!btnMute.getValue())
     {
         //Pick up any detuning that has been applied to the notes before this point
-		local coarseDetune = Message.getCoarseDetune();
-		local fineDetune = Message.getFineDetune();
+        coarseDetune = Message.getCoarseDetune();
+        fineDetune = Message.getFineDetune();
 
         if (Message.getNoteNumber() == retriggerNote)
         {
@@ -250,6 +279,8 @@ function onNoteOff()
 
         if (Message.getNoteNumber() == note)
         {
+            ccTime = 0;
+
             if ((Synth.isSustainPedalDown() == 0 && btnRetrigger.getValue() == 0) || btnRetrigger.getValue()) //CC64 sustain
             {
                 Message.ignoreEvent(true);
@@ -276,8 +307,7 @@ function onNoteOff()
                 }
                 else
                 {
-                    //Turn off old note
-                    Synth.noteOffByEventId(eventId);
+                    if (eventId != -1) Synth.noteOffByEventId(eventId);
                     eventId = -1;
                     note = -1;
                 }
@@ -307,23 +337,41 @@ function onController()
             note = -1;
         }
 
-        //Retrigger CC
-        if (Message.getControllerNumber() == knbCC.getValue() && eventId != -1)
+        //Breath controller handler;
+        if (btnBc.getValue())
         {
-            local threshold = knbThreshold.getValue();
-
-            retriggerCCValue = Message.getControllerValue();
-
-            if (Synth.getNumPressedKeys() == 1 && threshold > 0)
+            if (Message.getControllerNumber() == knbCC.getValue())
             {
-                if (retriggerCCValue > threshold && lastCCValue < threshold) //Gone high
+                ccValue = Message.getControllerValue();
+
+                //Going up but haven't reached threshold
+                if (ccValue < threshold && ccValue > lastCcValue && ccTime == 0 && note != -1)
+                {
+                    ccTime = Engine.getUptime();
+                }
+
+                //Going up and reached the threshold
+                if (ccValue >= threshold && lastCcValue < threshold && ccTime > 0 && note != -1)
+                {
+                    //Calculate velocity based on breath attack
+                    setBreathVelocity();
+
+                    //Turn off old note
+                    if (eventId != -1) Synth.noteOffByEventId(eventId);
+
+                    //Play new note
+                    eventId = Synth.playNoteWithStartOffset(channel, note, velocity, 0);
+                    Synth.addPitchFade(eventId, 0, coarseDetune, fineDetune);  //Add any detuning
+                }
+
+                if (ccValue < 2 && eventId != -1)
                 {
                     Synth.noteOffByEventId(eventId);
-                    eventId = Synth.playNoteWithStartOffset(channel, note, velocity, offset);
+                    eventId = -1;
                 }
-            }
 
-            lastCCValue = retriggerCCValue;
+                lastCcValue = ccValue;
+            }
         }
     }
 }
@@ -385,6 +433,10 @@ function onControl(number, value)
 				setRate(Math.abs(notes[0] - notes[1]));
 				Synth.startTimer(rate);
 			}
+		break;
+
+		case knbThreshold:
+		    threshold = value;
 		break;
     }
 }
