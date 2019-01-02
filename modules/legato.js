@@ -54,13 +54,17 @@ const var btnMute = Content.addButton("btnMute", 0, 10);
 btnMute.set("text", "Mute");
 btnMute.set("tooltip", "Enable this to bypass the script. Still responds to hanging notes.");
 
-const var knbOffset = Content.addKnob("knbOffset", 150, 0);
+const var knbOffset = Content.addKnob("knbOffset", 0, 50);
 knbOffset.set("text", "Offset");
 knbOffset.setRange(0, 1000, 1);
 knbOffset.set("suffix", "ms");
 knbOffset.set("tooltip", "Sample start offset time for legato and glide notes.");
 
-const var knbFadeMin = Content.addKnob("knbFadeMin", 0, 50);
+const var btnRetrigger = Content.addButton("btnRetrigger", 0, 110);
+btnRetrigger.set("text", "CC64 Retrigger");
+btnRetrigger.set("tooltip", "When enabled sustain pedal is used to retrigger notes, when disabled sustain pedal will hold legato notes.");
+
+const var knbFadeMin = Content.addKnob("knbFadeMin", 150, 0);
 knbFadeMin.set("text", "Fade Tm Min");
 knbFadeMin.setRange(0, 1000, 1);
 knbFadeMin.set("suffix", "ms");
@@ -72,19 +76,19 @@ knbFadeMax.setRange(0, 1000, 1);
 knbFadeMax.set("suffix", "ms");
 knbFadeMax.set("tooltip", "Maximum legato fade time.");
 
-const var knbFadeOut = Content.addKnob("knbFadeOut", 300, 50);
+const var knbFadeOut = Content.addKnob("knbFadeOut", 150, 100);
 knbFadeOut.set("text", "Fade Out Ratio");
 knbFadeOut.setRange(10, 100, 1);
 knbFadeOut.set("suffix", "%");
 knbFadeOut.set("tooltip", "Percentage of overall fade time to be used to fade out old notes.");
 
-const var knbBendTm = Content.addKnob("knbBendTm", 0, 100);
+const var knbBendTm = Content.addKnob("knbBendTm", 300, 0);
 knbBendTm.set("text", "Bend Tm");
 knbBendTm.setRange(-50, 50, 1);
 knbBendTm.set("suffix", "%");
 knbBendTm.set("tooltip", "Use this knob to set +-50% of fade time that will be used for bend time.");
 
-const var knbBendMin = Content.addKnob("knbBendMin", 150, 100);
+const var knbBendMin = Content.addKnob("knbBendMin", 300, 50);
 knbBendMin.set("text", "Bend Min");
 knbBendMin.setRange(0, 100, 1);
 knbBendMin.set("suffix", "ct");
@@ -114,15 +118,6 @@ const var btnBc = Content.addButton("btnBc", 600, 10);
 btnBc.set("text", "Breath Control");
 btnBc.set("tooltip", "Toggles breath controller mode.");
 
-const var knbBcSkew = Content.addKnob("knbBcSkew", 600, 150);
-knbBcSkew.set("text", "Skew");
-knbBcSkew.setRange(0, 1, 0.1);
-knbBcSkew.set("tooltip", "Breath controller velocity skew factor.");
-
-const var btnRetrigger = Content.addButton("btnRetrigger", 0, 160);
-btnRetrigger.set("text", "CC64 Retrigger");
-btnRetrigger.set("tooltip", "When enabled sustain pedal is used to retrigger notes, when disabled sustain pedal will hold legato notes.");
-
 const var knbCC = Content.addKnob("knbCC", 600, 50);
 knbCC.set("text", "Breath CC");
 knbCC.setRange(1, 127, 1);
@@ -132,6 +127,11 @@ const var knbThreshold = Content.addKnob("knbThreshold", 600, 100);
 knbThreshold.set("text", "Trigger Level");
 knbThreshold.setRange(10, 127, 1);
 knbThreshold.set("tooltip", "Breath controller trigger threshold.");
+
+const var knbBcSkew = Content.addKnob("knbBcSkew", 600, 150);
+knbBcSkew.set("text", "Velocity Skew");
+knbBcSkew.setRange(0, 1, 0.1);
+knbBcSkew.set("tooltip", "Breath controller velocity skew factor.");
 
 /**
  * A lookup table is used for pitch bending to save CPU. This function fills that lookup table based on the min bend and max bend values.
