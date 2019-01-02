@@ -124,7 +124,7 @@ knbCC.set("tooltip", "Select the CC used in breath controller mode.");
 
 const var knbThreshold = Content.addKnob("knbThreshold", 600, 100);
 knbThreshold.set("text", "Trigger Level");
-knbThreshold.setRange(0, 127, 1);
+knbThreshold.setRange(10, 127, 1);
 knbThreshold.set("tooltip", "Breath controller trigger threshold.");
 
 /**
@@ -231,7 +231,7 @@ inline function setRate(interval)
 
                 //Fade out old note
                 Synth.addVolumeFade(eventId, fadeTm / 100 * knbFadeOut.getValue(), -100); //Volume
-                Synth.addPitchFade(eventId, bendTm / 100 * knbFadeOut.getValue(), 0, fineDetune + bendAmt); //Pitch
+                Synth.addPitchFade(eventId, bendTm / 100 * knbFadeOut.getValue(), coarseDetune, fineDetune + bendAmt); //Pitch
 
                 //Update eventId
                 eventId = Message.makeArtificial();
@@ -246,6 +246,7 @@ inline function setRate(interval)
             else //First note of phrase
             {
                 eventId = Message.makeArtificial(); //Update eventId
+                Synth.addPitchFade(eventId, 0, coarseDetune, fineDetune); //Set initial detunin
             }
 
             //Update variables
@@ -288,7 +289,7 @@ function onNoteOff()
                 {
                     //Fade out old note
                     Synth.addVolumeFade(eventId, fadeTm / 100 * knbFadeOut.getValue(), -100); //Volume
-                    Synth.addPitchFade(eventId, bendTm / 100 * knbFadeOut.getValue(), 0, fineDetune + bendAmt); //Pitch
+                    Synth.addPitchFade(eventId, bendTm / 100 * knbFadeOut.getValue(), coarseDetune, fineDetune + bendAmt); //Pitch
 
                     //Play new note
                     eventId = Synth.playNoteWithStartOffset(channel, retriggerNote, velocity, offset);
