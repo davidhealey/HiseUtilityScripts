@@ -45,7 +45,7 @@ reg fadeOutFine;
 
 //Breath control
 reg ccTime;
-reg ccValue;
+reg ccValue = 0;
 reg lastCcValue;
 reg threshold;
 
@@ -183,6 +183,7 @@ inline function setRate(interval)
 	rate = Math.max(0.04, rate / interval); //Rate is per glide step - capped at timer's min
 }function onNoteOn()
 {
+
     if (!btnMute.getValue())
     {
         Synth.stopTimer(); //Stop the timer (if it's running)
@@ -197,7 +198,7 @@ inline function setRate(interval)
             {
                 Message.ignoreEvent(true); //Ignore the event
             }
-            else if (Synth.isLegatoInterval() && Synth.isSustainPedalDown()) //Glide
+            else if (Synth.isLegatoInterval() && Synth.isSustainPedalDown() && eventId != -1) //Glide
             {
                 Message.ignoreEvent(true);
 
@@ -217,7 +218,7 @@ inline function setRate(interval)
                 //Start the timer
                 Synth.startTimer(rate);
             }
-            else if (note != -1) //Legato
+            else if (note != -1 && eventId != -1) //Legato
             {
                 //Calculate played interval - limit max to 12
                 interval = Math.min(Math.abs(note - Message.getNoteNumber()), 12);
