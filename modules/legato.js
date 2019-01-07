@@ -300,7 +300,7 @@ function onNoteOff()
             {
                 Message.ignoreEvent(true);
 
-                if (retriggerNote != -1 && (ccValue > 2 || btnBc.getValue() == 0))
+                if (retriggerNote != -1 && (ccValue > 2 || btnBc.getValue() == 0) && eventId != -1)
                 {
                     //Fade out old note
                     Synth.addVolumeFade(eventId, fadeTm / 100 * knbFadeOut.getValue(), -100); //Volume
