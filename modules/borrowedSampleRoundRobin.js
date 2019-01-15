@@ -2,15 +2,15 @@
  * Title: borrowedSampleRoundRobin.js
  * Author: David Healey
  * Date: 17/11/2017
- * Modified: 20/03/2018
+ * Modified: 15/01/2019
  * License: Public Domain
 */
 
-reg rrStep = -1;
-reg lastRR = -1; //RR step number used for the last onNote
-reg lastTime = 0; //Track how long between notes
+reg lastTime = Engine.createMidiList(); //Track how long between notes
+lastTime.fill(0);
+reg lastRR = Engine.createMidiList(); //RR step number used for the last onNote
 
-Content.setWidth(650);
+Content.setWidth(730);
 Content.setHeight(50);
 
 const var btnEnable = Content.addButton("Enable", 0, 10); //Script bypass
@@ -23,44 +23,52 @@ knbLowNote.setRange(0, 127, 1);
 
 const var knbHighNote = Content.addKnob("High Note", 450, 0); //Highest playable note
 knbHighNote.setRange(0, 127, 1);
-knbHighNote.set("defaultValue", 127);function onNoteOn()
+knbHighNote.set("defaultValue", 127);
+
+const var knbReset = Content.addKnob("Reset Time", 600, 0); //Time in seconds until RR reset
+knbReset.setRange(1, 60, 1);
+knbReset.set("defaultValue", 3);function onNoteOn()
 {
-	if (btnEnable.getValue() && (Message.getNoteNumber() >= knbLowNote.getValue() && Message.getNoteNumber() <= knbHighNote.getValue())) //Not bypassed and note in range
+    local n = Message.getNoteNumber();
+
+	if (btnEnable.getValue() && (n >= knbLowNote.getValue() && n <= knbHighNote.getValue())) //Not bypassed and note in range
 	{
-		if (Engine.getUptime() - lastTime > 2) //More than 2 seconds between notes
+	    local v = lastRR.getValue(n); //Transpose value
+
+		if (Engine.getUptime() - lastTime.getValue(n) > knbReset.getValue()) //Reset time between notes
 		{
-			rrStep = 1; //Reset RR counter
+			v = 1; //Reset RR counter
 		}
 		else
 		{
 			//Random RR
 			if (btnRandom.getValue())
 			{
-				rrStep = Math.randInt(0, 2);
+				v = Math.randInt(0, 2);
 			}
 
 			//Random is disabled, or the randomly generated RR is the same as the last RR
-			if (!btnRandom.getValue() || lastRR == rrStep)
+			if (!btnRandom.getValue() || lastRR.getValue(n) == v)
 			{
-				rrStep = (rrStep + 1) % 3; //Max of 3 RRs
+				v = (v + 1) % 3; //Max of 3 RRs
 			}
 
 			//Prevent rrStep resulting in note outside of playable range
-			if (Message.getNoteNumber()+(1-rrStep) < knbLowNote.getValue())
+			if (n+v < knbLowNote.getValue())
 			{
-				rrStep = -1;
+				v = -1;
 			}
-			else if (Message.getNoteNumber()+(1-rrStep) > knbHighNote.getValue())
+			else if (n+v > knbHighNote.getValue())
 			{
-				rrStep = 3;
+				v = 3;
 			}
 		}
 
-		lastRR = rrStep; //Make a note of the RR number for next time
-		lastTime = Engine.getUptime();
+		lastRR.setValue(n, v); //Record the RR tranpose value for n
+		lastTime.setValue(n, Engine.getUptime());
 
-		Message.setTransposeAmount(1-rrStep);
-		Message.setCoarseDetune(-(1-rrStep)); //This can also be picked up by later scripts if needed using .getCoarseDetune
+		Message.setTransposeAmount(1-v);
+		Message.setCoarseDetune(-(1-v)); //This can be picked up by later scripts
 	}
 }function onNoteOff()
 {
