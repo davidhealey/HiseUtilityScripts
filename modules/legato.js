@@ -113,6 +113,11 @@ const var btnWholeStep = Content.addButton("btnWholeStep", 450, 110);
 btnWholeStep.set("text", "Whole Step Glide");
 btnWholeStep.set("tooltip", "When enabled glides will be per whole step rather than each semi-tone.");
 
+const var knbMaxGlide = Content.addKnob("knbMaxGlide", 450, 150);
+knbMaxGlide.set("text", "Max Glide");
+knbMaxGlide.setRange(0, 11, 1);
+knbMaxGlide.set("tooltip", "Limits the maximum glide interval. A value of 0 means no limit");
+
 //Breath controller GUI
 const var btnBc = Content.addButton("btnBc", 600, 10);
 btnBc.set("text", "Breath Control");
@@ -127,11 +132,6 @@ const var knbThreshold = Content.addKnob("knbThreshold", 600, 100);
 knbThreshold.set("text", "Trigger Level");
 knbThreshold.setRange(10, 127, 1);
 knbThreshold.set("tooltip", "Breath controller trigger threshold.");
-
-const var knbBcSkew = Content.addKnob("knbBcSkew", 600, 150);
-knbBcSkew.set("text", "Velocity Skew");
-knbBcSkew.setRange(0, 1, 0.1);
-knbBcSkew.set("tooltip", "Breath controller velocity skew factor.");
 
 /**
  * A lookup table is used for pitch bending to save CPU. This function fills that lookup table based on the min bend and max bend values.
@@ -164,7 +164,7 @@ inline function setLegatoFadeTime(interval, velocity)
 inline function setBreathVelocity()
 {
     local timeDiff = Math.min(1, Engine.getUptime()-ccTime) / 1; //Limit timeDiff to 0-1
-    local v = Math.pow(timeDiff, knbBcSkew.getValue()); //Skew values
+    local v = Math.pow(timeDiff, 0.5); //Skew values
     velocity = parseInt(127-(v*117));
     ccTime = 0;
 }
@@ -181,9 +181,10 @@ inline function setRate(interval)
 	rate = Engine.getMilliSecondsForTempo(rate) / 1000; //Rate to milliseconds for timer
 
 	rate = Math.max(0.04, rate / interval); //Rate is per glide step - capped at timer's min
-}function onNoteOn()
-{
+}
 
+function onNoteOn()
+{
     if (!btnMute.getValue())
     {
         Synth.stopTimer(); //Stop the timer (if it's running)
@@ -194,69 +195,72 @@ inline function setRate(interval)
             coarseDetune = Message.getCoarseDetune();
             fineDetune = Message.getFineDetune();
 
-            if (btnBc.getValue() && ccValue < 2) //If breath controller enabled and the bcc is below 2
+            if (btnBc.getValue() && ccValue < threshold) //If breath controller enabled and the bcc is below the threshold
             {
                 Message.ignoreEvent(true); //Ignore the event
             }
-            else if (Synth.isLegatoInterval() && Synth.isSustainPedalDown() && eventId != -1) //Glide
-            {
-                Message.ignoreEvent(true);
-
-                //Glide rate determined by velocity
-                if (btnGlideVel.getValue())
-                {
-                    knbRate.setValue((Message.getVelocity()/127) * 18);
-                }
-
-                glideNote = note; //First note of glide (same as origin)
-                notes[0] = note; //Origin
-                notes[1] = Message.getNoteNumber(); //Target
-
-                //Get rate for timer
-                setRate(Math.abs(notes[0] - notes[1]));
-
-                //Start the timer
-                Synth.startTimer(rate);
-            }
-            else if (note != -1 && eventId != -1) //Legato
+            else if (note != -1 && eventId != -1) //If there is a last note
             {
                 //Calculate played interval - limit max to 12
                 interval = Math.min(Math.abs(note - Message.getNoteNumber()), 12);
 
-                //Set global fadeTm value
-                setLegatoFadeTime(interval, Message.getVelocity());
+                if (Synth.isLegatoInterval() && Synth.isSustainPedalDown() && eventId != -1 && (knbMaxGlide.getValue() == 0 || interval <= knbMaxGlide.getValue())) //Glide
+                {
+                    Message.ignoreEvent(true);
 
-                //Set global bendTm value
-                bendTm = fadeTm / 100 * (100 + knbBendTm.getValue());
+                    //Glide rate determined by velocity
+                    if (btnGlideVel.getValue())
+                    {
+                        knbRate.setValue((Message.getVelocity()/127) * 18);
+                    }
 
-                //Set global bendAmt value
-                interval > 0 ? bendAmt = bendLookup[interval - 1] : bendAmt = bendLookup[0]; //Get value from lookup table
-                if (note > Message.getNoteNumber()) bendAmt = -bendAmt; //Invert for down interval
+                    glideNote = note; //First note of glide (same as origin)
+                    notes[0] = note; //Origin
+                    notes[1] = Message.getNoteNumber(); //Target
 
-                //Set start offset
-                Message.setStartOffset(offset);
+                    //Get rate for timer
+                    setRate(Math.abs(notes[0] - notes[1]));
 
-                //Get coarseDetune and fineDetune for old notes
-                fadeOutCoarse = coarseDetune + parseInt((bendAmt+fineDetune) / 100);
-                fadeOutFine = ((bendAmt+fineDetune) % 100);
+                    //Start the timer
+                    Synth.startTimer(rate);
+                }
+                else //Legato
+                {
+                    //Set global fadeTm value
+                    setLegatoFadeTime(interval, Message.getVelocity());
 
-                //Get coarseDetune and fineDetune for new note
-                fadeInCoarse = coarseDetune + parseInt((-bendAmt+fineDetune) / 100);
-                fadeInFine = ((-bendAmt+fineDetune) % 100);
+                    //Set global bendTm value
+                    bendTm = fadeTm / 100 * (100 + knbBendTm.getValue());
 
-                //Fade out old note
-                Synth.addVolumeFade(eventId, fadeTm / 100 * knbFadeOut.getValue(), -100); //Volume
-                Synth.addPitchFade(eventId, bendTm / 100 * knbFadeOut.getValue(), fadeOutCoarse, fadeOutFine); //Pitch
+                    //Set global bendAmt value
+                    interval > 0 ? bendAmt = bendLookup[interval - 1] : bendAmt = bendLookup[0]; //Get value from lookup table
+                    if (note > Message.getNoteNumber()) bendAmt = -bendAmt; //Invert for down interval
 
-                //Update eventId
-                eventId = Message.makeArtificial();
+                    //Set start offset
+                    Message.setStartOffset(offset);
 
-                //Fade in new note
-                Synth.addVolumeFade(eventId, 0, -99); //Set initial volume
-                Synth.addVolumeFade(eventId, fadeTm, 0);
+                    //Get coarseDetune and fineDetune for old notes
+                    fadeOutCoarse = coarseDetune + parseInt((bendAmt+fineDetune) / 100);
+                    fadeOutFine = ((bendAmt+fineDetune) % 100);
 
-                Synth.addPitchFade(eventId, 0, fadeInCoarse, fadeInFine); //Set initial detuning
-                Synth.addPitchFade(eventId, bendTm, coarseDetune, fineDetune); //Pitch fade to fineDetune
+                    //Get coarseDetune and fineDetune for new note
+                    fadeInCoarse = coarseDetune + parseInt((-bendAmt+fineDetune) / 100);
+                    fadeInFine = ((-bendAmt+fineDetune) % 100);
+
+                    //Fade out old note
+                    Synth.addVolumeFade(eventId, fadeTm / 100 * knbFadeOut.getValue(), -100); //Volume
+                    Synth.addPitchFade(eventId, bendTm / 100 * knbFadeOut.getValue(), fadeOutCoarse, fadeOutFine); //Pitch
+
+                    //Update eventId
+                    eventId = Message.makeArtificial();
+
+                    //Fade in new note
+                    Synth.addVolumeFade(eventId, 0, -99); //Set initial volume
+                    Synth.addVolumeFade(eventId, fadeTm, 0);
+
+                    Synth.addPitchFade(eventId, 0, fadeInCoarse, fadeInFine); //Set initial detuning
+                    Synth.addPitchFade(eventId, bendTm, coarseDetune, fineDetune); //Pitch fade to fineDetune
+                }
             }
             else //First note of phrase
             {
@@ -300,7 +304,7 @@ function onNoteOff()
             {
                 Message.ignoreEvent(true);
 
-                if (retriggerNote != -1 && (ccValue > 2 || btnBc.getValue() == 0) && eventId != -1)
+                if (retriggerNote != -1 && (ccValue > threshold || btnBc.getValue() == 0) && eventId != -1)
                 {
                     //Fade out old note
                     Synth.addVolumeFade(eventId, fadeTm / 100 * knbFadeOut.getValue(), -100); //Volume
@@ -379,7 +383,7 @@ function onController()
                     Synth.addPitchFade(eventId, 0, coarseDetune, fineDetune);  //Add any detuning
                 }
 
-                if (ccValue < 2 && eventId != -1)
+                if (ccValue < threshold && eventId != -1)
                 {
                     Synth.noteOffByEventId(eventId);
                     eventId = -1;
@@ -392,7 +396,7 @@ function onController()
 }
 function onTimer()
 {
-    if (!btnMute.getValue())
+  if (!btnMute.getValue())
 	{
 	    local glideBend = 100;
 
