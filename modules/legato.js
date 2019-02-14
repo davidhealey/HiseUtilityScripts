@@ -44,9 +44,7 @@ reg fadeOutCoarse;
 reg fadeOutFine;
 
 //Breath control
-reg ccTime;
-reg ccValue = 0;
-reg lastCcValue;
+reg lastBreathValue = 0;
 reg threshold;
 
 //GUI
@@ -123,10 +121,11 @@ const var btnBc = Content.addButton("btnBc", 600, 10);
 btnBc.set("text", "Breath Control");
 btnBc.set("tooltip", "Toggles breath controller mode.");
 
-const var knbCC = Content.addKnob("knbCC", 600, 50);
-knbCC.set("text", "Breath CC");
-knbCC.setRange(1, 127, 1);
-knbCC.set("tooltip", "Select the CC used in breath controller mode.");
+const var knbBreath = Content.addKnob("knbBreath", 600, 50);
+knbBreath.set("text", "Breath");
+knbBreath.setRange(0, 127, 1);
+knbBreath.set("tooltip", "Breath controller knob, value should be set by CC.");
+knbBreath.setControlCallback(breathTrigger);
 
 const var knbThreshold = Content.addKnob("knbThreshold", 600, 100);
 knbThreshold.set("text", "Trigger Level");
@@ -161,14 +160,6 @@ inline function setLegatoFadeTime(interval, velocity)
     if (velocity > 64) fadeTm = fadeTm - (fadeTm * 0.3);
 }
 
-inline function setBreathVelocity()
-{
-    local timeDiff = Math.min(1, Engine.getUptime()-ccTime) / 1; //Limit timeDiff to 0-1
-    local v = Math.pow(timeDiff, 0.5); //Skew values
-    velocity = parseInt(127-(v*117));
-    ccTime = 0;
-}
-
 /**
  * Returns the timer rate for glides
  * @param  {number} interval [The distance between the two notes that will be glided]
@@ -183,7 +174,30 @@ inline function setRate(interval)
 	rate = Math.max(0.04, rate / interval); //Rate is per glide step - capped at timer's min
 }
 
-function onNoteOn()
+//Breath controller handler;
+inline function breathTrigger(control, value)
+{
+    if (!btnMute.getValue() && btnBc.getValue())
+    {
+        //Going up and reached the threshold
+        if (value >= threshold && lastBreathValue < threshold && note != -1)
+        {
+            //Turn off old note
+            if (eventId != -1) Synth.noteOffByEventId(eventId);
+
+            //Play new note
+            eventId = Synth.playNoteWithStartOffset(channel, note, velocity, 0);
+            Synth.addPitchFade(eventId, 0, coarseDetune, fineDetune);  //Add any detuning
+        }
+        else if (value < threshold && eventId != -1)
+        {
+            Synth.noteOffByEventId(eventId);
+            eventId = -1;
+        }
+
+        lastBreathValue = value;
+    }
+}function onNoteOn()
 {
     if (!btnMute.getValue())
     {
@@ -195,7 +209,7 @@ function onNoteOn()
             coarseDetune = Message.getCoarseDetune();
             fineDetune = Message.getFineDetune();
 
-            if (btnBc.getValue() && ccValue < threshold) //If breath controller enabled and the bcc is below the threshold
+            if (btnBc.getValue() && knbBreath.getValue() < threshold) //If breath controller enabled and the bcc is below the threshold
             {
                 Message.ignoreEvent(true); //Ignore the event
             }
@@ -298,13 +312,11 @@ function onNoteOff()
 
         if (Message.getNoteNumber() == note)
         {
-            ccTime = 0;
-
             if ((Synth.isSustainPedalDown() == 0 && btnRetrigger.getValue() == 0) || btnRetrigger.getValue()) //CC64 sustain
             {
                 Message.ignoreEvent(true);
 
-                if (retriggerNote != -1 && (ccValue > threshold || btnBc.getValue() == 0) && eventId != -1)
+                if (retriggerNote != -1 && (knbBreath.getValue() > threshold || btnBc.getValue() == 0) && eventId != -1)
                 {
                     //Fade out old note
                     Synth.addVolumeFade(eventId, fadeTm / 100 * knbFadeOut.getValue(), -100); //Volume
@@ -354,43 +366,6 @@ function onController()
             Synth.noteOffByEventId(eventId);
             eventId = -1;
             note = -1;
-        }
-
-        //Breath controller handler;
-        if (btnBc.getValue())
-        {
-            if (Message.getControllerNumber() == knbCC.getValue())
-            {
-                ccValue = Message.getControllerValue();
-
-                //Going up but haven't reached threshold
-                if (ccValue < threshold && ccValue > lastCcValue && ccTime == 0 && note != -1)
-                {
-                    ccTime = Engine.getUptime();
-                }
-
-                //Going up and reached the threshold
-                if (ccValue >= threshold && lastCcValue < threshold && ccTime > 0 && note != -1)
-                {
-                    //Calculate velocity based on breath attack
-                    setBreathVelocity();
-
-                    //Turn off old note
-                    if (eventId != -1) Synth.noteOffByEventId(eventId);
-
-                    //Play new note
-                    eventId = Synth.playNoteWithStartOffset(channel, note, velocity, 0);
-                    Synth.addPitchFade(eventId, 0, coarseDetune, fineDetune);  //Add any detuning
-                }
-
-                if (ccValue < threshold && eventId != -1)
-                {
-                    Synth.noteOffByEventId(eventId);
-                    eventId = -1;
-                }
-
-                lastCcValue = ccValue;
-            }
         }
     }
 }
