@@ -14,32 +14,38 @@
     You should have received a copy of the GNU General Public License
     along with this file. If not, see <http://www.gnu.org/licenses/>.
 */
+Content.setWidth(730);
+Content.setHeight(50);
+
 reg lastTime = Engine.createMidiList(); //Track how long between notes
 lastTime.fill(0);
 reg lastRR = Engine.createMidiList(); //RR step number used for the last onNote
 
-Content.setWidth(730);
-Content.setHeight(50);
-
-const var btnEnable = Content.addButton("Enable", 0, 10); //Script bypass
-
-const var btnRandom = Content.addButton("Random", 150, 10); //Random mode button
-
 //Knobs used to set instrument's playable range
-const var knbLowNote = Content.addKnob("Low Note", 300, 0); //Lowest playable note
+const var knbLowNote = Content.addKnob("Low Note", 0, 0); //Lowest playable note
 knbLowNote.setRange(0, 127, 1);
 
-const var knbHighNote = Content.addKnob("High Note", 450, 0); //Highest playable note
+const var knbHighNote = Content.addKnob("High Note", 150, 0); //Highest playable note
 knbHighNote.setRange(0, 127, 1);
 knbHighNote.set("defaultValue", 127);
 
-const var knbReset = Content.addKnob("Reset Time", 600, 0); //Time in seconds until RR reset
+const var knbReset = Content.addKnob("Reset Time", 300, 0); //Time in seconds until RR reset
 knbReset.setRange(1, 60, 1);
-knbReset.set("defaultValue", 3);function onNoteOn()
+knbReset.set("defaultValue", 3);
+
+const var knbFine = Content.addKnob("Fine Tune", 450, 0);
+knbFine.setRange(0, 50, 1);
+knbFine.set("defaultValue", 0);
+
+const var knbGain = Content.addKnob("Gain", 600, 0);
+knbGain.setRange(0, 3, 1);
+knbGain.set("mode", "Decibel");
+knbGain.set("defaultValue", 0);function onNoteOn()
 {
     local n = Message.getNoteNumber();
 
-	if (btnEnable.getValue() && (n >= knbLowNote.getValue() && n <= knbHighNote.getValue())) //Not bypassed and note in range
+    //Not legato and in playable range
+	if (n >= knbLowNote.getValue() && n <= knbHighNote.getValue())
 	{
 	    local v = lastRR.getValue(n); //Transpose value
 
@@ -64,14 +70,10 @@ knbReset.set("defaultValue", 3);function onNoteOn()
                 break;
             }
 
-			//Random RR
-			if (btnRandom.getValue())
-			{
-                v = Math.randInt(range[0], range[1]);
-			}
+            v = Math.randInt(range[0], range[1]);
 
-			//Random is disabled, or the randomly generated RR is the same as the last RR
-			if (!btnRandom.getValue() || lastRR.getValue(n) == v)
+			//Generated RR is the same as the last RR
+			if (lastRR.getValue(n) == v)
 			{
 			    v = v + 1;
 			    if (v > range[1]-1) v = range[0];
@@ -83,11 +85,24 @@ knbReset.set("defaultValue", 3);function onNoteOn()
 		lastTime.setValue(n, Engine.getUptime());
 
 		Message.setTransposeAmount(1-v);
-		Message.setCoarseDetune(-(1-v)); //This can be picked up by later scripts
+		Message.setCoarseDetune(-(1-v));
 	}
+
+	if (knbFine.getValue() > 0)
+        Message.setFineDetune(Math.randInt(-knbFine.getValue(), knbFine.getValue()+1));
+
+    if (knbGain.getValue() > 0)
+        Message.setGain(Math.randInt(-knbGain.getValue(), knbGain.getValue()+1));
 }function onNoteOff()
 {
+    Message.setTransposeAmount(1-lastRR.getValue(Message.getNoteNumber()));
+	Message.setCoarseDetune(-(1-lastRR.getValue(Message.getNoteNumber())));
 
+	if (knbFine.getValue() > 0)
+        Message.setFineDetune(Math.randInt(-knbFine.getValue(), knbFine.getValue()+1));
+
+    if (knbGain.getValue() > 0)
+        Message.setGain(Math.randInt(-knbGain.getValue(), knbGain.getValue()+1));
 }
 function onController()
 {
