@@ -85,21 +85,21 @@ knbGain.set("defaultValue", 0);function onNoteOn()
 		lastTime.setValue(n, Engine.getUptime());
 
 		Message.setTransposeAmount(1-v);
-		Message.setCoarseDetune(-(1-v));
+		Message.setCoarseDetune(Message.getCoarseDetune()+-(1-v));
 	}
 
 	if (knbFine.getValue() > 0)
-        Message.setFineDetune(Math.randInt(-knbFine.getValue(), knbFine.getValue()+1));
+        Message.setFineDetune(Message.getFineDetune() + Math.randInt(-knbFine.getValue(), knbFine.getValue()+1));
 
     if (knbGain.getValue() > 0)
         Message.setGain(Math.randInt(-knbGain.getValue(), knbGain.getValue()+1));
 }function onNoteOff()
 {
     Message.setTransposeAmount(1-lastRR.getValue(Message.getNoteNumber()));
-	Message.setCoarseDetune(-(1-lastRR.getValue(Message.getNoteNumber())));
+	Message.setCoarseDetune(Message.getCoarseDetune()+-(1-lastRR.getValue(Message.getNoteNumber())));
 
 	if (knbFine.getValue() > 0)
-        Message.setFineDetune(Math.randInt(-knbFine.getValue(), knbFine.getValue()+1));
+        Message.setFineDetune(Message.getFineDetune() + Math.randInt(-knbFine.getValue(), knbFine.getValue()+1));
 
     if (knbGain.getValue() > 0)
         Message.setGain(Math.randInt(-knbGain.getValue(), knbGain.getValue()+1));
