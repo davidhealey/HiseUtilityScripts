@@ -267,7 +267,7 @@ inline function breathTrigger(control, value)
 
                     //Fade in new note
                     Synth.addVolumeFade(eventId, 0, -99); //Set initial volume
-                    Synth.addVolumeFade(eventId, fadeTm, 0);
+                    Synth.addVolumeFade(eventId, fadeTm, Message.getGain());
 
                     Synth.addPitchFade(eventId, 0, fadeCoarse, fadeFine); //Set initial detuning
                     Synth.addPitchFade(eventId, bendTm, coarseDetune, fineDetune); //Pitch fade to fineDetune
@@ -275,6 +275,7 @@ inline function breathTrigger(control, value)
             }
             else //First note of phrase
             {
+                Message.setGain(0);
                 eventId = Message.makeArtificial(); //Update eventId
                 Synth.addPitchFade(eventId, 0, coarseDetune, fineDetune); //Pitch
             }
