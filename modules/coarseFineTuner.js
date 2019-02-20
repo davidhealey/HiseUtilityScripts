@@ -13,8 +13,9 @@ knbFine.set("middlePosition", 0);
 const var knbCoarse = Content.addKnob("knbCoarse", 150, 0);
 knbCoarse.set("text", "Coarse Tune");
 knbCoarse.set("suffix", "st");
-knbCoarse.setRange(-12, 12, 1);function onNoteOn()
+knbCoarse.setRange(-12, 12, 1);
 knbCoarse.set("middlePosition", 0);
+function onNoteOn()
 {
 	Message.setFineDetune(knbFine.getValue());
 	Message.setCoarseDetune(knbCoarse.getValue());
