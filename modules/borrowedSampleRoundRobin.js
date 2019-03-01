@@ -22,24 +22,29 @@ lastTime.fill(0);
 reg lastRR = Engine.createMidiList(); //RR step number used for the last onNote
 
 //Knobs used to set instrument's playable range
-const var knbLowNote = Content.addKnob("Low Note", 0, 0); //Lowest playable note
+const var knbLowNote = Content.addKnob("knbLowNote", 0, 0); //Lowest playable note
+knbLowNote.set("text", "Low Note");
 knbLowNote.setRange(0, 127, 1);
 
-const var knbHighNote = Content.addKnob("High Note", 150, 0); //Highest playable note
+const var knbHighNote = Content.addKnob("knbHighNote", 150, 0); //Highest playable note
 knbHighNote.setRange(0, 127, 1);
+knbHighNote.set("text", "High Note");
 knbHighNote.set("defaultValue", 127);
 
-const var knbReset = Content.addKnob("Reset Time", 300, 0); //Time in seconds until RR reset
+const var knbReset = Content.addKnob("knbResetTime", 300, 0); //Time in seconds until RR reset
 knbReset.setRange(1, 60, 1);
+knbReset.set("text", "Reset Time");
 knbReset.set("defaultValue", 3);
 
-const var knbFine = Content.addKnob("Fine Tune", 450, 0);
+const var knbFine = Content.addKnob("knbFineTune", 450, 0);
 knbFine.setRange(0, 50, 1);
+knbFine.set("text", "Fine Tune");
 knbFine.set("defaultValue", 0);
 
-const var knbGain = Content.addKnob("Gain", 600, 0);
+const var knbGain = Content.addKnob("knbGain", 600, 0);
 knbGain.setRange(0, 3, 1);
 knbGain.set("mode", "Decibel");
+knbGain.set("text", "knbGain");
 knbGain.set("defaultValue", 0);function onNoteOn()
 {
     local n = Message.getNoteNumber();
