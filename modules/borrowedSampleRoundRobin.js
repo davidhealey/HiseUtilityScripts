@@ -62,18 +62,16 @@ knbGain.set("defaultValue", 0);function onNoteOn()
 		{
 		    local range = [0, 3];
 
-		    switch(n)
-            {
-                case knbHighNote.getValue(): //Highest note
-                    range[0] = 1;
-                    range[1] = 3;
-                break;
-
-                case knbLowNote.getValue(): //Lowest note
-                    range[0] = 0;
-                    range[1] = 2;
-                break;
-            }
+        if (n == knbHighNote.getValue())
+		    {
+                range[0] = 1;
+                range[1] = 3;
+		    }
+		    else if (n == knbLowNote.getValue())
+		    {
+                range[0] = 0;
+                range[1] = 2;
+		    }
 
             v = Math.randInt(range[0], range[1]);
 
