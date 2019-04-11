@@ -1,6 +1,0 @@
-<snippet>
-	<content><![CDATA[const var lbl${1:id} = ui.label(${2:x}, ${3:y}, {width:${4:num}, height:${5:num}, text:"${6:string}", bgColour:${7:hex}, textColour:${8:hex}, fontName:"${9:string}", fontSize:${10:num}, editable:${11:bool}});]]></content>
-	<description>ui.label</description>
-	<tabTrigger>ui.label</tabTrigger>
-	<scope>source.js</scope>
-</snippet>

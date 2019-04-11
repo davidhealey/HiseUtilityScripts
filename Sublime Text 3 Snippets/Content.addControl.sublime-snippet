@@ -1,6 +1,0 @@
-<snippet>
-	<content><![CDATA[const var ${1:variable name} = Content.add${2:control}("${3:id}", ${4:x}, ${5:y});]]></content>
-	<description>Content.addControl</description>
-	<tabTrigger>addControl</tabTrigger>
-	<scope>source.js</scope>
-</snippet>

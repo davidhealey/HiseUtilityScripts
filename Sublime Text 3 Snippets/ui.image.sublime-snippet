@@ -1,6 +1,0 @@
-<snippet>
-	<content><![CDATA[const var img${1:id} = ui.image(${2:x}, ${3:y}, {width:${4:num}, height:${5:num}, alpha:${6:num}, fileName:"${7:string}", offset:${8:num}, scale:${9:num}});]]></content>
-	<description>ui.image</description>
-	<tabTrigger>ui.image</tabTrigger>
-	<scope>source.js</scope>
-</snippet>

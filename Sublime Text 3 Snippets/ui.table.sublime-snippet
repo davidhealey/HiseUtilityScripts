@@ -1,6 +1,0 @@
-<snippet>
-	<content><![CDATA[const var tbl${1:id} = ui.table(${2:x}, ${3:y}, {width:${4:num}, height:${5:num}, parentComponent:"${6:string}", tableIndex:${7:num}, processorId:"${8:string}"});]]></content>
-	<description>ui.table</description>
-	<tabTrigger>ui.table</tabTrigger>
-	<scope>source.js</scope>
-</snippet>

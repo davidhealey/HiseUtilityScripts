@@ -1,6 +1,0 @@
-<snippet>
-	<content><![CDATA[Console.print(${1:value});]]></content>
-	<description>print</description>
-	<tabTrigger>print</tabTrigger>
-	<scope>source.js</scope>
-</snippet>

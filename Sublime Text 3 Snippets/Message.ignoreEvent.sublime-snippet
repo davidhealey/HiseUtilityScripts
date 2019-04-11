@@ -1,6 +1,0 @@
-<snippet>
-	<content><![CDATA[Message.ignoreEvent(true)]]></content>
-	<description>ignoreEvent</description>
-	<tabTrigger>Message.</tabTrigger>
-	<scope>source.js</scope>
-</snippet>

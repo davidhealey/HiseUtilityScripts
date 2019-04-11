@@ -1,6 +1,0 @@
-<snippet>
-	<content><![CDATA[getValue()]]></content>
-	<description>Control.getValue()</description>
-	<tabTrigger>getValue()</tabTrigger>
-	<scope>source.js</scope>
-</snippet>

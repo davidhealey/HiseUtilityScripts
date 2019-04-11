@@ -1,6 +1,0 @@
-<snippet>
-	<content><![CDATA[const var pnl${1:id} = ui.panel(${2:x}, ${3:y}, {width:${4:num}, height:${5:num}, itemColour:${6:hex}, itemColour2:${7:hex}, textColour:${8:hex}, parentComponent:"${9:string}", borderSize:${10:num}, borderRadius:${11:num}, opaque:${12:bool}, allowDragging:${13:bool}, allowCallbacks:${14:bool}, popupMenuItems:${15:[]}, popupOnRightClick:${16:bool}, popupMenuAlign:${17:bool}});]]></content>
-	<description>ui.panel</description>
-	<tabTrigger>ui.panel</tabTrigger>
-	<scope>source.js</scope>
-</snippet>

@@ -1,6 +1,0 @@
-<snippet>
-	<content><![CDATA[Engine.getUptime();]]></content>
-	<description>Engine.getUptime</description>
-	<tabTrigger>getUptime</tabTrigger>
-	<scope>source.js</scope>
-</snippet>

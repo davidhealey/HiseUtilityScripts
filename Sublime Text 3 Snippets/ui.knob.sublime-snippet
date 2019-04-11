@@ -1,6 +1,0 @@
-<snippet>
-	<content><![CDATA[const var knb${1:id} = ui.knob(${2:x}, ${3:y}, {text:${4:"string"}, width:${5:num}, height:${6:num}, filmstripImage:"${7:string}", numStrips:${8:num}, mode:${9:num}, min:${10:num}, max:${11:num}, style:"${12:string}", stepSize:${13:num}, middlePosition:${14:num}, defaultValue:${15:num}, suffix:"${16:string}", dragDirection:"${17:string}"});]]></content>
-	<description>ui.knob</description>
-	<tabTrigger>ui.knob</tabTrigger>
-	<scope>source.js</scope>
-</snippet>

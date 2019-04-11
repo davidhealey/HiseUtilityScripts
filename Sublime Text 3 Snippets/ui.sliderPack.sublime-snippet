@@ -1,6 +1,0 @@
-<snippet>
-	<content><![CDATA[const var spk${1:id} = ui.sliderPack(${2:x}, ${3:y}, {width:${4:num}, height:${5:num}, text:"${6:string}", enabled:${7:bool}, visible:${8:bool}, bgColour:${9:hex}, textColour:${10:hex}, itemColour:${11:hex}, itemColour2:${12:hex}, min:${13:num}, max:${14:num}, sliderAmount:${15:num}, stepSize:${16:num}});]]></content>
-	<description>ui.sliderPack</description>
-	<tabTrigger>ui.sliderPack</tabTrigger>
-	<scope>source.js</scope>
-</snippet>

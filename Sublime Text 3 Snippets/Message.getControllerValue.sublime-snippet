@@ -1,6 +1,0 @@
-<snippet>
-	<content><![CDATA[Message.getControllerValue()]]></content>
-	<description>getControllerValue</description>
-	<tabTrigger>Message.</tabTrigger>
-	<scope>source.js</scope>
-</snippet>

@@ -1,6 +1,0 @@
-<snippet>
-	<content><![CDATA[Synth.addVolumeFade(${1:eventId}, ${2:fadeTimeMilliseconds}, ${3:targetVolume});]]></content>
-	<description>Synth.addVolumeFade</description>
-	<tabTrigger>addVolumeFade</tabTrigger>
-	<scope>source.js</scope>
-</snippet>

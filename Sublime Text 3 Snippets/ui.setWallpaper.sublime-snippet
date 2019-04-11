@@ -1,6 +1,0 @@
-<snippet>
-	<content><![CDATA[const ui.setWallpaper(${2:width}, ${3:height}, "${4:fileName}");]]></content>
-	<description>ui.setWallpaper</description>
-	<tabTrigger>ui.setWallpaper</tabTrigger>
-	<scope>source.js</scope>
-</snippet>

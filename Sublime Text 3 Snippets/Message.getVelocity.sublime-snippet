@@ -1,6 +1,0 @@
-<snippet>
-	<content><![CDATA[Message.getVelocity()]]></content>
-	<description>getVelocity</description>
-	<tabTrigger>Message.</tabTrigger>
-	<scope>source.js</scope>
-</snippet>
