@@ -62,27 +62,27 @@ knbGain.set("defaultValue", 0);function onNoteOn()
 		{
 		    local range = [0, 3];
 
-        if (n == knbHighNote.getValue())
-		    {
+            if (n == knbHighNote.getValue())
+            {
                 range[0] = 1;
                 range[1] = 3;
-		    }
-		    else if (n == knbLowNote.getValue())
-		    {
+            }
+            else if (n == knbLowNote.getValue())
+            {
                 range[0] = 0;
                 range[1] = 2;
-		    }
+            }
 
             v = Math.randInt(range[0], range[1]);
 
-			//Generated RR is the same as the last RR
-			if (lastRR.getValue(n) == v)
-			{
-			    v = v + 1;
-			    if (v > range[1]-1) v = range[0];
-			    if (v < range[0]) v = range[1];
-			}
-		}
+            //Generated RR is the same as the last RR
+            if (lastRR.getValue(n) == v)
+            {
+                v = v + 1;
+                if (v > range[1]-1) v = range[0];
+                if (v < range[0]) v = range[1];
+            }
+        }
 
 		lastRR.setValue(n, v); //Record the RR tranpose value for n
 		lastTime.setValue(n, Engine.getUptime());
@@ -98,9 +98,6 @@ knbGain.set("defaultValue", 0);function onNoteOn()
         Message.setGain(Math.randInt(-knbGain.getValue(), knbGain.getValue()+1));
 }function onNoteOff()
 {
-    Message.setTransposeAmount(1-lastRR.getValue(Message.getNoteNumber()));
-	Message.setCoarseDetune(Message.getCoarseDetune()+-(1-lastRR.getValue(Message.getNoteNumber())));
-
 	if (knbFine.getValue() > 0)
         Message.setFineDetune(Message.getFineDetune() + Math.randInt(-knbFine.getValue(), knbFine.getValue()+1));
 
