@@ -77,6 +77,10 @@ knbFadeOut.setRange(10, 100, 1);
 knbFadeOut.set("suffix", "%");
 knbFadeOut.set("tooltip", "Percentage of overall fade time to be used to fade out old notes.");
 
+const var btnNoteOff = Content.addButton("btnNoteOff", 150, 160);
+btnNoteOff.set("text", "Note Off");
+btnNoteOff.set("tooltip", "When enabled legato phrase notes will be turned off instead of faded out.");
+
 const var knbBendTm = Content.addKnob("knbBendTm", 300, 0);
 knbBendTm.set("text", "Bend Tm");
 knbBendTm.setRange(-50, 50, 1);
@@ -255,8 +259,15 @@ inline function breathTrigger(control, value)
                     local fadeFine = ((bendAmt+lastFineDetune) % 100);
 
                     //Fade out old note
-                    Synth.addVolumeFade(eventId, fadeTm / 100 * knbFadeOut.getValue(), -100); //Volume
-                    Synth.addPitchFade(eventId, bendTm / 100 * knbFadeOut.getValue(), fadeCoarse, fadeFine); //Pitch
+                    if (btnNoteOff.getValue() == 0)
+                    {
+                        Synth.addVolumeFade(eventId, fadeTm / 100 * knbFadeOut.getValue(), -100); //Volume
+                        Synth.addPitchFade(eventId, bendTm / 100 * knbFadeOut.getValue(), fadeCoarse, fadeFine); //Pitch                        
+                    }
+                    else 
+                    {
+                        Synth.noteOffByEventId(eventId);
+                    }
 
                     //Update eventId
                     eventId = Message.makeArtificial();
@@ -317,8 +328,15 @@ function onNoteOff()
                     local fadeFine = ((bendAmt+fineDetune) % 100);
 
                     //Fade out old note
-                    Synth.addVolumeFade(eventId, fadeTm / 100 * knbFadeOut.getValue(), -100); //Volume
-                    Synth.addPitchFade(eventId, bendTm / 100 * knbFadeOut.getValue(), fadeCoarse, fadeFine); //Pitch
+                    if (btnNoteOff.getValue() == 0)
+                    {
+                        Synth.addVolumeFade(eventId, fadeTm / 100 * knbFadeOut.getValue(), -100); //Volume
+                        Synth.addPitchFade(eventId, bendTm / 100 * knbFadeOut.getValue(), fadeCoarse, fadeFine); //Pitch                        
+                    }
+                    else
+                    {
+                        Synth.noteOffByEventId(eventId);
+                    }
 
                     //Play new note
                     eventId = Synth.playNoteWithStartOffset(channel, retriggerNote+Message.getTransposeAmount(), velocity, offset);
