@@ -23,45 +23,60 @@ reg eventId;
 reg lastTuning = 0;
 
 //GUI
-const var time = Content.addKnob("Time", 0, 0);
+const var bypass = Content.addButton("Bypass", 10, 10);
+
+const var time = Content.addKnob("Time", 160, 0);
 time.setRange(0, 2000, 0.01);
 
 function onNoteOn()
 {
-    if (lastNote == 0)
+    if (!bypass.getValue())
     {
-        lastNote = Message.getNoteNumber();
-        eventId = Message.makeArtificial();
-    }
-    else
-    {
-        if (time.getValue() > 0)
+        if (lastNote == 0)
         {
-            Message.ignoreEvent(true);
-            Synth.addPitchFade(eventId, time.getValue(), lastTuning + Message.getNoteNumber()-lastNote, 0);
-            lastTuning = lastTuning + Message.getNoteNumber()-lastNote;
+            lastNote = Message.getNoteNumber();
+            eventId = Message.makeArtificial();
         }
         else
         {
-            Synth.noteOffByEventId(eventId);
-            eventId = Message.makeArtificial();
+            if (time.getValue() > 0)
+            {
+                Message.ignoreEvent(true);
+                Synth.addPitchFade(eventId, time.getValue(), lastTuning + Message.getNoteNumber()-lastNote, 0);
+                lastTuning = lastTuning + Message.getNoteNumber()-lastNote;
+            }
+            else
+            {
+                Synth.noteOffByEventId(eventId);
+                eventId = Message.makeArtificial();
+            }
+            lastNote = Message.getNoteNumber();
         }
-        lastNote = Message.getNoteNumber();
     }
 }
 
 function onNoteOff()
 {
-    Message.ignoreEvent(true);
+    if (!bypass.getValue())
+    {
+        Message.ignoreEvent(true);
 
-    if (eventId != -1 && Message.getNoteNumber() == lastNote)
+        if (eventId != -1 && Message.getNoteNumber() == lastNote)
+        {
+            Synth.noteOffByEventId(eventId);
+            eventId = -1;
+        }
+
+        if (!Synth.getNumPressedKeys())
+        {
+            lastNote = 0;
+            lastTuning = 0;
+        }
+    }
+    else if (eventId != -1)
     {
         Synth.noteOffByEventId(eventId);
         eventId = -1;
-    }
-
-    if (!Synth.getNumPressedKeys())
-    {
         lastNote = 0;
         lastTuning = 0;
     }
@@ -69,13 +84,13 @@ function onNoteOff()
 
 function onController()
 {
-
+	
 }
-function onTimer()
+ function onTimer()
 {
-
+	
 }
-function onControl(number, value)
+ function onControl(number, value)
 {
-
+	
 }
