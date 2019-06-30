@@ -15,110 +15,78 @@
     along with This file. If not, see <http://www.gnu.org/licenses/>.
 */
 
-Content.setWidth(730);
+Content.setWidth(600);
 Content.setHeight(50);
 
-reg ids = Engine.createMidiList();
-reg held = Engine.createMidiList();
+const var ids = Engine.createMidiList();
+ids.fill(false);
+
 reg lastLevel = 0;
 
-//GUI
 const var btnBypass = Content.addButton("btnBypass", 10, 10);
 btnBypass.set("text", "Bypass");
 
-const var knbLevel = Content.addKnob("knbLevel", 160, 0);
-knbLevel.set("text", "Level");
-knbLevel.setRange(0, 127, 1);
-knbLevel.setControlCallback(onknbLevelControl);
-
-const var knbThreshold = Content.addKnob("knbThreshold", 310, 0);
+const var knbThreshold = Content.addKnob("knbThreshold", 160, 0);
 knbThreshold.set("text", "Threshold");
 knbThreshold.set("defaultValue", 10);
 knbThreshold.setRange(0, 127, 1);
 
-inline function getVelocity()
-{
-    local timeDiff = Math.min(1, Engine.getUptime()-lastTime) / 1; //Limit timeDiff to 0-1
-    local v = Math.pow(timeDiff, 0.2); //Skew values
-    velocity = parseInt(127-(v*117));
-
-    lastTime = 0;
-}
+const var knbLevel = Content.addKnob("knbLevel", 310, 0);
+knbLevel.set("text", "Level");
+knbLevel.setRange(0, 127, 1);
+knbLevel.setControlCallback(onknbLevelControl);
 
 inline function onknbLevelControl(component, value)
-{Console.print(held.getValueAmount(true));
+{
     if (!btnBypass.getValue())
     {
         local threshold = knbThreshold.getValue();
-        
-        //Going up and reached threshold
-        if (value >= threshold && lastLevel < threshold && held.getValueAmount(true))
-        {            
-            for (i = 0; i < 127; i++)
+    
+        for (i = 0; i < 127; i++)
+        {
+            if (Synth.isKeyDown(i))
             {
-                if (ids.getValue(i) != -1)
+                if (value >= threshold && lastLevel < threshold)
+                {
+                    if (ids.getValue(i) != false)
+                        Synth.noteOffByEventId(ids.getValue(i));
+            
+                    ids.setValue(i, Synth.playNote(i, 64));  
+                }
+                else if (value < threshold && ids.getValue(i) != false)
+                {
                     Synth.noteOffByEventId(ids.getValue(i));
-                
-                //Play new note                
-                ids.setValue(i, Synth.playNote(i, 64));                
+                    ids.setValue(i, false);
+                }
             }
         }
-        else if (value < threshold && held.getValueAmount(true))
-        {
-            Engine.allNotesOff();
-            ids.clear();
-        }
-                    
-        lastLevel = value;        
+    
+        lastLevel = value;   
     }
-};
-
-//Breath controller handler;
-inline function breathTrigger(control, value)
-{    
-    if (!btnMute.getValue() && btnBc.getValue())
-    {
-        //Going up and reached the threshold
-        if (value >= threshold && lastBreathValue < threshold && note != -1)
-        {
-            //Turn off old note
-            if (eventId != -1) Synth.noteOffByEventId(eventId);
-
-            //Play new note
-            eventId = Synth.playNoteWithStartOffset(channel, note, velocity, 0);
-            Synth.addPitchFade(eventId, 0, coarseDetune, fineDetune);  //Add any detuning
-        }
-        else if (value < threshold && eventId != -1)
-        {
-            Synth.noteOffByEventId(eventId);
-            eventId = -1;
-        }
-
-        lastBreathValue = value;
-    }
-}
-
-
-function onNoteOn()
+};function onNoteOn()
 {        
-    if (btnBypass.getValue() || knbLevel.getValue() < knbThreshold.getValue())
-        Message.ignoreEvent(true);
-    else
-        ids.setValue(Message.getNoteNumber(), Message.makeArtificial());
-    
-    held.setValue(Message.getNoteNumber(), true);
-}function onNoteOff()
-{
-    local note = Message.getNoteNumber();
-    held.setValue(note, -1);    
-    
-    if (ids.getValue(note) != -1)
+    if (!btnBypass.getValue())
     {
-        Engine.allNotesOff();
-        ids.clear();
-    }    
+        if (knbLevel.getValue() < knbThreshold.getValue())
+            Message.ignoreEvent(true);
+        else
+        {
+            if (ids.getValue(Message.getNoteNumber()) != false)
+                Synth.noteOffByEventId(ids.getValue(Message.getNoteNumber()));
+            
+            ids.setValue(Message.getNoteNumber(), Message.makeArtificial());
+        }        
+    }        
 }
-function onController()
+ function onNoteOff()
+{
+    if (ids.getValue(Message.getNoteNumber()) != false)
+    {
+        Synth.noteOffByEventId(ids.getValue(Message.getNoteNumber()));
+        ids.setValue(Message.getNoteNumber(), false);
+    }
+}
+ function onController()
 {
 	
 }
