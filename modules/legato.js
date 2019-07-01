@@ -128,6 +128,7 @@ knbBreath.setControlCallback(breathTrigger);
 const var knbThreshold = Content.addKnob("knbThreshold", 600, 100);
 knbThreshold.set("text", "Trigger Level");
 knbThreshold.setRange(10, 127, 1);
+knbThreshold.set("defaultValue", 10);
 knbThreshold.set("tooltip", "Breath controller trigger threshold.");
 
 const var btnBreathVel = Content.addButton("btnBreathVel", 600, 160)
