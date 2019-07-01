@@ -35,6 +35,7 @@ reg bendAmt = 0;
 reg lastTime;
 reg offset;
 reg rate;
+reg isChord = false;
 const var bendLookup = []; //Generated on init (onControl) and updated when bend amount changed
 reg glideNote;
 const var notes = [];
@@ -129,6 +130,9 @@ knbThreshold.set("text", "Trigger Level");
 knbThreshold.setRange(10, 127, 1);
 knbThreshold.set("tooltip", "Breath controller trigger threshold.");
 
+const var btnBreathVel = Content.addButton("btnBreathVel", 600, 160)
+btnBreathVel.set("text", "Speed = Velocity");
+
 /**
  * A lookup table is used for pitch bending to save CPU. This function fills that lookup table based on the min bend and max bend values.
  * @param  {number} minBend The amount of bend for an interval of 1 semitone
@@ -168,52 +172,64 @@ inline function setLegatoFadeTime(interval, velocity)
 inline function setRate(interval)
 {
 	rate = knbRate.getValue(); //Get rate knob value
-
 	rate = Engine.getMilliSecondsForTempo(rate) / 1000; //Rate to milliseconds for timer
-
 	rate = Math.max(0.04, rate / interval); //Rate is per glide step - capped at timer's min
 }
 
 //Breath controller handler;
 inline function breathTrigger(control, value)
 {
-    if (!btnMute.getValue() && btnBc.getValue())
+    if (!btnMute.getValue() && btnBc.getValue() && !isChord)
     {
         //Going up and reached the threshold
         if (value >= threshold && lastBreathValue < threshold && note != -1)
         {
             //Turn off old note
-            if (eventId != -1) Synth.noteOffByEventId(eventId);
+            if (noteId0 != -1) Synth.noteOffByEventId(noteId0);
 
+            //Breath controlled velocity - if enabled
+            if (btnBreathVel.getValue())
+                velocity = getBreathVelocity();
+            
             //Play new note
-            eventId = Synth.playNoteWithStartOffset(channel, note, velocity, 0);
-            Synth.addPitchFade(eventId, 0, coarseDetune, fineDetune);  //Add any detuning
+            noteId0 = Synth.playNoteWithStartOffset(channel, note, velocity, 0);
+            Synth.addPitchFade(noteId0, 0, coarseDetune, fineDetune);  //Add any detuning
         }
-        else if (value < threshold && eventId != -1)
+        else if (value < threshold && noteId0 != -1)
         {
-            Synth.noteOffByEventId(eventId);
-            eventId = -1;
+            Synth.noteOffByEventId(noteId0);
+            noteId0 = -1;
         }
 
         lastBreathValue = value;
     }
+}
+
+//Calculate the velocity based on the breath speed - up to 1 second window
+inline function getBreathVelocity()
+{
+    local timeDiff = Math.min(1, Engine.getUptime()-lastBreathTime) / 1; //Limit timeDiff to 0-1 seconds
+    local v = Math.pow(timeDiff, 0.3); //Skew value
+    return parseInt(127-(v*117));
 }function onNoteOn()
 {
     if (!btnMute.getValue())
     {
         Synth.stopTimer(); //Stop the timer (if it's running)
 
-        if ((Engine.getUptime() - lastTime) > 0.025) //Not a chord
+        isChord = (Engine.getUptime() - lastTime) < 0.025;
+        
+        //If breath control enabled and value below threshold and not playing a chord
+        if (btnBc.getValue() && knbBreath.getValue() < threshold)
+            Message.ignoreEvent(true); //Ignore the event
+        
+        if (!isChord) //Not a chord
         {
             //Pick up values have been applied to the notes before this point
             coarseDetune = Message.getCoarseDetune();
             fineDetune = Message.getFineDetune();
             
-            if (btnBc.getValue() && knbBreath.getValue() < threshold) //If breath controller enabled and the bcc is below the threshold
-            {
-                Message.ignoreEvent(true); //Ignore the event
-            }
-            else if (note != -1 && noteId0 != -1) //If there is a last note
+            if (note != -1 && noteId0 != -1) //If there is a last note
             {
                 //Calculate played interval - limit max to 12
                 interval = Math.min(Math.abs(note - Message.getNoteNumber()), 12);
