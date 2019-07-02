@@ -15,7 +15,6 @@
     along with This file. If not, see <http://www.gnu.org/licenses/>.
 */
 
-//Init
 Content.setWidth(650);
 Content.setHeight(175);
 
@@ -49,8 +48,11 @@ tblTime.setPosition(0, 60, 575, 100);
 
 inline function playReleaseNote(noteNumber, velocity)
 {
+	local c = Message.getCoarseDetune();
+	local f = Message.getFineDetune();
+	
     noteIds.setValue(noteNumber, Synth.playNote(noteNumber, velocity));
-    Synth.addPitchFade(noteIds.getValue(noteNumber), 0, Message.getCoarseDetune(), Message.getFineDetune());
+    Synth.addPitchFade(noteIds.getValue(noteNumber), 0, c, f);
 
     if (btnAttenuate.getValue()) //Attenuation is enabled
     {
@@ -68,15 +70,14 @@ inline function playReleaseNote(noteNumber, velocity)
 	if (!btnMute.getValue())
 	{
 		Message.ignoreEvent(true);
+		
 		velocityValues.setValue(Message.getNoteNumber(), Message.getVelocity());
 		lengthValues.setValue(Message.getNoteNumber(), Engine.getUptime());
 
 		//If a legato chord was played, set the flag
 		legatoChord = false;
 		if (btnLegato.getValue() && ((Engine.getUptime() - lastTime) * 1000 < CHORD_THRESHOLD))
-	    {
 	        legatoChord = true;
-	    }
 
 	    lastNote = Message.getNoteNumber();
 	    lastTime = Engine.getUptime();
@@ -89,12 +90,10 @@ function onNoteOff()
 	if (!btnMute.getValue() && velocityValues.getValue(Message.getNoteNumber()) > 0 && !Synth.isSustainPedalDown())
 	{
 		Message.ignoreEvent(true);
-
+        
 		//Only play release triggers if legato is disabled or legato is enabled, no keys are held, and previous voices are still playing
-		if (btnLegato.getValue() == 0 || legatoChord == true || (btnLegato.getValue() && Synth.getNumPressedKeys() == 0) && Engine.getNumVoices() > 0)
-		{
+		if (btnLegato.getValue() == 0 || legatoChord == true || (btnLegato.getValue() && !Synth.getNumPressedKeys()))// && Engine.getNumVoices() > 0)
 		    playReleaseNote(Message.getNoteNumber(), velocityValues.getValue(Message.getNoteNumber()));
-		}
 	}
 }
 
@@ -107,9 +106,9 @@ function onController()
 }
 function onTimer()
 {
-
+	
 }
-function onControl(number, value)
+ function onControl(number, value)
 {
 	switch (number)
 	{
