@@ -21,12 +21,16 @@
 */
 
 const var ids = Engine.createMidiList();
+
 ids.fill(false);function onNoteOn()
 {
     if (Message.getNoteNumber()+12 < 128)
     {
         if (ids.getValue(Message.getNoteNumber()) != false)
-            Message.ignoreEvent(true);        
+        {
+            Synth.noteOffByEventId(ids.getValue(Message.getNoteNumber()));
+            ids.setValue(Message.getNoteNumber(), false);
+        }            
     
         if (!Synth.isKeyDown(Message.getNoteNumber()+12))
             ids.setValue(Message.getNoteNumber()+12, Synth.playNote(Message.getNoteNumber()+12, Message.getVelocity()));   
