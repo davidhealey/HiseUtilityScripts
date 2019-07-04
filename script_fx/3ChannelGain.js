@@ -1,8 +1,17 @@
 const var core = Libraries.load("core");
 const var gain = core.createModule("smoothed_gainer");
 
-const knbGain = Content.getComponent("knbGain");
-const knbSmooth = Content.getComponent("knbSmooth");
+Content.setWidth(500);
+
+const knbGain = Content.addKnob("Gain", 0, 0);
+knbGain.set("mode", "Decibel");
+knbGain.setRange(-100, 0, 0.1);
+
+const knbSmooth = Content.addKnob("Smoothing", 150, 0);
+knbSmooth.set("mode", "Time");
+knbSmooth.setRange(0, 1000, 1);
+knbSmooth.set("middlePosition", 500);
+
 function prepareToPlay(sampleRate, blockSize)
 {
     gain.prepareToPlay(sampleRate, blockSize);
