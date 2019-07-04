@@ -5,7 +5,7 @@ Content.setWidth(500);
 
 const knbGain = Content.addKnob("Gain", 0, 0);
 knbGain.set("mode", "Decibel");
-knbGain.setRange(-100, 0, 0.1);
+knbGain.setRange(-100, 3, 0.1);
 
 const knbSmooth = Content.addKnob("Smoothing", 150, 0);
 knbSmooth.set("mode", "Time");
