@@ -69,7 +69,7 @@ function onNoteOff()
           {
               Synth.addPitchFade(eventId, time.getValue(), 0, 0);
               lastTuning = 0;
-              lastNote == retrigger;
+              lastNote = retrigger;
               retrigger = -1;
           }
           else
