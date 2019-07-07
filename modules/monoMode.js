@@ -48,7 +48,9 @@ function onNoteOn()
             }
             else
             {
-                Synth.noteOffByEventId(eventId);
+                if (eventId != -1)
+                    Synth.noteOffByEventId(eventId);
+                    
                 eventId = Message.makeArtificial();
             }
             retrigger = lastNote;
