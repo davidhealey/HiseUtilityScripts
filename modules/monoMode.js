@@ -18,7 +18,8 @@
 Content.setWidth(650);
 Content.setHeight(50);
 
-reg lastNote = 0;
+reg lastNote = -1;
+reg retrigger = -1;
 reg eventId;
 reg lastTuning = 0;
 
@@ -32,7 +33,7 @@ function onNoteOn()
 {
     if (!bypass.getValue())
     {
-        if (lastNote == 0)
+        if (lastNote == -1)
         {
             lastNote = Message.getNoteNumber();
             eventId = Message.makeArtificial();
@@ -50,6 +51,7 @@ function onNoteOn()
                 Synth.noteOffByEventId(eventId);
                 eventId = Message.makeArtificial();
             }
+            retrigger = lastNote;
             lastNote = Message.getNoteNumber();
         }
     }
@@ -63,21 +65,31 @@ function onNoteOff()
 
         if (eventId != -1 && Message.getNoteNumber() == lastNote)
         {
-            Synth.noteOffByEventId(eventId);
-            eventId = -1;
+          if (Synth.isKeyDown(retrigger))
+          {
+              Synth.addPitchFade(eventId, time.getValue(), 0, 0);
+              lastTuning = 0;
+              lastNote == retrigger;
+              retrigger = -1;
+          }
+          else
+          {
+              Synth.noteOffByEventId(eventId);
+              eventId = -1; 
+          }
         }
 
         if (!Synth.getNumPressedKeys())
         {
-            lastNote = 0;
+            lastNote = -1;
             lastTuning = 0;
         }
     }
-    else if (eventId != -1)
+    else if (eventId != -1 && eventId != undefined)
     {
         Synth.noteOffByEventId(eventId);
         eventId = -1;
-        lastNote = 0;
+        lastNote = -1;
         lastTuning = 0;
     }
 }
