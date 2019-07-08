@@ -9,10 +9,12 @@ source: http://creativecommons.org/publicdomain/zero/1.0/
 
 Content.setWidth(500);
 
-const var knbLow = Content.addKnob("Low Note", 0, 0);
+const var knbLow = Content.addKnob("knbLow", 0, 0);
+knbLow.set("text", "Low Note");
 knbLow.setRange(0, 127, 1);
 
-const var knbHigh = Content.addKnob("High Note", 150, 0);
+const var knbHigh = Content.addKnob("knbHigh", 150, 0);
+knbHigh.set("text", "High Note");
 knbHigh.setRange(0, 127, 1);
 knbHigh.set("defaultValue", 127);function onNoteOn()
 {
@@ -40,4 +42,3 @@ knbHigh.set("defaultValue", 127);function onNoteOn()
 {
 	
 }
- 
