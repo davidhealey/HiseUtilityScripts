@@ -40,16 +40,15 @@ function onNoteOn()
         }
         else
         {
-            if (time.getValue() > 0)
+            if (time.getValue() > 0 && eventId != -1)
             {
-                Message.ignoreEvent(true);
-                Synth.addPitchFade(eventId, time.getValue(), lastTuning + Message.getNoteNumber()-lastNote, 0);
+                Message.ignoreEvent(true);                
+                Synth.addPitchFade(eventId, time.getValue(), lastTuning + Message.getNoteNumber()-lastNote, 0);                    
                 lastTuning = lastTuning + Message.getNoteNumber()-lastNote;
             }
             else
             {
-                if (eventId != -1)
-                    Synth.noteOffByEventId(eventId);
+                if (eventId != -1) Synth.noteOffByEventId(eventId);
                     
                 eventId = Message.makeArtificial();
             }
