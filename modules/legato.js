@@ -38,6 +38,7 @@ reg rate;
 reg isChord = false;
 const var bendLookup = []; //Generated on init (onControl) and updated when bend amount changed
 reg glideNote;
+reg transposition = 0;
 const var notes = [];
 notes.reserve(2);
 
@@ -246,6 +247,7 @@ inline function getBreathVelocity()
                     if (btnGlideVel.getValue())
                         knbRate.setValue((Message.getVelocity()/127) * 18);
 
+                    transposition = Message.getTransposeAmount();
                     glideNote = note; //First note of glide (same as origin)
                     notes[0] = note; //Origin
                     notes[1] = Message.getNoteNumber(); //Target
@@ -439,7 +441,7 @@ function onTimer()
 			Synth.addVolumeFade(noteId0, rate*1000, -100); //Fade out last note
 
 			//Play new note
-			noteId1 = Synth.playNoteWithStartOffset(channel, glideNote, velocity, offset);
+			noteId1 = Synth.playNoteWithStartOffset(channel, glideNote+transposition, velocity, offset);
 
 			//Fade in new note
 			Synth.addVolumeFade(noteId1, 0, -99); //Set new note's initial volume
@@ -475,4 +477,4 @@ function onControl(number, value)
 		    threshold = value;
 		break;
     }
-} 
+}
