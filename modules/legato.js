@@ -159,8 +159,11 @@ inline function setLegatoFadeTime(interval, velocity)
     fadeTm = fadeTm + (interval * 2);
 
     //Reduce fadeTm by 30% is velocity > 64
-    if (velocity > 64) fadeTm = fadeTm - (fadeTm * 0.3);
-    
+    if (g_realVelocity != undefined)
+        if (g_realVelocity > 64) fadeTm = fadeTm - (fadeTm * 0.3);
+    else
+        if (velocity > 64) fadeTm = fadeTm - (fadeTm * 0.3);
+
     //Apply intensity slider value
     fadeTm = fadeTm / 100 * knbFadeIntensity.getValue();
 }
@@ -191,7 +194,7 @@ inline function breathTrigger(control, value)
             //Breath controlled velocity - if enabled
             if (btnBreathVel.getValue())
                 velocity = getBreathVelocity();
-            
+
             //Play new note
             noteId0 = Synth.playNoteWithStartOffset(channel, note, velocity, 0);
             Synth.addPitchFade(noteId0, 0, coarseDetune, fineDetune);  //Add any detuning
@@ -219,17 +222,17 @@ inline function getBreathVelocity()
         Synth.stopTimer(); //Stop the timer (if it's running)
 
         isChord = (Engine.getUptime() - lastTime) < 0.025;
-        
+
         //If breath control enabled and value below threshold and not playing a chord
         if (btnBc.getValue() && knbBreath.getValue() < threshold)
             Message.ignoreEvent(true); //Ignore the event
-        
+
         if (!isChord) //Not a chord
         {
             //Pick up values have been applied to the notes before this point
             coarseDetune = Message.getCoarseDetune();
             fineDetune = Message.getFineDetune();
-            
+
             if (note != -1 && noteId0 != -1) //If there is a last note
             {
                 //Calculate played interval - limit max to 12
@@ -268,18 +271,18 @@ inline function getBreathVelocity()
 
                     //Update eventId
                     noteId1 = Message.makeArtificial();
-                    
+
                     if (knbFadeIntensity.getValue() > 0)
-                    {                        
+                    {
                         //Fade out old note
                         Synth.addVolumeFade(noteId0, fadeTm, -100); //Volume
-                        
+
                         //Fade in new note
                         Synth.addVolumeFade(noteId1, 0, -99); //Set initial volume
-                        Synth.addVolumeFade(noteId1, fadeTm, Message.getGain());                        
-                        
-                        if (knbBendIntensity.getValue() > 0)    
-                        {                      
+                        Synth.addVolumeFade(noteId1, fadeTm, Message.getGain());
+
+                        if (knbBendIntensity.getValue() > 0)
+                        {
                             //Get coarseDetune and fineDetune for new note
                             local fadeCoarse = coarseDetune + parseInt((-bendAmt+fineDetune) / 100);
                             local fadeFine = ((-bendAmt+fineDetune) % 100);
@@ -292,14 +295,14 @@ inline function getBreathVelocity()
                     {
                         Synth.noteOffByEventId(noteId0);
                     }
-                    
+
                     noteId0 = noteId1;
                 }
             }
             else //First note of phrase
             {
                 Message.setGain(0);
-                noteId0 = Message.makeArtificial(); //Update eventId                
+                noteId0 = Message.makeArtificial(); //Update eventId
             }
 
             //Update variables
@@ -336,18 +339,18 @@ function onNoteOff()
                 {
                     //Play new note
                     noteId1 = Synth.playNoteWithStartOffset(channel, retriggerNote+Message.getTransposeAmount(), velocity, offset);
-                    
+
                     if (knbFadeIntensity.getValue() > 0)
                     {
                         //Fade out old note
                         Synth.addVolumeFade(noteId0, fadeTm, -100); //Volume
-                        
+
                         //Fade in new note
                         Synth.addVolumeFade(noteId1, 0, -99); //Set initial volume
                         Synth.addVolumeFade(noteId1, fadeTm, 0);
-                        
+
                         if (knbBendIntensity.getValue() > 0)
-                        {                            
+                        {
                             //Get coarseDetune and fineDetune for the new note
                             coarseDetune = Message.getCoarseDetune();
                             fineDetune = Message.getFineDetune();
@@ -356,7 +359,7 @@ function onNoteOff()
                             local fadeFine = ((-bendAmt+fineDetune) % 100);
 
                             Synth.addPitchFade(noteId1, 0, fadeCoarse, fadeFine); //Set initial detuning
-                            Synth.addPitchFade(noteId1, fadeTm, coarseDetune, fineDetune); //Pitch fade to fineDetune 
+                            Synth.addPitchFade(noteId1, fadeTm, coarseDetune, fineDetune); //Pitch fade to fineDetune
                         }
                     }
                     else
@@ -443,7 +446,7 @@ function onTimer()
 			Synth.addVolumeFade(noteId1, rate*1000, 0); //Fade in new note
 			Synth.addPitchFade(noteId1, 0, 0, -glideBend); //Set new note's initial detuning
 			Synth.addPitchFade(noteId1, rate*1000, 0, 0); //Pitch fade new note to 0
-			
+
 			noteId0 = noteId1;
 		}
 	}
@@ -472,4 +475,4 @@ function onControl(number, value)
 		    threshold = value;
 		break;
     }
-}
+} 
