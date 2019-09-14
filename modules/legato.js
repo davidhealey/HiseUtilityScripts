@@ -447,7 +447,7 @@ function onTimer()
 			Synth.addVolumeFade(noteId1, 0, -99); //Set new note's initial volume
 			Synth.addVolumeFade(noteId1, rate*1000, 0); //Fade in new note
 			Synth.addPitchFade(noteId1, 0, 0, -glideBend); //Set new note's initial detuning
-			Synth.addPitchFade(noteId1, rate*1000, 0, 0); //Pitch fade new note to 0
+			Synth.addPitchFade(noteId1, rate*1000, coarseDetune, fineDetune); //Pitch fade new note to 0
 
 			noteId0 = noteId1;
 		}
@@ -477,4 +477,4 @@ function onControl(number, value)
 		    threshold = value;
 		break;
     }
-}
+} 
