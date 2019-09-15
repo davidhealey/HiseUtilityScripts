@@ -5,9 +5,9 @@
 
 namespace groupXFCurves
 {
-  inline function draw(sampler, numGroups, shape)
+  inline function draw(samplerId, numGroups, shape)
   {
-    local table = sampler.getTableProcessor();
+    local table = Synth.getTableProcessor(samplerId);
 
     switch (numGroups) {
       case 2:
