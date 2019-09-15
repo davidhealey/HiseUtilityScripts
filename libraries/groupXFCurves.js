@@ -3,8 +3,25 @@
 * License: Public Domain
 */
 
-namespace groupFXCurves
+namespace groupXFCurves
 {
+  inline function draw(sampler, numGroups, shape)
+  {
+    local table = sampler.getTableProcessor();
+
+    switch (numGroups) {
+      case 2:
+        shape == "s" ? twoGroupsS(table) : twoGroups(table);
+        break;
+      case 3:
+        shape == "s" ? threeGroupsS(table) : threeGroups(table);
+        break;
+      case 4:
+        shape == "s" ? fourGroupsS(table) : fourGroups(table);
+        break;
+    }
+  }
+
   inline function twoGroups(table)
   {
       table.reset(0);
