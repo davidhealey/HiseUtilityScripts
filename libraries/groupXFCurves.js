@@ -3,7 +3,7 @@
 * License: Public Domain
 */
 
-namespace groupXFCurves
+namespace GroupXFCurves
 {
   inline function draw(samplerId, numGroups, shape)
   {

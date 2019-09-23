@@ -6,7 +6,7 @@
  *          Such functions are preceded by a comment indicating their public domain status.
 */
 
-namespace ui
+namespace UI
 {
 	inline function buttonPanel(id, paintRoutine)
 	{

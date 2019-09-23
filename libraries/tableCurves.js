@@ -3,7 +3,7 @@
 * License: Public Domain
 */
 
-namespace tableCurves
+namespace TableCurves
 {
 	inline function equalPower2(tableProcessor, stage)
 	{

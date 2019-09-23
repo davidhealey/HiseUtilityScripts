@@ -17,12 +17,12 @@ This library only supports the use of one deferred function at a time, to defer 
 either combine those functions into one or modify this library to allow for multiple functions.
 */
 
-namespace asyncUpdater
+namespace AsyncUpdater
 {
 	const var updater = Engine.createTimerObject();
 	reg func;
 	reg param;
-	
+
 	updater.callback = function()
     {
         if (func)

@@ -6,7 +6,7 @@
  * License: LGPL - https://www.gnu.org/licenses/lgpl-3.0.en.html
 */
 
-namespace tab
+namespace Tab
 {
 	/**
 	 * Defines a panel that can be used as the parent component of other controls when creating a tabbed interface.

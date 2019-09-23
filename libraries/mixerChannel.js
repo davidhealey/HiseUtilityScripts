@@ -6,7 +6,7 @@
  * License: LGPL - https://www.gnu.org/licenses/lgpl-3.0.en.html
 */
 
-namespace mixerChannel
+namespace MixerChannel
 {
 	inline function newChannel(micIndex, gainEffect, controls)
 	{
