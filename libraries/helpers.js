@@ -7,7 +7,7 @@
  * License: LGPL - https://www.gnu.org/licenses/lgpl-3.0.en.html
 */
 
-namespace helpers
+namespace Helpers
 {
 	//Returns note letter only, for letter + octave use built in Engine.getMidiNoteName()
 	inline function noteNumberToLetter(n)
@@ -33,11 +33,6 @@ namespace helpers
 	{
 		reg tempos = ["1/1", "1/2", "1/2T", "1/4", "1/4T", "1/8", "1/8T", "1/16", "1/16T", "1/32", "1/32T"];
 		return tempos[tempoIndex];
-	}
-
-	inline function keyExists(obj, key)
-	{
-		return !(obj[key] == void); // Important: not undefined!
 	}
 
 	inline function mergeArrays(a, b)
