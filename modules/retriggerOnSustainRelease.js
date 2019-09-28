@@ -2,6 +2,7 @@
  * Title: retriggerOnRelease
  * Author: David Healey
  * Date: 28/03/2017
+ * Updated: 28/09/2019
  * License: Public Domain
 */
 
@@ -20,7 +21,7 @@ function onNoteOn()
 
 function onNoteOff()
 {
-	if (Synth.isSustainPedalDown())
+	if (Synth.isSustainPedalDown() && velocities.getValue(Message.getNoteNumber()) > 0)
 	{
 		Synth.playNote(Message.getNoteNumber(), velocities.getValue(Message.getNoteNumber()));
 	}
@@ -28,12 +29,13 @@ function onNoteOff()
 
 function onController()
 {
-}
 
-function onTimer()
-{
 }
-
-function onControl(number, value)
+ function onTimer()
 {
+
+}
+ function onControl(number, value)
+{
+
 }
