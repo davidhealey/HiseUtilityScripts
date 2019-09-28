@@ -28,28 +28,31 @@ const var samplerIds = Synth.getIdList("Sampler");
 const var sampler = Synth.getSampler(samplerIds[0]); //Get first child sampler
 
 //GUI
+const var btnBypass = Content.addButton("btnBypass", 10, 10);
+btnBypass.set("text", "Bypass");
+
 const var modes = ["Group", "Group Random", "Velocity", "Velocity Random", "Borrowed", "Borrowed Random"];
-const var cmbType = Content.addComboBox("cmbType", 10, 10);
+const var cmbType = Content.addComboBox("cmbType", 160, 10);
 cmbType.set("items", modes.join("\n"));
 
-const var knbCount = Content.addKnob("knbCount", 160, 0);
+const var knbCount = Content.addKnob("knbCount", 310, 0);
 knbCount.set("text", "Num RRs");
 knbCount.setRange(0, 50, 1);
 
-const var knbLock = Content.addKnob("knbLock", 310, 0);
+const var knbLock = Content.addKnob("knbLock", 460, 0);
 knbLock.set("text", "Lock Step");
 knbLock.setRange(0, 50, 1);
 
-const var knbReset = Content.addKnob("knbReset", 460, 0);
+const var knbReset = Content.addKnob("knbReset", 0, 45);
 knbReset.set("text", "Reset Tm");
 knbReset.set("suffix", " seconds");
 knbReset.setRange(0, 5, 1);
 
-const var knbLoNote = Content.addKnob("knbLoNote", 0, 45);
+const var knbLoNote = Content.addKnob("knbLoNote", 160, 45);
 knbLoNote.set("text", "Low Note");
 knbLoNote.setRange(0, 127, 1);
 
-const var knbHiNote = Content.addKnob("knbHiNote", 160, 45);
+const var knbHiNote = Content.addKnob("knbHiNote", 310, 45);
 knbHiNote.set("text", "High Note");
 knbHiNote.setRange(0, 127, 1);
 
@@ -59,78 +62,84 @@ inline function oncmbTypeControl(component, value)
 	sampler.enableRoundRobin(value != 1 && value != 2);
 };
 
-cmbType.setControlCallback(oncmbTypeControl);function onNoteOn()
+cmbType.setControlCallback(oncmbTypeControl);
+
+function onNoteOn()
 {
-    local n = Message.getNoteNumber();
-    local t = Message.getTransposeAmount();
-    local s = lastStep.getValue(n);
-
-    //RR Reset
-    if (knbReset.getValue() > 0 && (Engine.getUptime() - lastTime.getValue(n)) >= knbReset.getValue())
+    if (!btnBypass.getValue())
     {
-        lastStep.setValue(n, 0);
-        s = 0;
-    }
+        local n = Message.getNoteNumber();
+        local t = Message.getTransposeAmount();
+        local s = lastStep.getValue(n);
 
-    if (knbLock.getValue() > 0)
-        s = knbLock.getValue();
-
-    switch (cmbType.getValue())
-    {
-        case 1: case 2: //Group
-            sampler.setActiveGroup(s+1);
-        break;
-
-        case 3: case 4: //Velocity
-            Message.setVelocity(s);
-        break;
-
-        case 5: case 6: //Borrowed
-            Message.setTransposeAmount(s-1 + t);
-            Message.setCoarseDetune(-(s-1) + Message.getCoarseDetune());
-        break;
-    }
-
-    //Get next step
-    if (knbLock.getValue() == 0)
-    {
-        //Borrowed
-        if ([5, 6].indexOf(cmbType.getValue()) != -1)
+        //RR Reset
+        if (knbReset.getValue() > 0 && (Engine.getUptime() - lastTime.getValue(n)) >= knbReset.getValue())
         {
-            if (cmbType.getValue() == 5) //Cycle
-                s = (s + 1) % 3;
-            else //Random
-                s = Math.randInt(0, 3);
-
-            //Non-repeating
-            if (s == lastStep.getValue(n))
-                s = (s + 1) % 3;
-
-            //Range limit (handles non-repeating too)
-            if (n == knbLoNote.getValue() - t && s < 1)
-                s = 1 + (1 == lastStep.getValue(n));
-            else if (n == knbHiNote.getValue() - t && s)
-                s = 1 + -(1 == lastStep.getValue(n));
-
-        }
-        else if (knbCount.getValue() > 1) //Group and velocity
-        {
-            if ([1, 3].indexOf(cmbType.getValue()) != -1) //Cycle
-                s = (s + 1) % knbCount.getValue();
-            else //Random
-                s = Math.randInt(1, knbCount.getValue() + 1);
-
-            //Non-repeating
-            if (s == lastStep.getValue(n))
-                s = (s + 1) % knbCount.getValue();
-        }
-        else
+            lastStep.setValue(n, 0);
             s = 0;
-    }
+        }
 
-    lastTime.setValue(n, Engine.getUptime());
-    lastStep.setValue(n, s);
-}function onNoteOff()
+        if (knbLock.getValue() > 0)
+            s = knbLock.getValue();
+
+        switch (cmbType.getValue())
+        {
+            case 1: case 2: //Group
+                sampler.setActiveGroup(s+1);
+            break;
+
+            case 3: case 4: //Velocity
+                Message.setVelocity(s);
+            break;
+
+            case 5: case 6: //Borrowed
+                Message.setTransposeAmount(s-1 + t);
+                Message.setCoarseDetune(-(s-1) + Message.getCoarseDetune());
+            break;
+        }
+
+        //Get next step
+        if (knbLock.getValue() == 0)
+        {
+            //Borrowed
+            if ([5, 6].indexOf(cmbType.getValue()) != -1)
+            {
+                if (cmbType.getValue() == 5) //Cycle
+                    s = (s + 1) % 3;
+                else //Random
+                    s = Math.randInt(0, 3);
+
+                //Non-repeating
+                if (s == lastStep.getValue(n))
+                    s = (s + 1) % 3;
+
+                //Range limit (handles non-repeating too)
+                if (n == knbLoNote.getValue() - t && s < 1)
+                    s = 1 + (1 == lastStep.getValue(n));
+                else if (n == knbHiNote.getValue() - t && s)
+                    s = 1 + -(1 == lastStep.getValue(n));
+
+            }
+            else if (knbCount.getValue() > 1) //Group and velocity
+            {
+                if ([1, 3].indexOf(cmbType.getValue()) != -1) //Cycle
+                    s = (s + 1) % knbCount.getValue();
+                else //Random
+                    s = Math.randInt(1, knbCount.getValue() + 1);
+
+                //Non-repeating
+                if (s == lastStep.getValue(n))
+                    s = (s + 1) % knbCount.getValue();
+            }
+            else
+                s = 0;
+        }
+
+        lastTime.setValue(n, Engine.getUptime());
+        lastStep.setValue(n, s);
+    }
+}
+function onNoteOff()
 {
 
 }
