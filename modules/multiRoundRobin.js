@@ -78,7 +78,6 @@ cmbType.setControlCallback(oncmbTypeControl);function onNoteOn()
     switch (cmbType.getValue())
     {
         case 1: case 2: //Group
-        Console.print(s+1);
             sampler.setActiveGroup(s+1);
         break;
 
