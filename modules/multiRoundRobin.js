@@ -22,7 +22,7 @@ const var lastStep = Engine.createMidiList();
 const var step = Engine.createMidiList();
 
 lastTime.fill(0);
-lastStep.fill(1);
+lastStep.fill(0);
 
 const var samplerIds = Synth.getIdList("Sampler");
 const var sampler = Synth.getSampler(samplerIds[0]); //Get first child sampler
@@ -122,7 +122,7 @@ cmbType.setControlCallback(oncmbTypeControl);function onNoteOn()
 
         //RR Reset
         if (knbReset.getValue() > 0 && (Engine.getUptime() - lastTime.getValue(n)) >= knbReset.getValue())
-            s = 1;
+            s = 0;
     }
 
     lastTime.setValue(n, Engine.getUptime());
