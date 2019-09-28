@@ -16,35 +16,19 @@ IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
 DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
-
-const var cmbMode = Content.addComboBox("cmbMode", 10, 10);
-cmbMode.set("items", ["Round Robin", -2, -1, 0, 1, 2].join("\n"));
-cmbMode.set("defaultValue", 4);
-
-reg step; //Round robin mode step tracker
+const var knbAmount = Content.addKnob("knbAmount", 0, 0);
+knbAmount.setRange(-2, 2, 1);
+knbAmount.set("text", "Transposition");
+knbAmount.set("defaultValue", 0);
+knbAmount.set("middlePosition", 0);
 function onNoteOn()
 {
-	if (cmbMode.getValue() > 1 && cmbMode.getValue() != 4)
-    {
-        Message.setTransposeAmount(cmbMode.getItemText());
-    }
-    else if (cmbMode.getValue() == 1) //Round robin
-    {
-        step = Math.randInt(-1, 2);
-        Message.setTransposeAmount(step);
-        Message.setCoarseDetune(-step + Message.getCoarseDetune());
-    }
+	if (knbAmount.getValue() != 0)
+        Message.setTransposeAmount(knbAmount.getValue());
 }function onNoteOff()
 {
-    if (cmbMode.getValue() > 1 && cmbMode.getValue() != 4)
-    {
-        Message.setTransposeAmount(cmbMode.getItemText());
-    }
-    else if (cmbMode.getValue() == 1) //Round robin
-    {
-        Message.setTransposeAmount(step);
-        Message.setCoarseDetune(-step + Message.getCoarseDetune());
-    }
+	if (knbAmount.getValue() != 0)
+        Message.setTransposeAmount(knbAmount.getValue());
 }
  function onController()
 {
