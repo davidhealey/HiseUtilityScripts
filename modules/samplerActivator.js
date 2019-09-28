@@ -20,22 +20,22 @@ const var btnActive = Content.addButton("btnActive", 10, 10);
 btnActive.set("text", "Active");
 
 const var knbKs = Content.addKnob("knbKs", 160, 0);
-knbKs.setRange(0, 127, 1);
+knbKs.setRange(-1, 127, 1);
 knbKs.set("text", "KS");
 
 const var knbProgram = Content.addKnob("knbProgram", 310, 0);
-knbProgram.setRange(0, 127, 1);
+knbProgram.setRange(-1, 127, 1);
 knbProgram.set("text", "Program");
 
 const var btnToggle = Content.addButton("btnToggle", 460, 10);
 btnToggle.set("text", "Toggle");
 
 const var knbLoKs = Content.addKnob("knbLoKs", 0, 45);
-knbLoKs.setRange(0, 127, 1);
+knbLoKs.setRange(-1, 127, 1);
 knbLoKs.set("text", "Lowest Ks");
 
 const var knbHiKs = Content.addKnob("knbHiKs", 160, 45);
-knbHiKs.setRange(0, 127, 1);
+knbHiKs.setRange(-1, 127, 1);
 knbHiKs.set("text", "Highest Ks");function onNoteOn()
 {
     if (!btnActive.getValue())
