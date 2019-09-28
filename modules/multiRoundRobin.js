@@ -1,284 +1,145 @@
-/**
- * Title: mulitRoundRobin
- * Author: David Healey, Christoph Hart
- * Date: 07/01/2017
- * Modified: 20/02/2017
- * License: Public Domain
- */
+/*
+    Copyright 2019 David Healey
 
-//INIT
+    This file is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-reg noteNumber;
-reg groupList = [];
-reg groupIndex;
-reg offsetList = [];
-reg offsetIndex;
-reg offset;
+    This file is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
 
-namespace RRTypes
-{
-	const var OFF = 1;
-	const var REAL = 2;
-	const var SYNTH = 3;
-	const var HYBRID = 4;
-};
+    You should have received a copy of the GNU General Public License
+    along with This file. If not, see <http://www.gnu.org/licenses/>.
+*/
 
-namespace RRModes
-{
-	const var CYCLE = 1;
-	const var RANDOM = 2;
-	const var RANDOM_CYCLE = 3;
-};
-
-const var timer = Engine.createMidiList();
-
-const var excludedIds = "(elease)"; //Regex string of words in sampler IDs to exclude RR from
-const var samplerNames = Synth.getIdList("Sampler"); //Get the ids of all child samplers
-const var samplers = [];
-
-//Get child samplers
-for (samplerName in samplerNames)
-{
-	if (Engine.matchesRegex(samplerName, excludedIds) == true) continue; //Skip excluded IDs
-
-	samplers.push(Synth.getSampler(samplerName)); //Add sampler to array
-	samplers[samplers.length-1].enableRoundRobin(false); //Disable default RR behaviour
-}
-
-//GUI
-Content.setWidth(650);
 Content.setHeight(100);
 
-//RR Type and Mode Combo Boxes
-const var cmbType = Content.addComboBox("Type", 0, 10);
-cmbType.set("items", ["Off", "Real", "Synthetic", "Hybrid"].join("\n"));
+const var lastTime = Engine.createMidiList();
+const var lastStep = Engine.createMidiList();
+const var step = Engine.createMidiList();
 
-const var cmbMode = Content.addComboBox("Mode", 150, 10);
-cmbMode.set("items", ["Cycle", "Random", "Random Full Cycle"].join("\n"));
+lastTime.fill(0);
+lastStep.fill(1);
 
-//Number of groups knob
-const var knbNumGroups = Content.addKnob("Num Groups", 300, 0);
-knbNumGroups.setRange(1, 100, 1);
+const var samplerIds = Synth.getIdList("Sampler");
+const var sampler = Synth.getSampler(samplerIds[0]); //Get first child sampler
 
-//Playable Range controls
-const var knbLowNote = Content.addKnob("Low Note", 450, 0);
-knbLowNote.setRange(0, 126, 1);
+//GUI
+const var modes = ["Group", "Group Random", "Velocity", "Velocity Random", "Borrowed", "Borrowed Random"];
+const var cmbType = Content.addComboBox("cmbType", 10, 10);
+cmbType.set("items", modes.join("\n"));
 
-const var knbHighNote = Content.addKnob("High Note", 600, 0);
-knbHighNote.setRange(1, 127, 1);
+const var knbCount = Content.addKnob("knbCount", 160, 0);
+knbCount.set("text", "Num RRs");
+knbCount.setRange(0, 50, 1);
 
-//Reset timeout knob
-const var knbReset = Content.addKnob("Reset Time", 0, 50);
-knbReset.setRange(1, 60, 1);
-knbReset.set("suffix", " Seconds");
+const var knbLock = Content.addKnob("knbLock", 310, 0);
+knbLock.set("text", "Lock Step");
+knbLock.setRange(0, 50, 1);
 
-//Microtuning knob
-const var knbMicroTuning = Content.addKnob("Microtuning", 150, 50);
-knbMicroTuning.setRange(0, 100, 0.1);
+const var knbReset = Content.addKnob("knbReset", 460, 0);
+knbReset.set("text", "Reset Tm");
+knbReset.set("suffix", " seconds");
+knbReset.setRange(0, 5, 1);
 
-//Borrowed Sample Range
-const var knbSampleRange = Content.addKnob("Sample Range", 300, 50);
-knbSampleRange.setRange(1, 12, 1);
+const var knbLoNote = Content.addKnob("knbLoNote", 0, 45);
+knbLoNote.set("text", "Low Note");
+knbLoNote.setRange(0, 127, 1);
 
-//-----------------
+const var knbHiNote = Content.addKnob("knbHiNote", 160, 45);
+knbHiNote.set("text", "High Note");
+knbHiNote.setRange(0, 127, 1);
 
-//FUNCTIONS
-/** Swaps two elements in an array randomly. */
-inline function swapRandomly(arr)
+inline function oncmbTypeControl(component, value)
 {
-	local firstIndex = Math.randInt(0, arr.length);
-	local secondIndex = Math.randInt(0, arr.length);
-	local temp = arr[firstIndex];
-	arr[firstIndex] = arr[secondIndex];
-	arr[secondIndex] = temp;
+    knbCount.showControl(value != 5 && value != 6); //Hide for borrowed mode
+	sampler.enableRoundRobin(value != 1 && value != 2);
+};
+
+cmbType.setControlCallback(oncmbTypeControl);function onNoteOn()
+{
+    local n = Message.getNoteNumber();
+    local t = Message.getTransposeAmount();
+    local s = lastStep.getValue(n);
+
+    if (knbLock.getValue() > 0)
+        s = knbLock.getValue();
+
+    switch (cmbType.getValue())
+    {
+        case 1: case 2: //Group
+            sampler.setActiveGroup(s);
+        break;
+
+        case 3: case 4: //Velocity
+            Message.setVelocity(s);
+        break;
+
+        case 5: case 6: //Borrowed
+            Message.setTransposeAmount(s-1 + t);
+            Message.setCoarseDetune(-(s-1) + Message.getCoarseDetune());
+        break;
+    }
+
+    //Get next step
+    if (knbLock.getValue() == 0)
+    {
+        //Borrowed
+        if ([5, 6].indexOf(cmbType.getValue()) != -1)
+        {
+            if (cmbType.getValue() == 5) //Cycle
+                s = (s + 1) % 3;
+            else //Random
+                s = Math.randInt(0, 3);
+
+            //Non-repeating
+            if (s == lastStep.getValue(n))
+                s = (s + 1) % 3;
+
+            //Range limit (handles non-repeating too)
+            if (n == knbLoNote.getValue() - t && s < 1)
+                s = 1 + (1 == lastStep.getValue(n));
+            else if (n == knbHiNote.getValue() - t && s)
+                s = 1 + -(1 == lastStep.getValue(n));
+
+        }
+        else if (knbCount.getValue() > 1) //Group and velocity
+        {
+            if ([1, 3].indexOf(cmbType.getValue()) != -1) //Cycle
+                s = (s + 1) % knbCount.getValue();
+            else //Random
+                s = Math.randInt(1, knbCount.getValue() + 1);
+
+            //Non-repeating
+            if (s == lastStep.getValue(n))
+                s = (s + 1) % knbCount.getValue();
+        }
+        else
+            s = 0;
+
+        //RR Reset
+        if (knbReset.getValue() > 0 && (Engine.getUptime() - lastTime.getValue(n)) >= knbReset.getValue())
+            s = 1;
+    }
+
+    lastTime.setValue(n, Engine.getUptime());
+    lastStep.setValue(n, s);
+}function onNoteOff()
+{
+
 }
-
-/** Swaps every element in the array. */
-inline function swapEntirely(arr)
+ function onController()
 {
-	local i = 0;
-	while(++i < arr.length)
-		swapRandomly(arr);
+
 }
-
-inline function resetGroupList(count)
+ function onTimer()
 {
-	local i;
 
-	for (i = 0; i < count; i++)
-	{
-		groupList[i] = i;
-	}
 }
-
-inline function resetOffsetList(count)
+ function onControl(number, value)
 {
-	local i;
 
-	//Build array going from -value to +value+1 (always need to account for 0)
-	for (i = 0; i < count*2+1; i++)
-	{
-		offsetList[i] = i-count;
-	}
-}
-
-//CALLBACKS
-function onNoteOn()
-{
-	noteNumber = Message.getNoteNumber();
-
-	if (cmbType.getValue() != RRTypes.OFF && noteNumber >= knbLowNote.getValue() && noteNumber <= knbHighNote.getValue())
-	{
-		//Group based RR
-		if (knbNumGroups.getValue() > 1 && (cmbType.getValue() == RRTypes.REAL || cmbType.getValue() == RRTypes.HYBRID)) //Real or Hybrid RR
-		{
-			switch (cmbMode.getValue())
-			{
-				case RRModes.CYCLE:
-					groupIndex = (groupIndex + 1) % groupList.length;
-				break;
-
-				case RRModes.RANDOM:
-					groupIndex = Math.floor(Math.random() * groupList.length);
-				break;
-
-				case RRModes.RANDOM_CYCLE:
-					if (++groupIndex >= groupList.length)
-					{
-						groupIndex = 0;
-						swapEntirely(groupList);
-					}
-				break;
-			}
-		}
-
-		//Reset groupIndex to 0 if only one group is present or the reset time has elapsed
-		if (knbNumGroups.getValue() == 1 || Engine.getUptime() - timer.getValue(noteNumber) > knbReset.getValue())
-		{
-			groupIndex = 0;
-			resetGroupList(knbNumGroups.getValue());
-		}
-
-		//Set active group for each sampler
-		if (samplers.length > 0)
-		{
-			for (sampler in samplers)
-			{
-				sampler.setActiveGroup(1 + groupList[groupIndex]);
-			}
-		}
-
-		//Synthetic sample borrowed RR
-		if (cmbType.getValue() == RRTypes.SYNTH || cmbType.getValue() == RRTypes.HYBRID) //Synthetic or Hybrid RR
-		{
-			switch (cmbMode.getValue())
-			{
-				case RRModes.CYCLE:
-					offsetIndex = (offsetIndex + 1) % offsetList.length;
-				break;
-
-				case RRModes.RANDOM:
-					offsetIndex = Math.floor(Math.random() * offsetList.length);
-				break;
-
-				case RRModes.RANDOM_CYCLE:
-					if (++offsetIndex >= offsetList.length)
-					{
-						offsetIndex = 0;
-						swapEntirely(offsetList);
-					}
-				break;
-			}
-
-			//If reset time has elapsed, reset index
-			if (Engine.getUptime() - timer.getValue(noteNumber) > knbReset.getValue())
-			{
-				offsetIndex = parseInt(Math.floor(offsetList.length / 2));
-				resetOffsetList(knbSampleRange.getValue());
-			}
-
-			//If the played note + the offset are within the playable range
-			if (noteNumber + offsetList[offsetIndex] > knbLowNote.getValue() && noteNumber + offsetList[offsetIndex] < knbHighNote.getValue())
-			{
-				Message.setTransposeAmount(offsetList[offsetIndex]); //Transpose the note
-				Message.setCoarseDetune(-offsetList[offsetIndex]); //Use coarse detune so setting can be picked up by later scripts
-			}
-		}
-
-		//Apply random microtuning, if any
-		if (knbMicroTuning.getValue() > 0)
-		{
-			Message.setFineDetune(Math.random() * (knbMicroTuning.getValue() - -knbMicroTuning.getValue() + 1) + -knbMicroTuning.getValue());
-		}
-
-		timer.setValue(noteNumber, Engine.getUptime()); //Record time this note was triggered
-	}
-}
-
-function onNoteOff()
-{
-}
-
-function onController()
-{
-}
-
-function onTimer()
-{
-}
-
-function onControl(number, value)
-{
-	switch(number)
-	{
-		case cmbType:
-			switch (value)
-			{
-				case RRTypes.OFF:
-					knbSampleRange.set("visible", false);
-				break;
-
-				case RRTypes.REAL:
-
-					knbSampleRange.set("visible", false);
-
-					if (knbNumGroups.getValue() == 1)
-					{
-						number.setValue(RRTypes.OFF);
-					}
-				break;
-
-				case RRTypes.SYNTH:
-					knbSampleRange.set("visible", true);
-				break;
-
-				case RRTypes.HYBRID:
-
-					knbSampleRange.set("visible", true);
-
-					if (knbNumGroups.getValue() == 1) //If there are no RR groups then Hybrid defaults to synth
-					{
-						number.setValue(RRTypes.SYNTH);
-					}
-				break;
-			}
-		break;
-
-		case cmbMode:
-			resetGroupList(knbNumGroups.getValue());
-			resetOffsetList(knbSampleRange.getValue());
-			offsetIndex = 0;
-			groupIndex = 0;
-		break;
-
-		case knbNumGroups:
-			groupList = [];
-			resetGroupList(value);
-		break;
-
-		case knbSampleRange:
-			offsetList = [];
-			resetOffsetList(value);
-		break;
-	}
 }
