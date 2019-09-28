@@ -14,56 +14,18 @@
     You should have received a copy of the GNU General Public License
     along with This file. If not, see <http://www.gnu.org/licenses/>.
 */
-
-Content.setHeight(100);
-
-const var lastTime = Engine.createMidiList();
-const var lastStep = Engine.createMidiList();
-const var step = Engine.createMidiList();
-
-lastTime.fill(0);
-lastStep.fill(0);
-
-const var samplerIds = Synth.getIdList("Sampler");
-const var sampler = Synth.getSampler(samplerIds[0]); //Get first child sampler
-
-//GUI
-const var modes = ["Group", "Group Random", "Velocity", "Velocity Random", "Borrowed", "Borrowed Random"];
-const var cmbType = Content.addComboBox("cmbType", 10, 10);
-cmbType.set("items", modes.join("\n"));
-
-const var knbCount = Content.addKnob("knbCount", 160, 0);
-knbCount.set("text", "Num RRs");
-knbCount.setRange(0, 50, 1);
-
-const var knbLock = Content.addKnob("knbLock", 310, 0);
-knbLock.set("text", "Lock Step");
-knbLock.setRange(0, 50, 1);
-
-const var knbReset = Content.addKnob("knbReset", 460, 0);
-knbReset.set("text", "Reset Tm");
-knbReset.set("suffix", " seconds");
-knbReset.setRange(0, 5, 1);
-
-const var knbLoNote = Content.addKnob("knbLoNote", 0, 45);
-knbLoNote.set("text", "Low Note");
-knbLoNote.setRange(0, 127, 1);
-
-const var knbHiNote = Content.addKnob("knbHiNote", 160, 45);
-knbHiNote.set("text", "High Note");
-knbHiNote.setRange(0, 127, 1);
-
-inline function oncmbTypeControl(component, value)
-{
-    knbCount.showControl(value != 5 && value != 6); //Hide for borrowed mode
-	sampler.enableRoundRobin(value != 1 && value != 2);
-};
-
-cmbType.setControlCallback(oncmbTypeControl);function onNoteOn()
+function onNoteOn()
 {
     local n = Message.getNoteNumber();
     local t = Message.getTransposeAmount();
     local s = lastStep.getValue(n);
+
+    //RR Reset
+    if (knbReset.getValue() > 0 && (Engine.getUptime() - lastTime.getValue(n)) >= knbReset.getValue())
+    {
+        lastStep.setValue(n, 0);
+        s = 0;
+    }
 
     if (knbLock.getValue() > 0)
         s = knbLock.getValue();
@@ -71,6 +33,7 @@ cmbType.setControlCallback(oncmbTypeControl);function onNoteOn()
     switch (cmbType.getValue())
     {
         case 1: case 2: //Group
+        Console.print(s+1);
             sampler.setActiveGroup(s+1);
         break;
 
@@ -119,27 +82,8 @@ cmbType.setControlCallback(oncmbTypeControl);function onNoteOn()
         }
         else
             s = 0;
-
-        //RR Reset
-        if (knbReset.getValue() > 0 && (Engine.getUptime() - lastTime.getValue(n)) >= knbReset.getValue())
-            s = 0;
     }
 
     lastTime.setValue(n, Engine.getUptime());
     lastStep.setValue(n, s);
-}function onNoteOff()
-{
-
-}
- function onController()
-{
-
-}
- function onTimer()
-{
-
-}
- function onControl(number, value)
-{
-
 }
