@@ -71,7 +71,7 @@ cmbType.setControlCallback(oncmbTypeControl);function onNoteOn()
     switch (cmbType.getValue())
     {
         case 1: case 2: //Group
-            sampler.setActiveGroup(s);
+            sampler.setActiveGroup(s+1);
         break;
 
         case 3: case 4: //Velocity
