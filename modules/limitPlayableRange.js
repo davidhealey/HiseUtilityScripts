@@ -19,26 +19,28 @@ knbHigh.setRange(0, 127, 1);
 knbHigh.set("defaultValue", 127);function onNoteOn()
 {
     local n = Message.getNoteNumber();
-    
-	if (n < knbLow.getValue() || n > knbHigh.getValue())
+    local t = Message.getTransposeAmount();
+
+	if (n < knbLow.getValue() + t || n > knbHigh.getValue() + t)
         Message.ignoreEvent(true);
 }
  function onNoteOff()
 {
     local n = Message.getNoteNumber();
-    
-    if (n < knbLow.getValue() || n > knbHigh.getValue())
+    local t = Message.getTransposeAmount();
+
+    if (n < knbLow.getValue() + t || n > knbHigh.getValue() + t)
         Message.ignoreEvent(true);
 }
  function onController()
 {
-	
+
 }
  function onTimer()
 {
-	
+
 }
  function onControl(number, value)
 {
-	
+
 }
