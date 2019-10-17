@@ -23,6 +23,7 @@ btnMode.set("tooltip", "When enabled notes will fade out rather than fade in.");
 const var knbLength = Content.addKnob("knbLength", 150, 0);
 knbLength.set("text", "Length");
 knbLength.set("mode", "Time");
+knbLength.set("middlePosition", 500);
 knbLength.setRange(5, 1000, 1);
 
 const var knbVelo = Content.addKnob("knbVelo", 300, 0);
