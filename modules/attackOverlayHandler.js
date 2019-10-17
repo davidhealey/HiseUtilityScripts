@@ -18,7 +18,7 @@ reg id;
 
 const var btnMode = Content.addButton("btnMode", 10, 10);
 btnMode.set("text", "Fade Out");
-btnMode.set("tooltip", "When enabled notes will fade out rather than fade in. Velocity filter and legato will be disabled.");
+btnMode.set("tooltip", "When enabled notes will fade out rather than fade in.");
 
 const var knbLength = Content.addKnob("knbLength", 150, 0);
 knbLength.set("text", "Length");
@@ -30,26 +30,16 @@ knbVelo.set("text", "Velocity Filter");
 knbVelo.setRange(0, 127, 1);
 
 const var btnLegato = Content.addButton("btnLegato", 450, 10);
-btnLegato.set("text", "Legato");
-
-
-inline function onbtnModeControl(component, value)
+btnLegato.set("text", "Legato");function onNoteOn()
 {
-	knbVelo.set("enabled", 1-value);
-	btnLegato.set("enabled", 1-value);
-};
-
-Content.getComponent("btnMode").setControlCallback(onbtnModeControl);
-function onNoteOn()
-{
-    if (btnMode.getValue()) //Fade out
+    if ((!btnLegato.getValue() || g_keys <= 1) && g_realVelocity >= knbVelo.getValue())
     {
-        id = Message.makeArtificial();
-        Synth.addVolumeFade(id, knbLength.getValue(), -100);
-    }
-    else //Fade in
-    {
-        if ((!btnLegato.getValue() || g_keys <= 1) && g_realVelocity >= knbVelo.getValue())
+        if (btnMode.getValue()) //Fade out
+        {
+            id = Message.makeArtificial();
+            Synth.addVolumeFade(id, knbLength.getValue(), -100);
+        }
+        else //Fade in
         {
             Synth.addVolumeFade(Message.getEventId(), 0, -99);
             Synth.addVolumeFade(Message.getEventId(), knbLength.getValue(), 0);
