@@ -44,7 +44,7 @@ notes.reserve(2);
 
 //Breath control
 reg lastBreathValue = 0;
-reg threshold;
+reg threshold = 10;
 
 //GUI
 const var btnMute = Content.addButton("btnMute", 0, 10);
@@ -477,4 +477,4 @@ function onControl(number, value)
 		    threshold = value;
 		break;
     }
-} 
+}
