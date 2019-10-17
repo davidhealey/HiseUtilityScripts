@@ -50,7 +50,7 @@ inline function playReleaseNote(noteNumber, velocity)
 {
 	local c = Message.getCoarseDetune();
 	local f = Message.getFineDetune();
-	
+
     noteIds.setValue(noteNumber, Synth.playNote(noteNumber, velocity));
     Synth.addPitchFade(noteIds.getValue(noteNumber), 0, c, f);
 
@@ -70,7 +70,7 @@ inline function playReleaseNote(noteNumber, velocity)
 	if (!btnMute.getValue())
 	{
 		Message.ignoreEvent(true);
-		
+
 		velocityValues.setValue(Message.getNoteNumber(), Message.getVelocity());
 		lengthValues.setValue(Message.getNoteNumber(), Engine.getUptime());
 
@@ -90,10 +90,10 @@ function onNoteOff()
 	if (!btnMute.getValue() && velocityValues.getValue(Message.getNoteNumber()) > 0 && !Synth.isSustainPedalDown())
 	{
 		Message.ignoreEvent(true);
-        
+
 		//Only play release triggers if legato is disabled or legato is enabled, no keys are held, and previous voices are still playing
-		if (btnLegato.getValue() == 0 || legatoChord == true || (btnLegato.getValue() && !Synth.getNumPressedKeys()))// && Engine.getNumVoices() > 0)
-		    playReleaseNote(Message.getNoteNumber(), velocityValues.getValue(Message.getNoteNumber()));
+		if (btnLegato.getValue() == 0 || legatoChord == true || (btnLegato.getValue() && !Synth.getNumPressedKeys()) && Engine.getNumVoices() > 0)
+		    playReleaseNote(Message.getNoteNumber() + Message.getTransposeAmount(), velocityValues.getValue(Message.getNoteNumber()));
 	}
 }
 
@@ -106,7 +106,7 @@ function onController()
 }
 function onTimer()
 {
-	
+
 }
  function onControl(number, value)
 {
