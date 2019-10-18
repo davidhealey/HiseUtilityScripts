@@ -1,7 +1,7 @@
 namespace Paths
 {
   const var path = Content.createPath();
-  const var svgData = [];
+  reg svgData = [];
 
   //Font Awesome Free License. - https://fontawesome.com/license/free
   const var fontawesome = {"regular":{}, "solid":{}};
