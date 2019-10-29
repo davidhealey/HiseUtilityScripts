@@ -17,6 +17,10 @@
 
 Content.setHeight(100);
 
+//Low and high note variables, set by knobs
+reg low = 0;
+reg high = 127;
+
 const var lastTime = Engine.createMidiList();
 const var lastStep = Engine.createMidiList();
 const var step = Engine.createMidiList();
@@ -51,10 +55,22 @@ knbReset.setRange(0, 5, 1);
 const var knbLoNote = Content.addKnob("knbLoNote", 160, 45);
 knbLoNote.set("text", "Low Note");
 knbLoNote.setRange(0, 127, 1);
+knbLoNote.setControlCallback(onknbLoNoteControl);
+
+inline function onknbLoNoteControl(component, value)
+{
+	low = value;
+};
 
 const var knbHiNote = Content.addKnob("knbHiNote", 310, 45);
 knbHiNote.set("text", "High Note");
 knbHiNote.setRange(0, 127, 1);
+knbHiNote.setControlCallback(onknbHiNoteControl);
+
+inline function onknbHiNoteControl(component, value)
+{
+	high = value;
+};
 
 inline function oncmbTypeControl(component, value)
 {
@@ -106,30 +122,29 @@ function onNoteOn()
             {
                 if (cmbType.getValue() == 5) //Cycle
                     s = (s + 1) % 3;
-                else //Random
-                    s = Math.randInt(0, 3);
+                else //Random non-repeating within playable range
+                {
+                    switch (n)
+                    {
+                        case low:
+                            s == 1 ? s = 2 : s = 1;
+                        break;
 
-                //Non-repeating
-                if (s == lastStep.getValue(n))
-                    s = (s + 1) % 3;
+                        case high:
+                            s == 1 ? s = 0 : s = 1;
+                        break;
 
-                //Range limit (handles non-repeating too)
-                if (n == knbLoNote.getValue() - t && s < 1)
-                    s = 1 + (1 == lastStep.getValue(n));
-                else if (n == knbHiNote.getValue() - t && s)
-                    s = 1 + -(1 == lastStep.getValue(n));
-
+                        default:
+                            s = (s - 1 + Math.randInt(2, 4)) % 3;
+                    }
+                }
             }
             else if (knbCount.getValue() > 1) //Group and velocity
             {
                 if ([1, 3].indexOf(cmbType.getValue()) != -1) //Cycle
                     s = (s + 1) % knbCount.getValue();
                 else //Random
-                    s = Math.randInt(1, knbCount.getValue() + 1);
-
-                //Non-repeating
-                if (s == lastStep.getValue(n))
-                    s = (s + 1) % knbCount.getValue();
+                    s = (lastStep.getValue(n) - 1 + Math.randInt(2, knbCount.getValue()+1)) % knbCount.getValue();
             }
             else
                 s = 0;
