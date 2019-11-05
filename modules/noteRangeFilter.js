@@ -2,7 +2,7 @@
 Author: David Healey
 Modified: 2019
 License: Public Domain Dedication (CC0)
-Filename: limitPlayableRange.js
+Filename: noteFilter.js
 
 source: http://creativecommons.org/publicdomain/zero/1.0/
 */
