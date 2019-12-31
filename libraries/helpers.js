@@ -35,10 +35,50 @@ namespace Helpers
 		return tempos[tempoIndex];
 	}
 
-	inline function mergeArrays(a, b)
-	{
-		for (i = 0; i < b.length; i++) a.push(b[i]);
-	}
+  inline function cartesianProduct(array)
+  {
+      local i;
+      local j;
+      local k;
+    
+      local result = [[]];
+
+      for (i = 0; i < array.length; i++)
+      {
+          local subArray = array[i];
+          local temp = [];
+        
+          for (j = 0; j < result.length; j++)
+          {
+              for (k = 0; k < subArray.length; k++)
+              {
+                  local c = concatArrays(result[j], [subArray[k]]);
+                  temp.push(c);
+              }
+          }
+          result = temp;
+      }
+
+      return result;
+  }
+
+  inline function concatArrays(a, b)
+  {    
+      local c = [];
+      local i;
+    
+      for (i = 0; i < a.length; i++)
+      {
+          c[i] = a[i];
+      }
+    
+      for (i = 0; i < b.length; i++)
+      {
+          c.push(b[i]);
+      }
+    
+      return c;
+  }
 
 	/**
 	 * Returns a random integer between min (inclusive) and max (inclusive)
