@@ -85,28 +85,4 @@ namespace ObjectHelpers
     
       return c;
   }
-  
-	inline function isArray(variable)
-	{
-	   return !(variable.length === undefined) && typeof variable != "string";
-	}
-	
-	inline function passByValue(a)
-  {
-    local i;
-    local s = a.join(",");
-    
-    if (typeof a[0] == "string")
-      return s.split(",");
-    else
-    {
-      local temp = s.split(",");
-      local result = [];
-      for (i = 0; i < temp.length; i++)
-      {
-        result[i] = parseInt(temp[i]);
-      }
-      return result;
-    }
-  }
 }
