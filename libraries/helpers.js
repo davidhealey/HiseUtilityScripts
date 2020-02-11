@@ -65,6 +65,16 @@ namespace Helpers
 		return false;
 	}
 
+  inline function skew(value, max, skewFactor)
+  {
+      // values > 1 will yield more resolution at the lower end
+      var normalised = value / max;
+
+      // this will "bend" the line towards the lower end
+      var skewed = Math.pow(normalised, skewFactor);
+      return skewed * max;    
+  }
+
 	inline function remapRange(value, oldMin, oldMax, newMin, newMax)
 	{
 	    if (oldMax - oldMin == 0)
