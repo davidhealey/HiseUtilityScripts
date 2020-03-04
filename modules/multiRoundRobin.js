@@ -1,5 +1,5 @@
 /*
-    Copyright 2019 David Healey
+    Copyright 2019, 2020 David Healey
 
     This file is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -93,8 +93,32 @@ function onNoteOn()
         {
             lastStep.setValue(n, 0);
             s = 0;
+        }   
+
+        //Borrowed
+        if ([5, 6].indexOf(cmbType.getValue()) != -1)
+        {
+            if (cmbType.getValue() == 5) //Cycle
+                s = (s + 1) % 3;
+            else //Random non-repeating within playable range
+            {
+                switch (n)
+                {
+                    case low:
+                        s == 1 ? s = 2 : s = 1;
+                    break;
+
+                    case high:
+                        s == 1 ? s = 0 : s = 1;
+                    break;
+
+                    default:
+                        s = (s - 1 + Math.randInt(2, 4)) % 3;
+                }
+            }
         }
 
+        //Lock to RR
         if (knbLock.getValue() > 0)
             s = knbLock.getValue();
 
@@ -117,37 +141,18 @@ function onNoteOn()
         //Get next step
         if (knbLock.getValue() == 0)
         {
-            //Borrowed
-            if ([5, 6].indexOf(cmbType.getValue()) != -1)
+            if ([5, 6].indexOf(cmbType.getValue()) == -1)  //Group and velocity
             {
-                if (cmbType.getValue() == 5) //Cycle
-                    s = (s + 1) % 3;
-                else //Random non-repeating within playable range
+                if (knbCount.getValue() > 1)
                 {
-                    switch (n)
-                    {
-                        case low:
-                            s == 1 ? s = 2 : s = 1;
-                        break;
-
-                        case high:
-                            s == 1 ? s = 0 : s = 1;
-                        break;
-
-                        default:
-                            s = (s - 1 + Math.randInt(2, 4)) % 3;
-                    }
+                    if ([1, 3].indexOf(cmbType.getValue()) != -1) //Cycle
+                        s = (s + 1) % knbCount.getValue();
+                    else //Random
+                        s = (lastStep.getValue(n) - 1 + Math.randInt(2, knbCount.getValue()+1)) % knbCount.getValue();
                 }
+                else
+                    s = 0;
             }
-            else if (knbCount.getValue() > 1) //Group and velocity
-            {
-                if ([1, 3].indexOf(cmbType.getValue()) != -1) //Cycle
-                    s = (s + 1) % knbCount.getValue();
-                else //Random
-                    s = (lastStep.getValue(n) - 1 + Math.randInt(2, knbCount.getValue()+1)) % knbCount.getValue();
-            }
-            else
-                s = 0;
         }
 
         lastTime.setValue(n, Engine.getUptime());
@@ -156,17 +161,18 @@ function onNoteOn()
 }
 function onNoteOff()
 {
-
+	
 }
  function onController()
 {
-
+	
 }
  function onTimer()
 {
-
+	
 }
  function onControl(number, value)
 {
-
+	
 }
+ 
