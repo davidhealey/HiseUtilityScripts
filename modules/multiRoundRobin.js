@@ -129,7 +129,7 @@ function onNoteOn()
             break;
 
             case 3: case 4: //Velocity
-                Message.setVelocity(s);
+                Message.setVelocity(s+1);
             break;
 
             case 5: case 6: //Borrowed
@@ -175,4 +175,3 @@ function onNoteOff()
 {
 	
 }
- 
