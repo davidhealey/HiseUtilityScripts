@@ -75,12 +75,17 @@ inline function onknbHiNoteControl(component, value)
 inline function oncmbTypeControl(component, value)
 {
     knbCount.showControl(value != 5 && value != 6); //Hide for borrowed mode
+    knbLoNote.showControl(value == 5 || value == 6);
+    knbHiNote.showControl(value == 5 || value == 6);
+    btnVelocityOffset.showControl(value == 3 || value == 4); //Only show for velocity modes
 	sampler.enableRoundRobin(value != 1 && value != 2);
 };
 
 cmbType.setControlCallback(oncmbTypeControl);
 
-function onNoteOn()
+//knbVelocity
+const var btnVelocityOffset = Content.addButton("btnVelocityOffset", 470, 55);
+btnVelocityOffset.set("text", "Velocity Offset");function onNoteOn()
 {
     if (!btnBypass.getValue())
     {
@@ -129,7 +134,8 @@ function onNoteOn()
             break;
 
             case 3: case 4: //Velocity
-                Message.setVelocity(s+1);
+                local v = (Message.getVelocity() * btnVelocityOffset.getValue()) + s;
+                Message.setVelocity(v);
             break;
 
             case 5: case 6: //Borrowed
@@ -175,3 +181,4 @@ function onNoteOff()
 {
 	
 }
+ 
