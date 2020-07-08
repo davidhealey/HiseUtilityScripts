@@ -5,35 +5,54 @@
 */
 
 const var core = Libraries.load("core");
-const var gain = core.createModule("smoothed_gainer");
+const var gainer = core.createModule("smoothed_gainer");
+const var stereo = core.createModule("stereo");
 
-const var knbGain = Content.addKnob("knbGain", 0, 0);
-knbGain.set("mode", "Decibel");
-knbGain.set("middlePosition", -18);
-knbGain.set("defaultValue", -6);
-knbGain.setRange(-100, 3, 0.1);
+const var Gain = Content.addKnob("Gain", 0, 0);
+Gain.set("mode", "Decibel");
+Gain.setRange(-100, 3, 0.1);
+Gain.set("middlePosition", -18);
+Gain.set("defaultValue", -3);
 
 const var knbSmooth = Content.addKnob("knbSmooth", 150, 0);
 knbSmooth.setRange(0, 1000, 0.1);
 knbSmooth.set("defaultValue", "250");
-knbSmooth.set("mode", "Time");function prepareToPlay(sampleRate, blockSize)
+knbSmooth.set("mode", "Time");
+
+const var Width = Content.addKnob("Width", 300, 0);
+Width.setRange(0, 200, 0.01);
+Width.set("middlePosition", 100);
+Width.set("defaultValue", 100);
+
+function prepareToPlay(sampleRate, blockSize)
 {
-    gain.prepareToPlay(sampleRate, blockSize);
+    gainer.prepareToPlay(sampleRate, blockSize);
+    stereo.prepareToPlay(sampleRate, blockSize);
 }
 function processBlock(channels)
 {
-	gain >> channels[0];
-	gain >> channels[1];
-	gain >> channels[2];
-	gain >> channels[3];
-	gain >> channels[4];
-	gain >> channels[5];
+	gainer >> channels[0];
+	gainer >> channels[1];
+	gainer >> channels[2];
+	gainer >> channels[3];
+	gainer >> channels[4];
+	gainer >> channels[5];
+	
+	stereo >> channels[0];
+	stereo >> channels[1];
+	stereo >> channels[2];
+	stereo >> channels[3];
+	stereo >> channels[4];
+	stereo >> channels[5];
 }
 function onControl(number, value)
 {
-    if (number == knbGain)
-	    gain.setParameter(gain.Gain,Engine.getGainFactorForDecibels(value));
+    if (number == Gain)
+	    gainer.setParameter(gainer.Gain,Engine.getGainFactorForDecibels(value));
 
-	if (number == knbSmooth)
-        gain.setParameter(gain.SmoothingTime, value);
+    if (number == knbSmooth)
+        gainer.setParameter(gainer.SmoothingTime, value);
+        
+    if (number == Width)
+	    stereo.setParameter(stereo.Width,value);
 }
