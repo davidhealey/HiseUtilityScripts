@@ -1,5 +1,5 @@
 /*
-    Copyright 2018, 2019 David Healey
+    Copyright 2018, 2019, 2020 David Healey
 
     This file is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -15,7 +15,7 @@
     along with This file. If not, see <http://www.gnu.org/licenses/>.
 */
 
-Content.setWidth(650);
+Content.setWidth(750);
 Content.setHeight(175);
 
 Content.setName("Release Trigger With Legato");
@@ -46,6 +46,10 @@ knbTime.setRange(0, 60, 0.1);
 const var tblTime = Content.addTable("tblTime", 140, 0);
 tblTime.setPosition(0, 60, 575, 100);
 
+const var knbLength = Content.addKnob("Length", 600, 0);
+knbLength.set("mode", "Time");
+knbLength.set("min", 50);
+
 inline function playReleaseNote(noteNumber, velocity)
 {
 	local c = Message.getCoarseDetune();
@@ -65,6 +69,8 @@ inline function playReleaseNote(noteNumber, velocity)
         //Attenuate the note
         Synth.addVolumeFade(noteIds.getValue(noteNumber), 0, -attenuation);
     }
+
+    Synth.noteOffDelayedByEventId(noteIds.getValue(noteNumber), Engine.getSamplesForMilliSeconds(knbLength.getValue()));
 }function onNoteOn()
 {
 	if (!btnMute.getValue())
@@ -106,7 +112,7 @@ function onController()
 }
 function onTimer()
 {
-
+	
 }
  function onControl(number, value)
 {
