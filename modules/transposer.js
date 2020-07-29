@@ -16,19 +16,19 @@ IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
 DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
-const var knbAmount = Content.addKnob("knbAmount", 0, 0);
-knbAmount.setRange(-2, 2, 1);
-knbAmount.set("text", "Transposition");
-knbAmount.set("defaultValue", 0);
-knbAmount.set("middlePosition", 0);
+const var knbTransposition = Content.addKnob("Transposition", 0, 0);
+knbTransposition.setRange(-12, 12, 1);
+knbTransposition.set("text", "Transposition");
+knbTransposition.set("defaultValue", 0);
+knbTransposition.set("middlePosition", 0);
 function onNoteOn()
 {
-	if (knbAmount.getValue() != 0)
-        Message.setTransposeAmount(knbAmount.getValue());
+	if (knbTransposition.getValue() != 0)
+        Message.setTransposeAmount(knbTransposition.getValue());
 }function onNoteOff()
 {
-	if (knbAmount.getValue() != 0)
-        Message.setTransposeAmount(knbAmount.getValue());
+	if (knbTransposition.getValue() != 0)
+        Message.setTransposeAmount(knbTransposition.getValue());
 }
  function onController()
 {
