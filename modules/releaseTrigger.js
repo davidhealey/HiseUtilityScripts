@@ -55,7 +55,7 @@ inline function playReleaseNote(noteNumber, velocity)
 	local c = Message.getCoarseDetune();
 	local f = Message.getFineDetune();
 
-    noteIds.setValue(noteNumber, Synth.playNote(noteNumber, velocity));
+    noteIds.setValue(noteNumber, Synth.playNote(noteNumber+Message.getTransposeAmount(), velocity));
     Synth.addPitchFade(noteIds.getValue(noteNumber), 0, c, f);
 
     if (btnAttenuate.getValue()) //Attenuation is enabled
