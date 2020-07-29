@@ -99,7 +99,7 @@ function onNoteOff()
 
 		//Only play release triggers if legato is disabled or legato is enabled, no keys are held, and previous voices are still playing
 		if (btnLegato.getValue() == 0 || legatoChord == true || (btnLegato.getValue() && !Synth.getNumPressedKeys()) && Engine.getNumVoices() > 0)
-		    playReleaseNote(Message.getNoteNumber() + Message.getTransposeAmount(), velocityValues.getValue(Message.getNoteNumber()));
+		    playReleaseNote(Message.getNoteNumber(), velocityValues.getValue(Message.getNoteNumber()));
 	}
 }
 
