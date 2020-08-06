@@ -31,11 +31,9 @@ const var noteIds = Engine.createMidiList();
 const var velocityValues = Engine.createMidiList();
 const var lengthValues = Engine.createMidiList();
 
-const var btnMute = Content.addButton("btnMute", 0, 10);
-btnMute.set("text", "Mute");
+const var btnMute = Content.addButton("Mute", 0, 10);
 
-const var btnLegato = Content.addButton("btnLegato", 150, 10);
-btnLegato.set("text", "Legato");
+const var btnLegato = Content.addButton("Legato", 150, 10);
 btnLegato.set("tooltip", "When enabled release samples will only be triggered when no other keys are held.");
 
 const var btnAttenuate = Content.addButton("Attenuate", 300, 10);
@@ -112,7 +110,7 @@ function onController()
 }
 function onTimer()
 {
-	
+
 }
  function onControl(number, value)
 {
