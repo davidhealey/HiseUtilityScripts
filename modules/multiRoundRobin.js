@@ -15,7 +15,8 @@
     along with This file. If not, see <http://www.gnu.org/licenses/>.
 */
 
-Content.setHeight(100);
+Content.setHeight(250);
+Content.setWidth(750);
 
 //Low and high note variables, set by knobs
 reg low = 0;
@@ -32,153 +33,163 @@ const var samplerIds = Synth.getIdList("Sampler");
 const var sampler = Synth.getSampler(samplerIds[0]); //Get first child sampler
 
 //GUI
-const var btnBypass = Content.addButton("btnBypass", 10, 10);
-btnBypass.set("text", "Bypass");
 
-const var modes = ["Group", "Group Random", "Velocity", "Velocity Random", "Borrowed", "Borrowed Random"];
-const var cmbType = Content.addComboBox("cmbType", 160, 10);
-cmbType.set("items", modes.join("\n"));
+//Mute
+const var btnMute = Content.addButton("Mute", 10, 10);
 
-const var knbCount = Content.addKnob("knbCount", 310, 0);
-knbCount.set("text", "Num RRs");
+//Random
+const var btnRandom = Content.addButton("Random", 160, 10);
+
+const var btnModes = [];
+
+//Group mode
+btnModes[0] = Content.addButton("Group", 10, 60);
+
+//velocity mode
+btnModes[1] = Content.addButton("Velocity", 160, 60);
+
+//Borrowed mode
+btnModes[2] = Content.addButton("Borrowed", 310, 60);
+
+for (i = 0; i < btnModes.length; i++)
+    btnModes[i].setControlCallback(onbtnModesControl);
+
+//RR Count
+const var knbCount = Content.addKnob("Count", 310, 0);
+knbCount.set("text", "Count");
 knbCount.setRange(0, 50, 1);
 
-const var knbLock = Content.addKnob("knbLock", 460, 0);
-knbLock.set("text", "Lock Step");
-knbLock.setRange(0, 50, 1);
-
-const var knbReset = Content.addKnob("knbReset", 0, 45);
+//Reset Tm
+const var knbReset = Content.addKnob("ResetTm", 460, 0);
 knbReset.set("text", "Reset Tm");
 knbReset.set("suffix", " seconds");
 knbReset.setRange(0, 5, 1);
 
-const var knbLoNote = Content.addKnob("knbLoNote", 160, 45);
+//RR Lock
+const var knbLock = Content.addKnob("Lock", 610, 0);
+knbLock.set("text", "Lock");
+knbLock.setRange(0, 20, 1);
+
+//Borrowed lowest note
+const var knbLoNote = Content.addKnob("LowNote", 310, 100);
 knbLoNote.set("text", "Low Note");
 knbLoNote.setRange(0, 127, 1);
 knbLoNote.setControlCallback(onknbLoNoteControl);
 
-inline function onknbLoNoteControl(component, value)
-{
-	low = value;
-};
-
-const var knbHiNote = Content.addKnob("knbHiNote", 310, 45);
+//Borrowed highest note
+const var knbHiNote = Content.addKnob("HighNote", 310, 150);
 knbHiNote.set("text", "High Note");
 knbHiNote.setRange(0, 127, 1);
 knbHiNote.setControlCallback(onknbHiNoteControl);
 
+//Velocity offset in effect
+const var btnVelocityOffset = Content.addButton("VelocityOffset", 160, 110);
+btnVelocityOffset.set("text", "Velocity Offset");
+
+//UI Callbacks
+inline function onknbLoNoteControl(component, value)
+{
+	low = value;
+}
+
 inline function onknbHiNoteControl(component, value)
 {
 	high = value;
-};
+}
 
-inline function oncmbTypeControl(component, value)
+inline function onbtnModesControl(component, value)
 {
-    knbCount.showControl(value != 5 && value != 6); //Hide for borrowed mode
-    knbLoNote.showControl(value == 5 || value == 6);
-    knbHiNote.showControl(value == 5 || value == 6);
-    btnVelocityOffset.showControl(value == 3 || value == 4); //Only show for velocity modes
-	sampler.enableRoundRobin(value != 1 && value != 2);
-};
-
-cmbType.setControlCallback(oncmbTypeControl);
-
-//knbVelocity
-const var btnVelocityOffset = Content.addButton("btnVelocityOffset", 470, 55);
-btnVelocityOffset.set("text", "Velocity Offset");function onNoteOn()
+    knbCount.showControl(btnModes[0].getValue() || btnModes[1].getValue());
+    knbLoNote.showControl(btnModes[2].getValue());
+    knbHiNote.showControl(btnModes[2].getValue());
+    btnVelocityOffset.showControl(btnModes[1].getValue());
+    sampler.enableRoundRobin(btnModes[0].getValue());
+}function onNoteOn()
 {
-    if (!btnBypass.getValue())
+    if (!btnMute.getValue() && (btnModes[0].getValue() || btnModes[1].getValue() || btnModes[2].getValue()))
     {
         local n = Message.getNoteNumber();
-        local t = Message.getTransposeAmount();
-        local s = lastStep.getValue(n);
+        local v = Message.getVelocity();
+        local s = lastStep.getValue(Message.getNoteNumber());
 
         //RR Reset
         if (knbReset.getValue() > 0 && (Engine.getUptime() - lastTime.getValue(n)) >= knbReset.getValue())
         {
             lastStep.setValue(n, 0);
             s = 0;
-        }   
-
-        //Borrowed
-        if ([5, 6].indexOf(cmbType.getValue()) != -1)
-        {
-            if (cmbType.getValue() == 5) //Cycle
-                s = (s + 1) % 3;
-            else //Random non-repeating within playable range
-            {
-                switch (n)
-                {
-                    case low:
-                        s == 1 ? s = 2 : s = 1;
-                    break;
-
-                    case high:
-                        s == 1 ? s = 0 : s = 1;
-                    break;
-
-                    default:
-                        s = (s - 1 + Math.randInt(2, 4)) % 3;
-                }
-            }
         }
 
         //Lock to RR
         if (knbLock.getValue() > 0)
-            s = knbLock.getValue();
+            s = knbLock.getValue() - 1;
 
-        switch (cmbType.getValue())
+        //Group
+        if (btnModes[0].getValue())
+            sampler.setActiveGroup(s+1);
+
+        //Velocity
+        if (btnModes[1].getValue())
+            Message.setVelocity(v * btnVelocityOffset.getValue() + s);
+
+        //Borrowed
+        if (btnModes[2].getValue())
         {
-            case 1: case 2: //Group
-                sampler.setActiveGroup(s+1);
-            break;
+            if (!knbLock.getValue())
+            {
+                if (!btnRandom.getValue()) //Cycle
+                    s = (s + 1) % 3;
+                else //Random non-repeating within playable range
+                {
+                    switch (n)
+                    {
+                        case low:
+                            s == 1 ? s = 2 : s = 1;
+                        break;
 
-            case 3: case 4: //Velocity
-                local v = (Message.getVelocity() * btnVelocityOffset.getValue()) + s;
-                Message.setVelocity(v);
-            break;
+                        case high:
+                            s == 1 ? s = 0 : s = 1;
+                        break;
 
-            case 5: case 6: //Borrowed
-                Message.setTransposeAmount(s-1 + t);
-                Message.setCoarseDetune(-(s-1) + Message.getCoarseDetune());
-            break;
+                        default:
+                            s = (s - 1 + Math.randInt(2, 4)) % 3;
+                    }
+                }
+            }
+
+            Message.setTransposeAmount(s-1 + Message.getTransposeAmount());
+            Message.setCoarseDetune(-(s-1) + Message.getCoarseDetune());
         }
 
-        //Get next step
-        if (knbLock.getValue() == 0)
+        //Get next step for group and velocity based
+        if (!knbLock.getValue() && (btnModes[0].getValue() || btnModes[1].getValue()))
         {
-            if ([5, 6].indexOf(cmbType.getValue()) == -1)  //Group and velocity
+            if (knbCount.getValue() > 1)
             {
-                if (knbCount.getValue() > 1)
-                {
-                    if ([1, 3].indexOf(cmbType.getValue()) != -1) //Cycle
-                        s = (s + 1) % knbCount.getValue();
-                    else //Random
-                        s = (lastStep.getValue(n) - 1 + Math.randInt(2, knbCount.getValue()+1)) % knbCount.getValue();
-                }
-                else
-                    s = 0;
+                if (!btnRandom.getValue()) //Cycle
+                    s = (s + 1) % knbCount.getValue();
+                else //Random
+                    s = (lastStep.getValue(n) - 1 + Math.randInt(2, knbCount.getValue()+1)) % knbCount.getValue();
             }
+            else
+                s = 0;
         }
 
         lastTime.setValue(n, Engine.getUptime());
         lastStep.setValue(n, s);
     }
-}
-function onNoteOff()
+}function onNoteOff()
 {
-	
+
 }
  function onController()
 {
-	
+
 }
  function onTimer()
 {
-	
+
 }
  function onControl(number, value)
 {
-	
+
 }
- 
