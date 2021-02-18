@@ -301,9 +301,14 @@ inline function onknbPressureControl(component, value)
                 Synth.noteOffByEventId(eventId0);
             
             if (btnPressureVelocity.getValue())
+            {
                 pressureTimer.startTimer(11);
+            }
             else
+            {
                 eventId0 = Synth.playNote(lastNote, velocity);
+                Synth.addPitchFade(eventId0, 0, coarseDetune, fineDetune);
+            }
         }
 
         if (value < trigger - 5)
@@ -323,6 +328,7 @@ inline function onknbPressureControl(component, value)
 // knbTriggerLevel
 const knbTriggerLevel = Content.addKnob("TriggerLevel", 450, 300);
 knbTriggerLevel.set("text", "Trigger Level");
+knbTriggerLevel.set("defaultValue", 6);
 knbTriggerLevel.setRange(6, 127, 1);
 
 // btnPressureVelocity
@@ -338,7 +344,8 @@ pressureTimer.setTimerCallback(function()
         velocity = pressureTally / pressureReadings;
     
         eventId0 = Synth.playNote(lastNote, velocity);
-            
+        Synth.addPitchFade(eventId0, 0, coarseDetune, fineDetune);
+
         lastPressureTime = 0;
         pressureTally = 1;
         pressureReadings = 1;
@@ -667,8 +674,8 @@ inline function getPressureVelocity(time)
         playGlideNote(rate * 1000, bend);
         Synth.startTimer(rate);
     }
-}
- function onControl(number, value)
+}function onControl(number, value)
 {
 	
-} 
+}
+  
