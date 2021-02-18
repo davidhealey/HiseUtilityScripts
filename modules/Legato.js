@@ -14,7 +14,6 @@
     You should have received a copy of the GNU General Public License
     along with This file. If not, see <http://www.gnu.org/licenses/>.
 */
-
 Content.setWidth(750);
 Content.setHeight(400);
 
@@ -255,8 +254,15 @@ inline function onbtnGlideManualControl(component, value)
     btnGlideSyncMode.set("enabled", 1-value);
 }
 
+// knbGlideManualRate
+const knbGlideManualRate = Content.addKnob("GlideManualRate", 300, 250);
+knbGlideManualRate.set("text", "Manual Rate");
+knbGlideManualRate.set("mode", "Time");
+knbGlideManualRate.setRange(50, 1000, 1);
+knbGlideManualRate.set("middlePosition", 500);
+
 // knbGlideManual
-const knbGlideManual = Content.addKnob("GlideManualValue", 300, 250);
+const knbGlideManual = Content.addKnob("GlideManualValue", 300, 300);
 knbGlideManual.set("text", "Glide Manual");
 knbGlideManual.set("mode", "NormalizedPercentage");
 knbGlideManual.setControlCallback(onknbGlideManualControl);
@@ -406,7 +412,7 @@ inline function manualGlide(value, direction)
     {
         local interval = Math.abs(glideOrigin - glideTarget);
         local bend = (100 * (1 - direction)) - (100 * direction);
-        local rate = knbGlideRate.getValue() / interval;
+        local rate = knbGlideManualRate.getValue();// / interval;
         
         if (glideOrigin > glideTarget)
             glideNote = glideOrigin - Math.round(interval * value);
@@ -665,5 +671,4 @@ inline function getPressureVelocity(time)
  function onControl(number, value)
 {
 	
-}
- 
+} 
