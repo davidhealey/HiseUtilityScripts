@@ -449,7 +449,7 @@ inline function playLegatoNote(note)
         local bendTm = fadeTm / 100 * knbBendTm.getValue();
         local bendAmt = pitchBend[lastNote > note][interval];
         local rand = Math.randInt(-knbBendVar.getValue(), knbBendVar.getValue() + 1) / 100;
-        bendAmt = bendAmt + bendAmt * rand;  
+        bendAmt = bendAmt + bendAmt * rand;
 
         if (bendAmt !== 0 && bendTm > 0)
         {
@@ -487,19 +487,6 @@ inline function playGlideNote(rate, bend)
 
         eventId0 = eventId1;
     }
-}
-
-inline function getPressureVelocity(time)
-{
-    local max = 0.3;
-    local limitTime = Math.min(max, time); // Limit time
-    //local v = Math.pow(limitTime, 0.3); //Skew value
-    
-    local v = Math.round(128 - (127 / max * limitTime));
-    
-    Console.print(v + " : " + max + " : " + limitTime);
-    
-    return 64;
 }function onNoteOn()
 {        
 	if (!btnBypass.getValue())
@@ -580,11 +567,11 @@ inline function getPressureVelocity(time)
 {
     if (!btnBypass.getValue())
     {
-        Synth.stopTimer();
-
         local n = Message.getNoteNumber();
         local transposition = Message.getTransposeAmount();
     
+        Synth.stopTimer();
+
         if (n == retriggerNote)
             retriggerNote = -99;
         
@@ -595,7 +582,7 @@ inline function getPressureVelocity(time)
         if (n == lastNote && !btnAutoHold.getValue())
         {
             Message.ignoreEvent(true);
-            
+
             if (retriggerNote != -99 && eventId0 != -99 && (!btnBreath.getValue() || lastPressure > knbTriggerLevel.getValue()))
             {
                 if (btnGlide.getValue() && !btnRetrigger.getValue())
@@ -605,13 +592,13 @@ inline function getPressureVelocity(time)
                         glideNote = n;
                         glideOrigin = n;
                         glideTarget = retriggerNote;
-                        
+
                         local rate = getGlideTimerRate(interval, velocity);
                         Synth.startTimer(rate);
                     }
                 }
                 else
-                {
+                {                    
                     eventId1 = Synth.playNoteWithStartOffset(channel, retriggerNote + transposition, velocity, legatoOffset);
 
                     if (knbXfadeTm.getValue() > 0)
@@ -635,7 +622,7 @@ inline function getPressureVelocity(time)
                 eventId0 = -99;
                 lastNote = -99;
             }
-        }   
+        }
     }
     else if (eventId0 != -99)
     {
@@ -667,7 +654,7 @@ inline function getPressureVelocity(time)
         glideNote = glideTarget;
         Synth.stopTimer();
     }
-    
+
     // Play next glide note
     if (Synth.isTimerRunning())
     {
@@ -678,4 +665,3 @@ inline function getPressureVelocity(time)
 {
 	
 }
-  
