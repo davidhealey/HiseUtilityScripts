@@ -51,7 +51,7 @@ reg pressureReadings = 1;
 // GUI
 
 // btnBypass
-const btnBypass = Content.addButton("Bypass", 10, 10);
+const btnBypass = Content.addButton("Mute", 10, 10);
 
 // knbOffset
 const knbLegatoOffset = Content.addKnob("LegatoOffset", 0, 50);
@@ -665,3 +665,4 @@ inline function playGlideNote(rate, bend)
 {
 	
 }
+ 
