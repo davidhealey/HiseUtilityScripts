@@ -489,17 +489,16 @@ inline function playGlideNote(rate, bend)
     }
 }function onNoteOn()
 {        
+    local n = Message.getNoteNumber();
+    velocity = Message.getVelocity();
+    channel = Message.getChannel();
+    coarseDetune = Message.getCoarseDetune();
+    fineDetune = Message.getFineDetune();
+    transposition = Message.getTransposeAmount();
+        
 	if (!btnBypass.getValue())
     {
         Synth.stopTimer();
-
-        local n = Message.getNoteNumber();
-        velocity = Message.getVelocity();
-
-        channel = Message.getChannel();
-        coarseDetune = Message.getCoarseDetune();
-        fineDetune = Message.getFineDetune();
-        transposition = Message.getTransposeAmount();
 
         if (btnBreath.getValue() && lastPressure < knbTriggerLevel.getValue())
             Message.ignoreEvent(true);
