@@ -1,5 +1,5 @@
 /*
-    Copyright 2019, 2020 David Healey
+    Copyright 2019, 2020, 2021 David Healey
 
     This file is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -22,80 +22,33 @@ Content.setWidth(750);
 reg low = 0;
 reg high = 127;
 
-const var lastTime = Engine.createMidiList();
-const var lastStep = Engine.createMidiList();
-const var step = Engine.createMidiList();
+const lastTime = Engine.createMidiList();
+const lastStep = Engine.createMidiList();
+const step = Engine.createMidiList();
 
 lastTime.fill(0);
 lastStep.fill(0);
 
-const var samplerIds = Synth.getIdList("Sampler");
-const var sampler = Synth.getSampler(samplerIds[0]); //Get first child sampler
+const samplerIds = Synth.getIdList("Sampler");
+const sampler = Synth.getSampler(samplerIds[0]); //Get first child sampler
 
 //GUI
 
-//Mute
-const var btnMute = Content.addButton("Mute", 10, 10);
+// Mute
+const btnMute = Content.addButton("Mute", 10, 10);
 
-//Random
-const var btnRandom = Content.addButton("Random", 160, 10);
+// Random
+const btnRandom = Content.addButton("Random", 160, 10);
 
-const var btnModes = [];
+const btnModes = [];
 
-//Group mode
+// Mode
 btnModes[0] = Content.addButton("Group", 10, 60);
-
-//velocity mode
 btnModes[1] = Content.addButton("Velocity", 160, 60);
-
-//Borrowed mode
 btnModes[2] = Content.addButton("Borrowed", 310, 60);
 
 for (i = 0; i < btnModes.length; i++)
     btnModes[i].setControlCallback(onbtnModesControl);
-
-//RR Count
-const var knbCount = Content.addKnob("Count", 310, 0);
-knbCount.set("text", "Count");
-knbCount.setRange(0, 50, 1);
-
-//Reset Tm
-const var knbReset = Content.addKnob("ResetTm", 460, 0);
-knbReset.set("text", "Reset Tm");
-knbReset.set("suffix", " seconds");
-knbReset.setRange(0, 5, 1);
-
-//RR Lock
-const var knbLock = Content.addKnob("Lock", 610, 0);
-knbLock.set("text", "Lock");
-knbLock.setRange(0, 20, 1);
-
-//Borrowed lowest note
-const var knbLoNote = Content.addKnob("LowNote", 310, 100);
-knbLoNote.set("text", "Low Note");
-knbLoNote.setRange(0, 127, 1);
-knbLoNote.setControlCallback(onknbLoNoteControl);
-
-//Borrowed highest note
-const var knbHiNote = Content.addKnob("HighNote", 310, 150);
-knbHiNote.set("text", "High Note");
-knbHiNote.setRange(0, 127, 1);
-knbHiNote.setControlCallback(onknbHiNoteControl);
-
-//Velocity offset in effect
-const var btnVelocityOffset = Content.addButton("VelocityOffset", 160, 110);
-btnVelocityOffset.set("text", "Velocity Offset");
-
-//UI Callbacks
-inline function onknbLoNoteControl(component, value)
-{
-	low = value;
-}
-
-inline function onknbHiNoteControl(component, value)
-{
-	high = value;
-}
 
 inline function onbtnModesControl(component, value)
 {
@@ -104,7 +57,49 @@ inline function onbtnModesControl(component, value)
     knbHiNote.showControl(btnModes[2].getValue());
     btnVelocityOffset.showControl(btnModes[1].getValue());
     sampler.enableRoundRobin(btnModes[0].getValue());
-}function onNoteOn()
+}
+    
+// RR Count
+const knbCount = Content.addKnob("Count", 310, 0);
+knbCount.set("text", "Count");
+knbCount.setRange(0, 50, 1);
+
+// Reset Tm
+const knbReset = Content.addKnob("ResetTm", 460, 0);
+knbReset.set("text", "Reset Tm");
+knbReset.set("suffix", " seconds");
+knbReset.setRange(0, 5, 1);
+
+// RR Lock
+const knbLock = Content.addKnob("Lock", 610, 0);
+knbLock.set("text", "Lock");
+knbLock.setRange(0, 20, 1);
+
+// LowNote
+const knbLoNote = Content.addKnob("LowNote", 310, 100);
+knbLoNote.set("text", "Low Note");
+knbLoNote.setRange(0, 127, 1);
+knbLoNote.setControlCallback(onknbLoNoteControl);
+
+inline function onknbLoNoteControl(component, value)
+{
+	low = value;
+}
+
+// HighNote
+const knbHiNote = Content.addKnob("HighNote", 310, 150);
+knbHiNote.set("text", "High Note");
+knbHiNote.setRange(0, 127, 1);
+knbHiNote.setControlCallback(onknbHiNoteControl);
+
+inline function onknbHiNoteControl(component, value)
+{
+	high = value;
+}
+
+// Velocity offset in effect
+const btnVelocityOffset = Content.addButton("VelocityOffset", 160, 110);
+btnVelocityOffset.set("text", "Velocity Offset");function onNoteOn()
 {
     if (!btnMute.getValue() && (btnModes[0].getValue() || btnModes[1].getValue() || btnModes[2].getValue()))
     {
@@ -125,7 +120,7 @@ inline function onbtnModesControl(component, value)
 
         //Group
         if (btnModes[0].getValue())
-            sampler.setActiveGroup(s+1);
+            sampler.setActiveGroup(s + 1);
 
         //Velocity
         if (btnModes[1].getValue())
@@ -156,8 +151,8 @@ inline function onbtnModesControl(component, value)
                 }
             }
 
-            Message.setTransposeAmount(s-1 + Message.getTransposeAmount());
-            Message.setCoarseDetune(-(s-1) + Message.getCoarseDetune());
+            Message.setTransposeAmount(s - 1 + Message.getTransposeAmount());
+            Message.setCoarseDetune(-(s - 1) + Message.getCoarseDetune());
         }
 
         //Get next step for group and velocity based
@@ -168,10 +163,12 @@ inline function onbtnModesControl(component, value)
                 if (!btnRandom.getValue()) //Cycle
                     s = (s + 1) % knbCount.getValue();
                 else //Random
-                    s = (lastStep.getValue(n) - 1 + Math.randInt(2, knbCount.getValue()+1)) % knbCount.getValue();
+                    s = (lastStep.getValue(n) - 1 + Math.randInt(2, knbCount.getValue() + 1)) % knbCount.getValue();
             }
             else
+            {
                 s = 0;
+            }
         }
 
         lastTime.setValue(n, Engine.getUptime());
@@ -179,17 +176,18 @@ inline function onbtnModesControl(component, value)
     }
 }function onNoteOff()
 {
-
+	
 }
  function onController()
 {
-
+	
 }
  function onTimer()
 {
-
+	
 }
  function onControl(number, value)
 {
-
+	
 }
+ 
