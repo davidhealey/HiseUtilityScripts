@@ -37,46 +37,47 @@ const sampler = Synth.getSampler(samplerIds[0]); //Get first child sampler
 // Mute
 const btnMute = Content.addButton("Mute", 10, 10);
 
-// Random
-const btnRandom = Content.addButton("Random", 160, 10);
-
 const btnModes = [];
 
 // Mode
-btnModes[0] = Content.addButton("Group", 10, 60);
-btnModes[1] = Content.addButton("Velocity", 160, 60);
-btnModes[2] = Content.addButton("Borrowed", 310, 60);
+btnModes[0] = Content.addButton("Group", 160, 10);
+btnModes[1] = Content.addButton("Velocity", 310, 10);
+btnModes[2] = Content.addButton("Borrowed", 460, 10);
 
 for (i = 0; i < btnModes.length; i++)
     btnModes[i].setControlCallback(onbtnModesControl);
 
 inline function onbtnModesControl(component, value)
-{
+{    
+    btnRandom.showControl(btnModes[0].getValue() || btnModes[1].getValue());
     knbCount.showControl(btnModes[0].getValue() || btnModes[1].getValue());
     knbLoNote.showControl(btnModes[2].getValue());
     knbHiNote.showControl(btnModes[2].getValue());
     btnVelocityOffset.showControl(btnModes[1].getValue());
     sampler.enableRoundRobin(btnModes[0].getValue());
 }
-    
+
+// Random
+const btnRandom = Content.addButton("Random", 10, 70);
+
 // RR Count
-const knbCount = Content.addKnob("Count", 310, 0);
+const knbCount = Content.addKnob("Count", 10, 120);
 knbCount.set("text", "Count");
 knbCount.setRange(0, 50, 1);
-
-// Reset Tm
-const knbReset = Content.addKnob("ResetTm", 460, 0);
-knbReset.set("text", "Reset Tm");
-knbReset.set("suffix", " seconds");
-knbReset.setRange(0, 5, 1);
 
 // RR Lock
 const knbLock = Content.addKnob("Lock", 610, 0);
 knbLock.set("text", "Lock");
 knbLock.setRange(0, 20, 1);
 
+// Reset Tm
+const knbReset = Content.addKnob("ResetTm", 610, 60);
+knbReset.set("text", "Reset Tm");
+knbReset.set("suffix", " seconds");
+knbReset.setRange(0, 5, 1);
+
 // LowNote
-const knbLoNote = Content.addKnob("LowNote", 310, 100);
+const knbLoNote = Content.addKnob("LowNote", 460, 60);
 knbLoNote.set("text", "Low Note");
 knbLoNote.setRange(0, 127, 1);
 knbLoNote.setControlCallback(onknbLoNoteControl);
@@ -87,7 +88,7 @@ inline function onknbLoNoteControl(component, value)
 }
 
 // HighNote
-const knbHiNote = Content.addKnob("HighNote", 310, 150);
+const knbHiNote = Content.addKnob("HighNote", 460, 120);
 knbHiNote.set("text", "High Note");
 knbHiNote.setRange(0, 127, 1);
 knbHiNote.setControlCallback(onknbHiNoteControl);
@@ -98,7 +99,7 @@ inline function onknbHiNoteControl(component, value)
 }
 
 // Velocity offset in effect
-const btnVelocityOffset = Content.addButton("VelocityOffset", 160, 110);
+const btnVelocityOffset = Content.addButton("VelocityOffset", 310, 70);
 btnVelocityOffset.set("text", "Velocity Offset");function onNoteOn()
 {
     if (!btnMute.getValue() && (btnModes[0].getValue() || btnModes[1].getValue() || btnModes[2].getValue()))
@@ -131,23 +132,18 @@ btnVelocityOffset.set("text", "Velocity Offset");function onNoteOn()
         {
             if (!knbLock.getValue())
             {
-                if (!btnRandom.getValue()) //Cycle
-                    s = (s + 1) % 3;
-                else //Random non-repeating within playable range
+                switch (n)
                 {
-                    switch (n)
-                    {
-                        case low:
-                            s == 1 ? s = 2 : s = 1;
-                        break;
+                    case low:
+                        s == 1 ? s = 2 : s = 1;
+                    break;
 
-                        case high:
-                            s == 1 ? s = 0 : s = 1;
-                        break;
+                    case high:
+                        s == 1 ? s = 0 : s = 1;
+                    break;
 
-                        default:
-                            s = (s - 1 + Math.randInt(2, 4)) % 3;
-                    }
+                    default:
+                        s = (s - 1 + Math.randInt(2, 4)) % 3;
                 }
             }
 
