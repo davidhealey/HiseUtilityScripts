@@ -1,3 +1,6 @@
+//License - Public Domain
+//David Healey 2021
+
 Content.setHeight(100);
 
 const ids = Synth.getIdList("AHDSR Envelope");
