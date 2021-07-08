@@ -18,10 +18,6 @@
 Content.setHeight(250);
 Content.setWidth(750);
 
-//Low and high note variables, set by knobs
-reg low = 0;
-reg high = 127;
-
 const lastTime = Engine.createMidiList();
 const lastStep = Engine.createMidiList();
 const step = Engine.createMidiList();
@@ -31,6 +27,7 @@ lastStep.fill(0);
 
 const samplerIds = Synth.getIdList("Sampler");
 const sampler = Synth.getSampler(samplerIds[0]); //Get first child sampler
+sampler.enableRoundRobin(false);
 
 //GUI
 
@@ -51,10 +48,8 @@ inline function onbtnModesControl(component, value)
 {    
     btnRandom.showControl(btnModes[0].getValue() || btnModes[1].getValue());
     knbCount.showControl(btnModes[0].getValue() || btnModes[1].getValue());
-    knbLoNote.showControl(btnModes[2].getValue());
-    knbHiNote.showControl(btnModes[2].getValue());
+    knbFirstGroup.showControl(btnModes[0].getValue());
     btnVelocityOffset.showControl(btnModes[1].getValue());
-    sampler.enableRoundRobin(btnModes[0].getValue());
 }
 
 // Random
@@ -76,31 +71,14 @@ knbReset.set("text", "Reset Tm");
 knbReset.set("suffix", " seconds");
 knbReset.setRange(0, 5, 1);
 
-// LowNote
-const knbLoNote = Content.addKnob("LowNote", 460, 60);
-knbLoNote.set("text", "Low Note");
-knbLoNote.setRange(0, 127, 1);
-knbLoNote.setControlCallback(onknbLoNoteControl);
-
-inline function onknbLoNoteControl(component, value)
-{
-	low = value;
-}
-
-// HighNote
-const knbHiNote = Content.addKnob("HighNote", 460, 120);
-knbHiNote.set("text", "High Note");
-knbHiNote.setRange(0, 127, 1);
-knbHiNote.setControlCallback(onknbHiNoteControl);
-
-inline function onknbHiNoteControl(component, value)
-{
-	high = value;
-}
-
 // Velocity offset in effect
 const btnVelocityOffset = Content.addButton("VelocityOffset", 310, 70);
-btnVelocityOffset.set("text", "Velocity Offset");function onNoteOn()
+btnVelocityOffset.set("text", "Velocity Offset");
+
+// knbFirstGroup
+const knbFirstGroup = Content.addKnob("FirstGroup", 160, 60);
+knbFirstGroup.setRange(1, 50, 1);
+knbFirstGroup.set("text", "First Group");function onNoteOn()
 {
     if (!btnMute.getValue() && (btnModes[0].getValue() || btnModes[1].getValue() || btnModes[2].getValue()))
     {
@@ -121,7 +99,7 @@ btnVelocityOffset.set("text", "Velocity Offset");function onNoteOn()
 
         //Group
         if (btnModes[0].getValue())
-            sampler.setActiveGroup(s + 1);
+            sampler.setActiveGroup(knbFirstGroup.getValue() + s);
 
         //Velocity
         if (btnModes[1].getValue())
@@ -131,21 +109,7 @@ btnVelocityOffset.set("text", "Velocity Offset");function onNoteOn()
         if (btnModes[2].getValue())
         {
             if (!knbLock.getValue())
-            {
-                switch (n)
-                {
-                    case low:
-                        s == 1 ? s = 2 : s = 1;
-                    break;
-
-                    case high:
-                        s == 1 ? s = 0 : s = 1;
-                    break;
-
-                    default:
-                        s = (s - 1 + Math.randInt(2, 4)) % 3;
-                }
-            }
+                s = (s - 1 + Math.randInt(2, 4)) % 3;
 
             Message.setTransposeAmount(s - 1 + Message.getTransposeAmount());
             Message.setCoarseDetune(-(s - 1) + Message.getCoarseDetune());
