@@ -115,7 +115,7 @@ knbBendMin[0].set("suffix", " cts");
 knbBendMin[0].setRange(0, 100, 1);
 knbBendMin[0].setControlCallback(onknbBendControl);
 
-knbBendMin[1] = Content.addKnob("Bend Min Dn", 300, 50);
+knbBendMin[1] = Content.addKnob("BendMinDn", 300, 50);
 knbBendMin[1].set("text", "Bend Min Dn");
 knbBendMin[1].set("suffix", " cts");
 knbBendMin[1].setRange(0, 100, 1);
