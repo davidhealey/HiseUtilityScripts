@@ -1,5 +1,5 @@
 /*
-    Copyright 2018, 2019, 2021 David Healey
+    Copyright 2018, 2019, 2020, 2021 David Healey
 
     This file is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -14,8 +14,9 @@
     You should have received a copy of the GNU General Public License
     along with This file. If not, see <http://www.gnu.org/licenses/>.
 */
-Content.setWidth(750);
-Content.setHeight(400);
+
+Content.setWidth(600);
+Content.setHeight(300);
 
 Synth.stopTimer();
 
@@ -32,7 +33,6 @@ reg transposition = 0;
 reg lastTime = 0;
 reg channel;
 reg velocity;
-reg isChord = false;
 
 reg legatoOffset;
 reg glideOffset;
@@ -42,7 +42,6 @@ reg glideNote = -99;
 reg glideRate;
 reg glideDirection = 0;
 reg lastGlideNote = -99;
-reg lastManualGlideValue = 0;
 
 reg lastPressure = 0;
 reg lastPressureTime = 0;
@@ -51,8 +50,8 @@ reg pressureReadings = 1;
 
 // GUI
 
-// btnBypass
-const btnBypass = Content.addButton("Mute", 10, 10);
+// btnMute
+const btnMute = Content.addButton("Mute", 10, 10);
 
 // knbOffset
 const knbLegatoOffset = Content.addKnob("LegatoOffset", 0, 50);
@@ -72,21 +71,6 @@ btnRetrigger.setTooltip("Enable/Disable same note legato retrigger");
 btnRetrigger.setControlCallback(onbtnRetriggerControl);
 
 inline function onbtnRetriggerControl(component, value)
-{
-    // Turn off the last note if still playing
-    if (!Synth.getNumPressedKeys() && eventId0 != -99)
-    {
-        Synth.noteOffByEventId(eventId0);
-        eventId0 = -99;
-        lastNote = -99;
-    }
-}
-
-const btnAutoHold = Content.addButton("AutoHold", 10, 160);
-btnAutoHold.set("text", "Auto Hold");
-btnAutoHold.setControlCallback(onbtnAutoHoldControl);
-
-inline function onbtnAutoHoldControl(component, value)
 {
     // Turn off the last note if still playing
     if (!Synth.getNumPressedKeys() && eventId0 != -99)
@@ -166,7 +150,22 @@ inline function onknbBendControl(component, value)
 // btnGlide
 const btnGlide = Content.addButton("Glide", 10, 210);
 
-const knbGlideOffset = Content.addKnob("GlideOffset", 0, 250);
+// knbGlideMax
+const knbGlideMax = Content.addKnob("GlideMax", 150, 200);
+knbGlideMax.set("text", "Glide Max");
+knbGlideMax.set("suffix", "st");
+knbGlideMax.setRange(0, 24, 1);
+
+// knbGlideBendVar
+const knbGlideBendVar = Content.addKnob("GlideBendVar", 300, 200);
+knbGlideBendVar.set("text", "Glide Bend Var");
+knbGlideBendVar.set("mode", "Linear");
+knbGlideBendVar.set("suffix", "%");
+knbGlideBendVar.setRange(0, 25, 1);
+knbGlideBendVar.set("middlePosition", 12);
+
+// knbGlideOffset
+const knbGlideOffset = Content.addKnob("GlideOffset", 450, 200);
 knbGlideOffset.set("text", "Glide Offset");
 knbGlideOffset.set("mode", "Time");
 knbGlideOffset.set("max", 500);
@@ -177,120 +176,17 @@ inline function onknbGlideOffsetControl(component, value)
     glideOffset = Engine.getSamplesForMilliSeconds(value);
 }
 
-// knbGlideMax
-const knbGlideMax = Content.addKnob("GlideMax", 0, 300);
-knbGlideMax.set("text", "Glide Max");
-knbGlideMax.set("suffix", "st");
-knbGlideMax.setRange(0, 24, 1);
-
-// knbGlideBendVar
-const knbGlideBendVar = Content.addKnob("GlideBendVar", 0, 350);
-knbGlideBendVar.set("text", "Glide Bend Var");
-knbGlideBendVar.set("mode", "Linear");
-knbGlideBendVar.set("suffix", "%");
-knbGlideBendVar.setRange(0, 25, 1);
-knbGlideBendVar.set("middlePosition", 12);
-
-// knbGlideRate
-const knbGlideRate = Content.addKnob("GlideRate", 150, 200);
-knbGlideRate.set("text", "Glide Rate");
-knbGlideRate.set("mode", "TempoSync");
-
-// knbGlideRateVar
-const knbGlideRateVar = Content.addKnob("GlideRateVar", 150, 250);
-knbGlideRateVar.set("text", "Glide Rate Var");
-knbGlideRateVar.set("mode", "Linear");
-knbGlideRateVar.set("suffix", "%");
-knbGlideRateVar.setRange(0, 25, 1);
-knbGlideRateVar.set("middlePosition", 12);
-
-// btnGlideSyncMode
-const btnGlideSyncMode = Content.addButton("GlideSyncMode", 160, 310);
-btnGlideSyncMode.set("text", "Sync");
-btnGlideSyncMode.setControlCallback(onbtnGlideSyncModeControl);
-
-inline function onbtnGlideSyncModeControl(component, value)
-{
-    if (value)
-    {
-        knbGlideRate.set("mode", "TempoSync");
-        knbGlideRate.setRange(0, 18, 1);
-    }
-    else
-    {
-        knbGlideRate.set("mode", "Time");
-        knbGlideRate.setRange(100, 5000, 1);
-    }
-}
-
-// btnGlideVelocity
-const btnGlideVelocity = Content.addButton("GlideVelocity", 160, 360);
-btnGlideVelocity.set("text", "Velocity");
-btnGlideVelocity.setControlCallback(onbtnGlideVelocityControl);
-
-inline function onbtnGlideVelocityControl(component, value)
-{
-    if (value)
-    {
-        btnGlideSyncMode.setValue(false);
-        btnGlideSyncMode.changed();
-    }
-
-    btnGlideSyncMode.set("enabled", 1-value);
-}
-
-// btnGlideManual
-const btnGlideManual = Content.addButton("GlideManual", 310, 210);
-btnGlideManual.set("text", "Manual Glide");
-btnGlideManual.setControlCallback(onbtnGlideManualControl);
-
-inline function onbtnGlideManualControl(component, value)
-{
-    if (value)
-    {
-        btnGlideSyncMode.setValue(0);
-        btnGlideSyncMode.changed();
-    }
-
-    btnGlideSyncMode.set("enabled", 1-value);
-}
-
-// knbGlideManualRate
-const knbGlideManualRate = Content.addKnob("GlideManualRate", 300, 250);
-knbGlideManualRate.set("text", "Manual Rate");
-knbGlideManualRate.set("mode", "Time");
-knbGlideManualRate.setRange(50, 1000, 1);
-knbGlideManualRate.set("middlePosition", 500);
-
-// knbGlideManual
-const knbGlideManual = Content.addKnob("GlideManualValue", 300, 300);
-knbGlideManual.set("text", "Glide Manual");
-knbGlideManual.set("mode", "NormalizedPercentage");
-knbGlideManual.setControlCallback(onknbGlideManualControl);
-
-inline function onknbGlideManualControl(component, value)
-{
-    if (btnGlideManual.getValue())
-    {   
-        if (value < lastManualGlideValue != glideDirection)
-            glideDirection = value < lastManualGlideValue;
-
-        manualGlide(value, glideDirection);
-        lastManualGlideValue = value;
-    }
-}
-
 // btnBreath
-const btnBreath = Content.addButton("Breath", 460, 210);
+const btnBreath = Content.addButton("Breath", 10, 260);
 
 // knbPressure
-const knbPressure = Content.addKnob("Pressure", 450, 250);
+const knbPressure = Content.addKnob("Pressure", 150, 250);
 knbPressure.setRange(0, 127, 1);
 knbPressure.setControlCallback(onknbPressureControl);
 
 inline function onknbPressureControl(component, value)
 {
-    if (!btnBypass.getValue() && btnBreath.getValue() && !isChord)
+    if (!btnMute.getValue() && btnBreath.getValue())
     {
         local trigger = knbTriggerLevel.getValue();
 
@@ -327,13 +223,13 @@ inline function onknbPressureControl(component, value)
 }
 
 // knbTriggerLevel
-const knbTriggerLevel = Content.addKnob("TriggerLevel", 450, 300);
+const knbTriggerLevel = Content.addKnob("TriggerLevel", 300, 250);
 knbTriggerLevel.set("text", "Trigger Level");
 knbTriggerLevel.set("defaultValue", 6);
 knbTriggerLevel.setRange(6, 127, 1);
 
 // btnPressureVelocity
-const btnPressureVelocity = Content.addButton("PressureVelocity", 460, 360);
+const btnPressureVelocity = Content.addButton("PressureVelocity", 460, 260);
 btnPressureVelocity.set("text", "Pressure = Velocity");
 
 // Pressure timer
@@ -376,18 +272,9 @@ inline function getFadeTime(max, lastTime)
 
 inline function getGlideTimerRate(interval, velocity)
 {
-    local value = knbGlideRate.getValue();
-    local rand = Math.randInt(-knbGlideRateVar.getValue(), knbGlideRateVar.getValue() + 1) / 100;
-    local result = value;
-
-    if (btnGlideVelocity.getValue())
-        result = value - (value - 50) / (127 / velocity);
-    else if (btnGlideSyncMode.getValue())        
-        result = Engine.getMilliSecondsForTempo(value);    
-
-    result = result + result * rand;
-        
-    return Math.max(0.04, result / 1000 / interval);
+    local base = 500 * interval / 2;
+    local rate = base - (base * (1 / 127 * (velocity - 20)));
+    return Math.max(40, rate / interval);
 }
 
 inline function updatePitchBendTables()
@@ -414,27 +301,6 @@ inline function updatePitchBendTables()
 	}
 }
 
-inline function manualGlide(value, direction)
-{
-    if (glideOrigin != -99 && glideTarget != -99 && glideNote != -99)
-    {
-        local interval = Math.abs(glideOrigin - glideTarget);
-        local bend = (100 * (1 - direction)) - (100 * direction);
-        local rate = knbGlideManualRate.getValue();// / interval;
-        
-        if (glideOrigin > glideTarget)
-            glideNote = glideOrigin - Math.round(interval * value);
-        else
-            glideNote = glideOrigin + Math.round(interval * value);
-
-        if (glideNote != lastGlideNote)
-        {
-            playGlideNote(rate, bend);
-            lastGlideNote = glideNote;
-        }
-    }
-}
-
 inline function playLegatoNote(note)
 {
     if (eventId0 != -99)
@@ -448,8 +314,15 @@ inline function playLegatoNote(note)
 
         // Crossfade pitch
         local bendTm = fadeTm / 100 * knbBendTm.getValue();
-        local bendAmt = pitchBend[lastNote > note][interval];
+        local bendAmt;
+
+        if (interval > 0)
+            bendAmt = pitchBend[lastNote > note][interval];
+        else
+            bendAmt = pitchBend[0][1] / 2;
+            
         local rand = Math.randInt(-knbBendVar.getValue(), knbBendVar.getValue() + 1) / 100;
+
         bendAmt = bendAmt + bendAmt * rand;
 
         if (bendAmt !== 0 && bendTm > 0)
@@ -490,101 +363,83 @@ inline function playGlideNote(rate, bend)
     }
 }function onNoteOn()
 {        
-    local n = Message.getNoteNumber();
-    velocity = Message.getVelocity();
-    channel = Message.getChannel();
-    coarseDetune = Message.getCoarseDetune();
-    fineDetune = Message.getFineDetune();
-    transposition = Message.getTransposeAmount();
-        
-	if (!btnBypass.getValue())
+	if (!btnMute.getValue())
     {
         Synth.stopTimer();
 
-        isChord = (Engine.getUptime() - lastTime) < 0.025;
+        local n = Message.getNoteNumber();
+        velocity = Message.getVelocity();
 
-        if (!isChord)
+        channel = Message.getChannel();
+        coarseDetune = Message.getCoarseDetune();
+        fineDetune = Message.getFineDetune();
+        transposition = Message.getTransposeAmount();
+
+        if (btnBreath.getValue() && lastPressure < knbTriggerLevel.getValue())
+            Message.ignoreEvent(true);
+        else
         {
-            if (btnBreath.getValue() && lastPressure < knbTriggerLevel.getValue())
-                Message.ignoreEvent(true);
-            else
+            if (lastNote != -99)
             {
-                if (lastNote != -99)
+                // Calculate interval
+                interval = Math.abs(lastNote - n);
+
+                if (btnGlide.getValue() && Synth.isLegatoInterval() && (knbGlideMax.getValue() == 0 || interval <= knbGlideMax.getValue())) // Glide 
                 {
-                    // Calculate interval
-                    interval = Math.abs(lastNote - n);
+                    Message.ignoreEvent(true);
 
-                    if (btnGlide.getValue() && (knbGlideMax.getValue() == 0 || interval <= knbGlideMax.getValue())) // Glide 
-                    {
-                        Message.ignoreEvent(true);
+                    glideNote = lastNote;
+                    glideOrigin = lastNote;
+                    glideTarget = n;
 
-                        glideNote = lastNote;
-                        glideOrigin = lastNote;
-                        glideTarget = n;
+                    glideRate = getGlideTimerRate(interval, velocity);
 
-                        if (btnGlideManual.getValue())
-                        {
-                            lastGlideNote = lastNote;
-
-                            // Make sure origin is always lower than target
-                            if (lastNote > n)
-                            {
-                                glideOrigin = n;
-                                glideTarget = lastNote;
-                            }
-                        }
-                        else 
-                        {
-                            local rate = getGlideTimerRate(interval, velocity);
-                            Synth.startTimer(rate);
-                        }
-                    }
-                    else // Legato 
-                    {
-                        // Cap interval at 11 semitones
-                        interval = Math.min(interval, 11);
-
-                        Message.setStartOffset(legatoOffset);
-                        eventId1 = Message.makeArtificial();
-
-                        if (knbXfadeTm.getValue() > 0)
-                            playLegatoNote(n);
-                        else
-                            Synth.noteOffByEventId(eventId0);
-
-                        eventId0 = eventId1;
-                    }
+                    Synth.startTimer(glideRate / 1000);
                 }
-                else
+                else // Legato 
                 {
-                    // First note of phrase
-                    Message.setGain(0);
-                    eventId0 = Message.makeArtificial();
+                    // Cap interval at 11 semitones
+                    interval = Math.min(interval, 11);
+    
+                    Message.setStartOffset(legatoOffset);
+                    eventId1 = Message.makeArtificial();
+
+                    if (knbXfadeTm.getValue() > 0)
+                        playLegatoNote(n);
+                    else
+                        Synth.noteOffByEventId(eventId0);
+
+                    eventId0 = eventId1;
                 }
             }
-
-            lastTime = Engine.getUptime();
-            retriggerNote = lastNote;
-            lastNote = n;
+            else // First note of phrase
+            {
+                Message.setGain(0);
+                eventId0 = Message.makeArtificial();
+            }
         }
     }
+      
+    lastTime = Engine.getUptime();
+    retriggerNote = lastNote;
+    lastNote = n;
 } function onNoteOff()
 {
-    if (!btnBypass.getValue())
+    if (!btnMute.getValue())
     {
         local n = Message.getNoteNumber();
         local transposition = Message.getTransposeAmount();
-    
+
         Synth.stopTimer();
 
         if (n == retriggerNote)
             retriggerNote = -99;
-        
+
         // Sustain pedal retrigger
 		if (btnRetrigger.getValue())
             retriggerNote = lastNote;
-            
-        if (n == lastNote && !btnAutoHold.getValue())
+
+        if (n == lastNote)
         {
             Message.ignoreEvent(true);
 
@@ -592,18 +447,17 @@ inline function playGlideNote(rate, bend)
             {
                 if (btnGlide.getValue() && !btnRetrigger.getValue())
                 {
-                    if (!btnGlideManual.getValue())
-                    {
-                        glideNote = n;
-                        glideOrigin = n;
-                        glideTarget = retriggerNote;
+                    glideNote = n;
+                    glideOrigin = n;
+                    glideTarget = retriggerNote;
 
-                        local rate = getGlideTimerRate(interval, velocity);
-                        Synth.startTimer(rate);
-                    }
+                    local rate = getGlideTimerRate(interval, velocity);
+                    Synth.startTimer(rate);
                 }
                 else
-                {                    
+                {
+                    interval = 0;
+
                     eventId1 = Synth.playNoteWithStartOffset(channel, retriggerNote + transposition, velocity, legatoOffset);
 
                     if (knbXfadeTm.getValue() > 0)
@@ -640,19 +494,40 @@ inline function playGlideNote(rate, bend)
 }
  function onController()
 {
-	
+    if (!btnMute.getValue())
+    {
+        if (Message.getControllerNumber() == 64)
+        {
+            //Turn off the last note if the sutain pedal is lifted and last note is still playing
+            if (!Synth.isSustainPedalDown() && Synth.getNumPressedKeys() == 0 && eventId0 != -99)
+            {
+                Synth.noteOffByEventId(eventId0);
+                eventId0 = -99;
+                lastNote = -99;
+            }
+
+            btnRetrigger.setValue(Synth.isSustainPedalDown());
+            btnGlide.setValue(Synth.isSustainPedalDown());
+        }
+    }	
 }
  function onTimer()
 {
     local direction = glideOrigin > glideTarget;
     local bend = (100 * (1 - direction)) - (100 * direction);
-    local rate = getGlideTimerRate(interval, velocity);
+    local rand = Math.randInt(-10, 11) / 100;
+    local rate = glideRate + glideRate * rand;
     
     if (direction)
         glideNote--;
     else
         glideNote++;
 
+    // Apply a curve to the rate so it speeds up
+    local step = Math.abs(glideNote - glideOrigin) - 1;
+    local percent = 0.85 / interval * step;
+    rate = rate - rate * percent;
+        
     // Stop timer when target is reached
     if ((glideTarget > glideOrigin && glideNote > glideTarget) || (glideTarget < glideOrigin && glideNote < glideTarget) || (eventId[0] == -99 || glideNote == -99))
     {
@@ -663,8 +538,8 @@ inline function playGlideNote(rate, bend)
     // Play next glide note
     if (Synth.isTimerRunning())
     {
-        playGlideNote(rate * 1000, bend);
-        Synth.startTimer(rate);
+        playGlideNote(rate, bend);
+        Synth.startTimer(rate / 1000);
     }
 }function onControl(number, value)
 {
