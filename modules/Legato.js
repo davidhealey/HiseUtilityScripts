@@ -52,6 +52,18 @@ reg pressureReadings = 1;
 
 // btnMute
 const btnMute = Content.addButton("Mute", 10, 10);
+btnMute.setControlCallback(onbtnMuteControl);
+
+inline function onbtnMuteControl(component, value)
+{
+    if (!value)
+    {
+        eventId0 = -99;
+        eventId1 = -99;
+        lastNote = -99;
+        retriggerNote = -99;
+    }
+}
 
 // knbOffset
 const knbLegatoOffset = Content.addKnob("LegatoOffset", 0, 50);
