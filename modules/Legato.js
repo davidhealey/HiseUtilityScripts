@@ -337,13 +337,13 @@ inline function playLegatoNote(note)
 
         bendAmt = bendAmt + bendAmt * rand;
 
-        if (bendAmt !== 0 && bendTm > 0)
+        if (bendAmt != 0 && bendTm > 0)
         {
-            local coarse = coarseDetune + Math.round((-bendAmt + fineDetune) / 100);
-            local fine = ((-bendAmt + fineDetune) % 100);
+            local coarse = coarseDetune + Math.round((bendAmt + fineDetune) / 100);
+            local fine = ((bendAmt + fineDetune) % 100);
 
-            Synth.addPitchFade(eventId0, bendTm, -coarse, -fine);                        
-            Synth.addPitchFade(eventId1, 0, coarse, fine);
+            Synth.addPitchFade(eventId0, bendTm, coarse, fine);                        
+            Synth.addPitchFade(eventId1, 0, -coarse, -fine);
             Synth.addPitchFade(eventId1, bendTm, coarseDetune, fineDetune);
         }
     }
