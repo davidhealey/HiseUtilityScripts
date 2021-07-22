@@ -339,7 +339,7 @@ inline function playLegatoNote(note)
 
         if (bendAmt != 0 && bendTm > 0)
         {
-            local coarse = coarseDetune + Math.round((bendAmt + fineDetune) / 100);
+            local coarse = coarseDetune + parseInt((bendAmt + fineDetune) / 100);
             local fine = ((bendAmt + fineDetune) % 100);
 
             Synth.addPitchFade(eventId0, bendTm, coarse, fine);                        
@@ -354,12 +354,13 @@ inline function playGlideNote(rate, bend)
     if (eventId0 != -99)
     {
         local rand = Math.randInt(-knbGlideBendVar.getValue(), knbGlideBendVar.getValue() + 1) / 100;
-        local pitchBend = bend + bend * rand;
-        local coarse = coarseDetune + coarseDetune * rand;
-        local fine = fineDetune + fineDetune * rand;
+        local bendAmt = bend + bend * rand;
+        
+        local coarse = parseInt(bendAmt / 100);
+        local fine = (fineDetune + bendAmt) % 100;
 
         // Fade out old note
-        Synth.addPitchFade(eventId0, rate, 0, pitchBend);
+        Synth.addPitchFade(eventId0, rate, coarseDetune + coarse, fine);
         Synth.addVolumeFade(eventId0, rate, -100);
 
         // Play new note
@@ -368,8 +369,8 @@ inline function playGlideNote(rate, bend)
         // Fade in new note
         Synth.addVolumeFade(eventId1, 0, -99);
         Synth.addVolumeFade(eventId1, rate, 0);
-        Synth.addPitchFade(eventId1, 0, 0, -pitchBend);
-        Synth.addPitchFade(eventId1, rate, coarse, fine);
+        Synth.addPitchFade(eventId1, 0, coarseDetune - coarse, -fine);
+        Synth.addPitchFade(eventId1, rate, coarseDetune, fineDetune);
 
         eventId0 = eventId1;
     }
