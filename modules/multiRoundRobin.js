@@ -111,6 +111,9 @@ knbFirstGroup.set("text", "First Group");function onNoteOn()
             if (!knbLock.getValue())
                 s = (s - 1 + Math.randInt(2, 4)) % 3;
 
+            if (!sampler.isNoteNumberMapped(n + (s - 1)))
+                s = 1;
+
             Message.setTransposeAmount(s - 1 + Message.getTransposeAmount());
             Message.setCoarseDetune(-(s - 1) + Message.getCoarseDetune());
         }
