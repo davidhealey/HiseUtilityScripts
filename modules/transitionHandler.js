@@ -42,6 +42,7 @@ reg eventId;function onNoteOn()
     {
         eventId = Synth.playNote(lastNote + Message.getTransposeAmount(), 64);
         Synth.addPitchFade(eventId, 0, Message.getCoarseDetune(), Message.getFineDetune());
+        Synth.addVolumeFade(eventId, 0, Message.getGain());
         lastNote = retriggerNote;
     }
 }
