@@ -55,7 +55,8 @@ inline function playReleaseNote(noteNumber, velocity)
 
     noteIds.setValue(noteNumber, Synth.playNote(noteNumber+Message.getTransposeAmount(), velocity));
     Synth.addPitchFade(noteIds.getValue(noteNumber), 0, c, f);
-
+    Synth.addVolumeFade(noteIds.getValue(noteNumber), 0, Message.getGain());
+    
     if (btnAttenuate.getValue()) //Attenuation is enabled
     {
         //Use delay between this note and last note to calculate the table value based on the user set time (knbTime)
@@ -110,7 +111,7 @@ function onController()
 }
 function onTimer()
 {
-
+	
 }
  function onControl(number, value)
 {
