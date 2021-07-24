@@ -33,6 +33,7 @@ reg transposition = 0;
 reg lastTime = 0;
 reg channel;
 reg velocity;
+reg gain;
 
 reg legatoOffset;
 reg glideOffset;
@@ -368,7 +369,7 @@ inline function playGlideNote(rate, bend)
 
         // Fade in new note
         Synth.addVolumeFade(eventId1, 0, -99);
-        Synth.addVolumeFade(eventId1, rate, 0);
+        Synth.addVolumeFade(eventId1, rate, gain);
         Synth.addPitchFade(eventId1, 0, coarseDetune - coarse, -fine);
         Synth.addPitchFade(eventId1, rate, coarseDetune, fineDetune);
 
@@ -384,6 +385,7 @@ inline function playGlideNote(rate, bend)
         velocity = Message.getVelocity();
 
         channel = Message.getChannel();
+        gain = Message.getGain();
         coarseDetune = Message.getCoarseDetune();
         fineDetune = Message.getFineDetune();
         transposition = Message.getTransposeAmount();
@@ -427,7 +429,6 @@ inline function playGlideNote(rate, bend)
             }
             else // First note of phrase
             {
-                Message.setGain(0);
                 eventId0 = Message.makeArtificial();
             }
         }
