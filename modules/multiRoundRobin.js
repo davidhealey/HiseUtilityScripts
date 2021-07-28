@@ -103,7 +103,7 @@ knbFirstGroup.set("text", "First Group");function onNoteOn()
 
         //Velocity
         if (btnModes[1].getValue())
-            Message.setVelocity(v * btnVelocityOffset.getValue() + s);
+            Message.setVelocity(v * btnVelocityOffset.getValue() + s + 1);
 
         //Borrowed
         if (btnModes[2].getValue())
