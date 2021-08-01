@@ -50,6 +50,7 @@ inline function onbtnModesControl(component, value)
     knbCount.showControl(btnModes[0].getValue() || btnModes[1].getValue());
     knbFirstGroup.showControl(btnModes[0].getValue());
     btnVelocityOffset.showControl(btnModes[1].getValue());
+    btnVelocitySpread.showControl(btnModes[1].getValue());
 }
 
 // Random
@@ -58,7 +59,7 @@ const btnRandom = Content.addButton("Random", 10, 70);
 // RR Count
 const knbCount = Content.addKnob("Count", 10, 120);
 knbCount.set("text", "Count");
-knbCount.setRange(0, 50, 1);
+knbCount.setRange(0, 30, 1);
 
 // RR Lock
 const knbLock = Content.addKnob("Lock", 610, 0);
@@ -75,6 +76,7 @@ knbReset.setRange(0, 5, 1);
 const btnVelocityOffset = Content.addButton("VelocityOffset", 310, 70);
 btnVelocityOffset.set("text", "Velocity Offset");
 
+// Velocity spread
 const btnVelocitySpread = Content.addButton("VelocitySpread", 310, 130);
 btnVelocitySpread.set("text", "Velocity Spread");
 
