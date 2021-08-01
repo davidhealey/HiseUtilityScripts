@@ -75,6 +75,9 @@ knbReset.setRange(0, 5, 1);
 const btnVelocityOffset = Content.addButton("VelocityOffset", 310, 70);
 btnVelocityOffset.set("text", "Velocity Offset");
 
+const btnVelocitySpread = Content.addButton("VelocitySpread", 310, 130);
+btnVelocitySpread.set("text", "Velocity Spread");
+
 // knbFirstGroup
 const knbFirstGroup = Content.addKnob("FirstGroup", 160, 60);
 knbFirstGroup.setRange(1, 50, 1);
@@ -103,7 +106,12 @@ knbFirstGroup.set("text", "First Group");function onNoteOn()
 
         //Velocity
         if (btnModes[1].getValue())
-            Message.setVelocity(v * btnVelocityOffset.getValue() + s + 1);
+        {
+            if (btnVelocitySpread.getValue())
+                Message.setVelocity(128 / knbCount.getValue() * s + 1);
+            else
+                Message.setVelocity(v * btnVelocityOffset.getValue() + s + 1);
+        }
 
         //Borrowed
         if (btnModes[2].getValue())
