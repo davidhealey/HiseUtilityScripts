@@ -4,7 +4,7 @@ knbVelocity.set("text", "Velocity");
 knbVelocity.setRange(0, 127, 1);
 
 // knbNoteOffset
-const var knbNoteOffset = Content.addKnob("NoteOffset", 150, 0);
+const knbNoteOffset = Content.addKnob("NoteOffset", 150, 0);
 knbNoteOffset.set("text", "Note Offset");
 knbNoteOffset.setRange(-127, 127, 1);function onNoteOn()
 {
