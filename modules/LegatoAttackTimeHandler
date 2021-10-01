@@ -1,0 +1,65 @@
+Synth.deferCallbacks(true);
+
+reg attack;
+reg lastAttack;
+reg lastTime;
+reg lastNote;
+
+// Table Envelopes
+const envelopes = [];
+envelopes.push(Synth.getModulator("sampler0GainTable0"));
+envelopes.push(Synth.getModulator("sampler0GroupXFTable0"));
+
+// knbMax
+const knbMax = Content.addKnob("Max", 0, 0);
+knbMax.set("text", "Max");
+knbMax.setRange(50, 1000, 1);
+knbMax.set("suffix", "ms");function onNoteOn()
+{
+    local n = Message.getNoteNumber();
+    local v = Message.getVelocity();
+
+    attack = knbMax.getValue();
+
+    if (v > 20)
+    {
+        if (Synth.isLegatoInterval() && n != lastNote)
+        {
+            attack = knbMax.getValue() / 2;
+        }   
+        else
+        {
+            if (Engine.getUptime() - lastTime < 0.2)
+                attack = knbMax.getValue() / 3;
+            else if (Engine.getUptime() - lastTime < 0.6)
+                attack = knbMax.getValue() / 2;
+        }
+    }
+    
+    if (attack != lastAttack)
+    {
+        for (e in envelopes)
+            e.setAttribute(e.Attack, attack);
+    }
+        
+    lastAttack = attack;
+    lastTime = Engine.getUptime();
+    lastNote = n;
+}
+ function onNoteOff()
+{
+	
+}
+ function onController()
+{
+	
+}
+ function onTimer()
+{
+	
+}
+ function onControl(number, value)
+{
+	
+}
+ 
