@@ -34,6 +34,7 @@ reg lastTime = 0;
 reg channel;
 reg velocity;
 reg gain;
+reg isChord = false;
 
 reg legatoOffset;
 reg glideOffset;
@@ -159,6 +160,9 @@ inline function onknbBendControl(component, value)
 {
     updatePitchBendTables();
 }
+
+// btnChords
+const btnChords = Content.addButton("Chords", 10, 160);
 
 // btnGlide
 const btnGlide = Content.addButton("Glide", 10, 210);
@@ -389,54 +393,62 @@ inline function playGlideNote(rate, bend)
         coarseDetune = Message.getCoarseDetune();
         fineDetune = Message.getFineDetune();
         transposition = Message.getTransposeAmount();
+        isChord = ((Engine.getUptime() - lastTime) < 0.025) * btnChords.getValue();
 
-        if (btnBreath.getValue() && lastPressure < knbTriggerLevel.getValue())
-            Message.ignoreEvent(true);
-        else
-        {
-            if (lastNote != -99)
-            {
-                // Calculate interval
-                interval = Math.abs(lastNote - n);
+		if (!isChord)
+		{
+	        if (btnBreath.getValue() && lastPressure < knbTriggerLevel.getValue())
+	        {
+		        Message.ignoreEvent(true);
+	        }            
+	        else
+	        {
+	            if (lastNote != -99)
+	            {
+	                // Calculate interval
+	                interval = Math.abs(lastNote - n);
+	
+	                if (btnGlide.getValue() && Synth.isLegatoInterval() && (knbGlideMax.getValue() == 0 || interval <= knbGlideMax.getValue())) // Glide 
+	                {
+	                    Message.ignoreEvent(true);
+	
+	                    glideNote = lastNote;
+	                    glideOrigin = lastNote;
+	                    glideTarget = n;
+	
+	                    glideRate = getGlideTimerRate(interval, velocity);
+	
+	                    Synth.startTimer(glideRate / 1000);
+	                }
+	                else // Legato 
+	                {
+	                    // Cap interval at 11 semitones
+	                    interval = Math.min(interval, 11);
+	    
+	                    Message.setStartOffset(legatoOffset);
+	                    eventId1 = Message.makeArtificial();
+	
+	                    if (knbXfadeTm.getValue() > 0)
+	                        playLegatoNote(n);
+	                    else
+	                        Synth.noteOffByEventId(eventId0);
+	
+	                    eventId0 = eventId1;
+	                }
+	            }
+	            else // First note of phrase
+	            {
+	                eventId0 = Message.makeArtificial();
+	            }
+	        }
 
-                if (btnGlide.getValue() && Synth.isLegatoInterval() && (knbGlideMax.getValue() == 0 || interval <= knbGlideMax.getValue())) // Glide 
-                {
-                    Message.ignoreEvent(true);
-
-                    glideNote = lastNote;
-                    glideOrigin = lastNote;
-                    glideTarget = n;
-
-                    glideRate = getGlideTimerRate(interval, velocity);
-
-                    Synth.startTimer(glideRate / 1000);
-                }
-                else // Legato 
-                {
-                    // Cap interval at 11 semitones
-                    interval = Math.min(interval, 11);
-    
-                    Message.setStartOffset(legatoOffset);
-                    eventId1 = Message.makeArtificial();
-
-                    if (knbXfadeTm.getValue() > 0)
-                        playLegatoNote(n);
-                    else
-                        Synth.noteOffByEventId(eventId0);
-
-                    eventId0 = eventId1;
-                }
-            }
-            else // First note of phrase
-            {
-                eventId0 = Message.makeArtificial();
-            }
+	        lastTime = Engine.getUptime();
+	        retriggerNote = lastNote;
+	        lastNote = n;
         }
     }
       
-    lastTime = Engine.getUptime();
-    retriggerNote = lastNote;
-    lastNote = n;
+
 } function onNoteOff()
 {
     if (!btnMute.getValue())
