@@ -82,8 +82,16 @@ btnVelocitySpread.set("text", "Velocity Spread");
 
 // knbFirstGroup
 const knbFirstGroup = Content.addKnob("FirstGroup", 160, 60);
+knbFirstGroup.setControlCallback(onknbFirstGroupControl);
 knbFirstGroup.setRange(1, 50, 1);
-knbFirstGroup.set("text", "First Group");function onNoteOn()
+knbFirstGroup.set("text", "First Group");
+
+inline function onknbFirstGroupControl(component, value)
+{
+	step.fill(0);
+	lastStep.fill(0);
+	lastTime.fill(0);
+}function onNoteOn()
 {
     if (!btnMute.getValue() && (btnModes[0].getValue() || btnModes[1].getValue() || btnModes[2].getValue()))
     {
