@@ -20,4 +20,10 @@ namespace l10n
 	const systemInfo = Engine.getSystemStats();
 	
 	//Console.print(trace(systemInfo));
+	
+	// #TODO
+	inline function get(input)
+	{
+		return input;
+	}
 }
