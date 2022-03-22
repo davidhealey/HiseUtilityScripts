@@ -3,34 +3,32 @@
 
 namespace PreloadBar
 {
-    var _component;
+    reg component;
 
-    inline function init(panelId, props)
+    inline function init(panelId, properties)
     {
-        _component = Content.getComponent(panelId);
+        component = Content.getComponent(panelId);
 
-        if (typeof props == "object")
+        if (typeof properties == "object")
         {
-            for (p in props)
-            {
-                _component.set(p, props[p]);
-            }
+            for (p in properties)
+                component.set(p, properties[p]);
         }
         
-        _component.setPaintRoutine(function(g)
+        component.setPaintRoutine(function(g)
         {
 	        g.fillAll(this.get("bgColour"));
 	        g.setColour(this.get("itemColour"));
 	        g.fillRect([0, 0, this.getWidth() * this.data.progress, this.getHeight()]);
         });
         
-        _component.setTimerCallback(function()
+        component.setTimerCallback(function()
         {
             this.data.progress = Engine.getPreloadProgress();
             this.repaint();	
         });
         
-        _component.setLoadingCallback(function(isPreloading)
+        component.setLoadingCallback(function(isPreloading)
         {
             this.data.progress = 0.0;
             this.set("visible", isPreloading);
@@ -40,6 +38,6 @@ namespace PreloadBar
     
     inline function setPosition(x, y, w, h)
     {
-        _component.setPosition(x, y, w, h);
+        component.setPosition(x, y, w, h);
     }
 }

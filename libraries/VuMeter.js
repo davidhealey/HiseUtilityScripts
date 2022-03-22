@@ -16,10 +16,7 @@ namespace VuMeter
 	{
 		local widget = Content.getComponent(name);
     
-		Content.setPropertiesFromJSON(name, {
-		"saveInPreset": false,
-		"opaque": 1
-		});
+		Content.setPropertiesFromJSON(name, {"saveInPreset": false, "opaque": 1});
     	
 		widget.setPaintRoutine(function(g)
 		{
@@ -36,9 +33,7 @@ namespace VuMeter
 			g.setColour(this.get("itemColour2"));
     	
 			for(i = 1; i < this.getHeight()-1; i = i + 3)
-			{
 				g.fillRect([1, i, this.getWidth()-2, 1]);
-			}
 		});
     
 		widget.setTimerCallback(function()
@@ -56,9 +51,7 @@ namespace VuMeter
 				lvalue = getNormalizedPeakValue(Engine.getMasterPeakLevel(0));
 				rvalue = getNormalizedPeakValue(Engine.getMasterPeakLevel(1));
 			}
-			
-			
-    	
+			    	
 			this.data.lvalue = Math.max(lvalue, this.data.lvalue - 0.04);
 			this.data.rvalue = Math.max(rvalue, this.data.rvalue - 0.04);
     	
@@ -66,6 +59,7 @@ namespace VuMeter
 		});
     
 		widget.startTimer(30);
+
 		return widget;
 	};
 
