@@ -1,7 +1,7 @@
 //License - Public Domain
 //David Healey 2019
 
-const var NUM_CHANNELS = 3;
+const var NUM_CHANNELS = 4;
 
 const var samplerIds = Synth.getIdList("Sampler");
 const var samplers = [];
