@@ -1,5 +1,5 @@
 /*
-    Copyright 2018, 2019, 2020, 2021 David Healey
+    Copyright 2018, 2019, 2020, 2021, 2022 David Healey
 
     This file is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -8,7 +8,7 @@
 
     This file is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
@@ -320,7 +320,7 @@ inline function updatePitchBendTables()
 
 inline function playLegatoNote(note)
 {
-    if (eventId0 != -99)
+    if (eventId0 != -99 && Synth.isArtificialEventActive(eventId0))
     {
         local fadeTm = getFadeTime(knbXfadeTm.getValue(), lastTime);
 
@@ -380,7 +380,7 @@ inline function playGlideNote(rate, bend)
         eventId0 = eventId1;
     }
 }function onNoteOn()
-{        
+{
 	if (!btnMute.getValue())
     {
         Synth.stopTimer();
@@ -456,8 +456,6 @@ inline function playGlideNote(rate, bend)
         local n = Message.getNoteNumber();
         local transposition = Message.getTransposeAmount();
 
-        Synth.stopTimer();
-
         if (n == retriggerNote)
             retriggerNote = -99;
 
@@ -501,7 +499,7 @@ inline function playGlideNote(rate, bend)
             }
             else
             {
-                if (eventId0 != -99)
+                if (eventId0 != -99 && Synth.isArtificialEventActive(eventId0))
                     Synth.noteOffByEventId(eventId0);
 
                 eventId0 = -99;
@@ -553,6 +551,9 @@ inline function playGlideNote(rate, bend)
     local step = Math.abs(glideNote - glideOrigin) - 1;
     local percent = 0.85 / interval * step;
     rate = rate - rate * percent;
+    
+    if (rate < 0)
+    	rate = 10;
         
     // Stop timer when target is reached
     if ((glideTarget > glideOrigin && glideNote > glideTarget) || (glideTarget < glideOrigin && glideNote < glideTarget) || (eventId[0] == -99 || glideNote == -99))
@@ -567,6 +568,7 @@ inline function playGlideNote(rate, bend)
         playGlideNote(rate, bend);
         Synth.startTimer(rate / 1000);
     }
+    
 }function onControl(number, value)
 {
 	
