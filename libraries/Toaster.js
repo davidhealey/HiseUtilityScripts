@@ -65,9 +65,9 @@ namespace Toaster
 	
 	pnlToaster.setTimerCallback(function()
 	{
-		if (count < 35 && this.getValue() < 1.0)
+		if (count < 30 && this.getValue() < 1.0)
 			this.setValue(this.getValue() + 0.1);
-		else if (count > 35)
+		else if (count > 30)
 			this.setValue(this.getValue() - 0.1);
 			
 		count++;
@@ -86,7 +86,7 @@ namespace Toaster
 		pnlToaster.data.mode = mode;
 		pnlToaster.data.message = msg;
 		count = 0;
-		pnlToaster.startTimer(80);
+		pnlToaster.startTimer(50);
 	}
 	
 	inline function top(msg)
