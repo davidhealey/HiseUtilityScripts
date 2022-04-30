@@ -51,8 +51,10 @@ namespace Toaster
 
 			case MODES.Centre:
 				a = this.getLocalBounds(a[2] / 3.0);
-				g.setColour(Colours.withAlpha(this.get("bgColour"), this.getValue() / 2));
-				g.fillRoundedRectangle(a, 10);
+				g.setColour(Colours.withAlpha(this.get("bgColour"), 0.8 * this.getValue()));
+				g.fillRoundedRectangle(a, 8);
+				g.setColour(Colours.withAlpha(this.get("itemColour"), 0.7 * this.getValue()));
+				g.drawRoundedRectangle(a, 8, 2);
 				break;
 			
 			default:
@@ -63,11 +65,17 @@ namespace Toaster
 		g.drawFittedText(this.data.message, a, "centred", 2, 1);
 	});
 	
+	pnlToaster.setMouseCallback(function(event)
+	{
+		if (event.clicked)
+			count = 100;
+	});
+	
 	pnlToaster.setTimerCallback(function()
 	{
-		if (count < 30 && this.getValue() < 1.0)
+		if (count < 40 && this.getValue() < 1.0)
 			this.setValue(this.getValue() + 0.1);
-		else if (count > 30)
+		else if (count > 40)
 			this.setValue(this.getValue() - 0.1);
 			
 		count++;
@@ -86,7 +94,7 @@ namespace Toaster
 		pnlToaster.data.mode = mode;
 		pnlToaster.data.message = msg;
 		count = 0;
-		pnlToaster.startTimer(50);
+		pnlToaster.startTimer(60);
 	}
 	
 	inline function top(msg)
@@ -103,7 +111,7 @@ namespace Toaster
 	{
 		show(MODES.Centre, msg);
 	}
-	
+
 	inline function hide()
 	{
 		pnlToaster.showControl(false);
