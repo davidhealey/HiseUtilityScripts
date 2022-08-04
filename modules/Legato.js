@@ -79,12 +79,13 @@ inline function onknbLegatoOffsetControl(component, value)
     legatoOffset = Engine.getSamplesForMilliSeconds(value);
 }
 
-// btnRetrigger
-const btnRetrigger = Content.addButton("Retrigger", 10, 110);
-btnRetrigger.setTooltip("Enable/Disable same note legato retrigger");
-btnRetrigger.setControlCallback(onbtnRetriggerControl);
+// btnSameNoteRetrigger
+const btnSameNoteRetrigger = Content.addButton("SameNoteRetrigger", 10, 160);
+btnSameNoteRetrigger.set("text", "Same Note Retrigger");
+btnSameNoteRetrigger.setTooltip("Enable/Disable same note legato retrigger");
+btnSameNoteRetrigger.setControlCallback(onbtnSameNoteRetriggerControl);
 
-inline function onbtnRetriggerControl(component, value)
+inline function onbtnSameNoteRetriggerControl(component, value)
 {
     // Turn off the last note if still playing
     if (!Synth.getNumPressedKeys() && eventId0 != -99)
@@ -94,6 +95,11 @@ inline function onbtnRetriggerControl(component, value)
         lastNote = -99;
     }
 }
+
+// btnLastNoteRetrigger
+const btnLastNoteRetrigger = Content.addButton("LastNoteRetrigger", 150, 160);
+btnLastNoteRetrigger.set("text", "Last Note Retrigger");
+btnLastNoteRetrigger.setTooltip("Enable/Disable last note legato retrigger");
 
 // knbXfadeTm
 const knbXfadeTm = Content.addKnob("XfadeTm", 150, 0);
@@ -162,7 +168,7 @@ inline function onknbBendControl(component, value)
 }
 
 // btnChords
-const btnChords = Content.addButton("Chords", 10, 160);
+const btnChords = Content.addButton("Chords", 300, 160);
 
 // btnGlide
 const btnGlide = Content.addButton("Glide", 10, 210);
@@ -456,11 +462,11 @@ inline function playGlideNote(rate, bend)
         local n = Message.getNoteNumber();
         local transposition = Message.getTransposeAmount();
 
-        if (n == retriggerNote)
+        if (n == retriggerNote || !btnLastNoteRetrigger.getValue())
             retriggerNote = -99;
 
-        // Sustain pedal retrigger
-		if (btnRetrigger.getValue())
+        // Sustain pedal same note retrigger
+		if (btnSameNoteRetrigger.getValue())
             retriggerNote = lastNote;
 
         if (n == lastNote)
@@ -469,7 +475,7 @@ inline function playGlideNote(rate, bend)
 
             if (retriggerNote != -99 && eventId0 != -99 && (!btnBreath.getValue() || lastPressure > knbTriggerLevel.getValue()))
             {
-                if (btnGlide.getValue() && !btnRetrigger.getValue())
+                if (btnGlide.getValue() && !btnSameNoteRetrigger.getValue())
                 {
                     glideNote = n;
                     glideOrigin = n;
@@ -530,7 +536,7 @@ inline function playGlideNote(rate, bend)
                 lastNote = -99;
             }
 
-            btnRetrigger.setValue(Synth.isSustainPedalDown());
+            btnSameNoteRetrigger.setValue(Synth.isSustainPedalDown());
             btnGlide.setValue(Synth.isSustainPedalDown());
         }
     }	
