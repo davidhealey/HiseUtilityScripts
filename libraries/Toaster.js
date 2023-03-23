@@ -96,7 +96,7 @@ namespace Toaster
 		count = 0;
 		pnlToaster.startTimer(60);
 	}
-	
+
 	inline function top(msg)
 	{
 		show(MODES.Top, msg);

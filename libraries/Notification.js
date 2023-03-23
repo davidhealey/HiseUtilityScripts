@@ -39,25 +39,15 @@ namespace Notification
 		if (event.clicked)
 			pnlNotification.data.counter = 120;
 	});
-		
-	// btnNotificationClose
-	const btnNotificationClose = Content.getComponent("btnNotificationClose");
-	btnNotificationClose.setLocalLookAndFeel(LookAndFeel.iconButton);
-	btnNotificationClose.setControlCallback(onbtnNotificationCloseControl);
-
-	inline function onbtnNotificationCloseControl(component, value)
-	{
-		if (value)
-			pnlNotification.data.counter = 120;
-	}
 
 	// Functions
 	inline function show(text)
 	{
 		pnlNotification.set("text", text);
+		pnlNotification.showControl(true);
+
 		pnlNotification.data.counter = 0;
 		pnlNotification.set("x", 901);
-		pnlNotification.showControl(true);
 		pnlNotification.startTimer(50);
 	}
 }

@@ -12,7 +12,7 @@ namespace Helpers
 	//Returns note letter only, for letter + octave use built in Engine.getMidiNoteName()
 	inline function noteNumberToLetter(n)
 	{
-		var noteLetters = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+		local noteLetters = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
 		return noteLetters[n % 12];
 	}
 
@@ -189,4 +189,21 @@ namespace Helpers
     
       return c;
   }  
+  
+  inline function mergeObjects(arrayOfObjects)
+{
+	local target = {};
+	
+	for (object in arrayOfObjects)
+	{
+		if (!isDefined(object) || !object.length) continue;
+
+		for (key in object)
+		{
+			target[key] = object[key];
+		}
+	}
+
+	return target;
+}
 }
